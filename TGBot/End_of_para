@@ -1,1 +1,24 @@
+import telebot
+from telebot import types
+import schedule
+import time
+import webbrowser
+import sqlite3
+bot = telebot.TeleBot('7481543693:AAEH4ezJUtlT4BgcCztIx7CRvWfGbSaoeJ8')
 
+name = None
+@bot.message_handler(commands = ['start', 'старт'])
+def start(message):
+
+
+    bot.send_message(message.chat.id, "Пара началась(")
+
+
+    minutes = 90
+    while minutes > -1:
+        bot.send_message(message.chat.id, "До конца пары "+ str(minutes)+ " минут")
+        time.sleep(5)
+        minutes -= 1
+
+
+bot.polling(none_stop = True)
