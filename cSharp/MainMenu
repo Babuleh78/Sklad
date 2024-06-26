@@ -1,0 +1,50 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+public class MainMenu : MonoBehaviour
+{
+    [SerializeField] int money;
+    public Text moneyText;
+    public int totalMoney;
+    public int item1count;
+    public void Start()
+    {
+        money = PlayerPrefs.GetInt("money");
+        totalMoney = PlayerPrefs.GetInt("Tmoney");
+        item1count = PlayerPrefs.GetInt("item1");
+        if (item1count > 0)
+        {
+            StartCoroutine(IdleFarm());
+        }
+    }
+    public void ButtonClick()
+    {
+        money += 1;
+        totalMoney += 1;
+        PlayerPrefs.SetInt("money", money);
+        PlayerPrefs.SetInt("Tmoney", totalMoney);
+    }
+    public void ToAch()
+    {
+        SceneManager.LoadScene(1);
+    }
+    public void ToShop()
+    {
+        SceneManager.LoadScene(2);
+    }
+
+    IEnumerator IdleFarm()
+    {
+        yield return new WaitForSeconds(1);
+        money += item1count;
+       
+        PlayerPrefs.SetInt("money", money);
+        StartCoroutine(IdleFarm());
+    }
+    void Update()
+    {
+        moneyText.text = money.ToString();
+    }
+}
