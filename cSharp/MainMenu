@@ -5,26 +5,33 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] int money;
+    public Text persecText;
+    [SerializeField] Sprite[] images;
+    [SerializeField]  int  money;
+    public int milliard_count;
     public Text moneyText;
-    public int totalMoney;
-    public int item1count;
+    public Image clickimage;
+    public int clickpower;
+    public int plus_on_sec;
     public void Start()
     {
+        
         money = PlayerPrefs.GetInt("money");
-        totalMoney = PlayerPrefs.GetInt("Tmoney");
-        item1count = PlayerPrefs.GetInt("item1");
-        if (item1count > 0)
+        clickimage.sprite = images[0];
+        plus_on_sec = PlayerPrefs.GetInt("sec");
+        clickpower = PlayerPrefs.GetInt("power");
+        if(clickpower == 0) { clickpower = 1; PlayerPrefs.GetInt("power", clickpower); }
+        if (plus_on_sec > 0)
         {
             StartCoroutine(IdleFarm());
         }
     }
     public void ButtonClick()
     {
-        money += 1;
-        totalMoney += 1;
+        money += clickpower;
+        
         PlayerPrefs.SetInt("money", money);
-        PlayerPrefs.SetInt("Tmoney", totalMoney);
+        
     }
     public void ToAch()
     {
@@ -35,16 +42,195 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(2);
     }
 
+  
+    void Update()
+    {
+        if (money <15)
+        {
+            clickimage.sprite = images[money];
+        }
+        moneyText.text = money.ToString();
+        persecText.text = plus_on_sec.ToString();
+    }
+    public void item1()
+    {
+        if (money >= 50)
+        {
+            money -= 50;
+            PlayerPrefs.SetInt("money", money);
+            clickpower += 1;
+            PlayerPrefs.SetInt("power", clickpower);
+        }
+    }
+    public void item2()
+    {
+       
+        if (money >= 250)
+        {
+            money -= 250;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 15;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+       
+    }
+    public void item3()
+    {
+        if (money >= 1000)
+        {
+            money -= 1000;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 25;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+
+    }
+    public void item4()
+    {
+        if (money >= 2000)
+        {
+            money -= 2000;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 100;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+    }
+    public void item5()
+    {
+        if (money >= 10000)
+        {
+            money -= 10000;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 150;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+    }
+    public void item6()
+    {
+        if (money >= 25000)
+        {
+            money -= 25000;
+            PlayerPrefs.SetInt("money", money);
+            clickpower += 500;
+            PlayerPrefs.SetInt("power", clickpower);
+        }
+    }
+    public void item7()
+    {
+        if (money >= 50000)
+        {
+            money -= 50000;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 500;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+    }
+    public void item8()
+    {
+        if (money >= 150000)
+        {
+            money -= 150000;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 1500;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+    }
+    public void item9()
+    {
+        if (money >= 500000)
+        {
+            money -= 500000;
+            PlayerPrefs.SetInt("money", money);
+            clickpower += 2500;
+            PlayerPrefs.SetInt("power", clickpower);
+        }
+    }
+    public void item10()
+    {
+        if (money >= 1000000)
+        {
+            money -= 1000000;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 10000;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+    }
+    public void item11()
+    {
+        if (money >= 2000000)
+        {
+            money -= 2000000;
+            PlayerPrefs.SetInt("money", money);
+            clickpower += 15000;
+            PlayerPrefs.SetInt("power", clickpower);
+        }
+    }
+    public void item12()
+    {
+        if (money >= 10000000)
+        {
+            money -= 10000000;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 50000;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+    }
+    public void item13()
+    {
+        if (money >= 50000000)
+        {
+            money -= 50000000;
+            PlayerPrefs.SetInt("money", money);
+            clickpower += 150000;
+            PlayerPrefs.SetInt("power", clickpower);
+        }
+    }
+    public void item14()
+    {
+        if (money >= 250000000)
+        {
+            money -= 250000000;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 500000;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+    }
+    public void item15()
+    {
+        if (money >= 500000000)
+        {
+            money -= 500000000;
+            PlayerPrefs.SetInt("money", money);
+            clickpower += 1000000;
+            PlayerPrefs.SetInt("power", clickpower);
+        }
+    }
+    public void item16()
+    {
+        if (money >= 750000000)
+        {
+            money -= 750000000;
+            PlayerPrefs.SetInt("money", money);
+            plus_on_sec += 5000000;
+            PlayerPrefs.SetInt("sec", plus_on_sec);
+        }
+    }
     IEnumerator IdleFarm()
     {
         yield return new WaitForSeconds(1);
-        money += item1count;
-       
+        money += plus_on_sec;
         PlayerPrefs.SetInt("money", money);
         StartCoroutine(IdleFarm());
     }
-    void Update()
+    public void LIKVIDIROVAT()
     {
-        moneyText.text = money.ToString();
+        PlayerPrefs.SetInt("money", 0);
+        money = PlayerPrefs.GetInt("money");
+        PlayerPrefs.SetInt("sec", 0);
+        plus_on_sec = PlayerPrefs.GetInt("sec");
+        PlayerPrefs.SetInt("mil", 0);
+        milliard_count = PlayerPrefs.GetInt("mil");
+        PlayerPrefs.SetInt("power", 1);
+        clickpower = PlayerPrefs.GetInt("power");
     }
 }
