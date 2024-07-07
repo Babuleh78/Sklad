@@ -3,16 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+[System.Serializable]
+
 public class MainMenu : MonoBehaviour
 {
+ 
     public Text persecText;
     [SerializeField] Sprite[] images;
+    [SerializeField] Sprite[] skins;
+    [SerializeField] Button[] buttons;
     [SerializeField]  int  money;
+    [SerializeField] Sprite defskin;
     public int milliard_count;
     public Text moneyText;
     public Image clickimage;
     public int clickpower;
     public int plus_on_sec;
+    public int image_number;
+    public Text powerText;
+    public GameObject effect;
+    public GameObject button;
+    
     public void Start()
     {
         
@@ -21,17 +32,83 @@ public class MainMenu : MonoBehaviour
         plus_on_sec = PlayerPrefs.GetInt("sec");
         clickpower = PlayerPrefs.GetInt("power");
         if(clickpower == 0) { clickpower = 1; PlayerPrefs.GetInt("power", clickpower); }
-        if (plus_on_sec > 0)
+       
+        if (money > 1000)
         {
-            StartCoroutine(IdleFarm());
+
+            buttons[1].image.sprite = skins[1];
         }
+        if (money >= 5000)
+        {
+            buttons[2].image.sprite = skins[2];
+        }
+        if (money >= 10000)
+        {
+            buttons[3].image.sprite = skins[3];
+        }
+        if (money >= 50000)
+        {
+            buttons[4].image.sprite = skins[4];
+        }
+        if (money >= 100000 )
+        {
+            buttons[5].image.sprite = skins[5];
+            
+        }
+        if (money >= 500000 )
+        {
+            buttons[6].image.sprite = skins[6];
+        }
+        if (money >= 1000000)
+        {
+            buttons[7].image.sprite = skins[7];
+        }
+        if (money >= 5000000)
+        {
+            buttons[8].image.sprite = skins[8];
+          
+        }
+        if (money >= 10000000)
+        {
+            buttons[9].image.sprite = skins[9];
+            
+        }
+        if (money >= 50000000)
+        {
+            buttons[10].image.sprite = skins[10];
+            
+        }
+        if (money >= 100000000)
+        {
+            buttons[11].image.sprite = skins[11];
+            
+        }
+        if (money >= 200000000)
+        {
+            buttons[12].image.sprite = skins[12];
+            
+        }
+        if (money >= 500000000)
+        {
+            buttons[13].image.sprite = skins[13];
+            
+        }
+        if (money >= 1000000000)
+        {
+
+            buttons[14].image.sprite = skins[14];
+        }
+        StartCoroutine(IdleFarm());
+
     }
     public void ButtonClick()
     {
         money += clickpower;
         
         PlayerPrefs.SetInt("money", money);
-        
+
+        Instantiate(effect, button.GetComponent<RectTransform>().position.normalized, Quaternion.identity);
+
     }
     public void ToAch()
     {
@@ -45,12 +122,118 @@ public class MainMenu : MonoBehaviour
   
     void Update()
     {
-        if (money <15)
+        if (money < 1000)
         {
-            clickimage.sprite = images[money];
+            moneyText.text = money.ToString();
         }
-        moneyText.text = money.ToString();
-        persecText.text = plus_on_sec.ToString();
+        if (money >1000 && money <5000)
+        {
+            
+            buttons[1].image.sprite = skins[1];
+            
+            clickimage.sprite = images[1];
+        } else if(money>=5000 && money < 10000)
+        {
+            buttons[2].image.sprite = skins[2];
+            clickimage.sprite = images[2];
+        } else if (money >= 10000 && money <  50000 )
+        {
+            buttons[3].image.sprite = skins[3];
+            clickimage.sprite = images[3];
+        } else if( money >= 50000 && money < 100000)
+        {
+            buttons[4].image.sprite = skins[4];
+            clickimage.sprite = images[4];
+        } else if(money >= 100000 && money < 500000)
+        {
+            buttons[5].image.sprite = skins[5];
+            clickimage.sprite = images[5];
+        } else if(money >= 500000 && money < 1000000)
+        {
+            buttons[6].image.sprite = skins[6];
+            clickimage.sprite = images[6];
+        } else if(money >= 1000000 && money < 5000000)
+        {
+            buttons[7].image.sprite = skins[7];
+            
+                
+            
+            clickimage.sprite = images[7];
+        } else if(money >= 5000000 && money < 10000000)
+        {
+            buttons[8].image.sprite = skins[8];
+            clickimage.sprite = images[8];
+        }
+        else if (money >= 10000000 && money < 50000000)
+        {
+            buttons[9].image.sprite = skins[9];
+            clickimage.sprite = images[9];
+        }
+        else if (money >= 50000000 && money < 100000000)
+        {
+            buttons[10].image.sprite = skins[10];
+            clickimage.sprite = images[10];
+        }
+        else if (money >= 100000000 && money < 200000000)
+        {
+            buttons[11].image.sprite = skins[11];
+            clickimage.sprite = images[11];
+        }
+        else if (money >= 200000000 && money < 500000000)
+        {
+            buttons[12].image.sprite = skins[12];
+            clickimage.sprite = images[12];
+        }
+        else if (money >= 500000000 && money < 1000000000)
+        {
+            buttons[13].image.sprite = skins[13];
+            clickimage.sprite = images[13];
+        }
+        else if (money >= 1000000000 )
+        {
+            
+            buttons[14].image.sprite = skins[14];
+            
+
+            clickimage.sprite = images[14];
+        }
+        if (plus_on_sec > 1000)
+        {
+            
+            persecText.text = (plus_on_sec / 1000).ToString() + "." + ((plus_on_sec/ 100) % 10).ToString() + "K";
+        }
+        else if (plus_on_sec > 1000000)
+        {
+            persecText.text = (plus_on_sec / 1000000).ToString() + "." + ((plus_on_sec / 100000) % 10).ToString() + "M";
+        }
+        else
+        {
+            persecText.text = plus_on_sec.ToString();
+        }
+        if (clickpower > 1000)
+        {
+            powerText.text = (clickpower / 1000).ToString() + "." + ((clickpower/ 100) % 10).ToString() + "K";
+        } else if (clickpower > 1000000)
+        {
+            powerText.text = (clickpower/ 1000000).ToString() + "." + ((clickpower / 100000) % 10).ToString() + "M";
+        }
+        else
+        {
+            powerText.text = clickpower.ToString();
+        }
+        if (money > 1000) {
+            moneyText.text = (money / 1000).ToString() + "." + ((money / 100) % 10).ToString() + "K"; 
+        } else if(money> 1000000)
+        {
+            moneyText.text = (money / 1000000).ToString() + "." + ((money / 100000) % 10).ToString() + "M";
+        }
+        else
+        {
+            moneyText.text = (money / 1000000000).ToString() + "." + ((money / 100000000) % 10).ToString() + "B";
+        }
+
+        //moneyText.text = money.ToString();
+        //persecText.text = plus_on_sec.ToString();
     }
     public void item1()
     {
@@ -69,6 +252,7 @@ public class MainMenu : MonoBehaviour
         {
             money -= 250;
             PlayerPrefs.SetInt("money", money);
+           
             plus_on_sec += 15;
             PlayerPrefs.SetInt("sec", plus_on_sec);
         }
@@ -80,6 +264,7 @@ public class MainMenu : MonoBehaviour
         {
             money -= 1000;
             PlayerPrefs.SetInt("money", money);
+            
             plus_on_sec += 25;
             PlayerPrefs.SetInt("sec", plus_on_sec);
         }
@@ -91,8 +276,8 @@ public class MainMenu : MonoBehaviour
         {
             money -= 2000;
             PlayerPrefs.SetInt("money", money);
-            plus_on_sec += 100;
-            PlayerPrefs.SetInt("sec", plus_on_sec);
+            clickpower += 50;
+            PlayerPrefs.SetInt("power", clickpower);
         }
     }
     public void item5()
@@ -215,6 +400,66 @@ public class MainMenu : MonoBehaviour
             PlayerPrefs.SetInt("sec", plus_on_sec);
         }
     }
+    public void skin1()
+    {
+        clickimage.sprite = images[0];
+    }
+    public void skin2()
+    {
+        clickimage.sprite = images[1];
+    }
+    public void skin3()
+    {
+        clickimage.sprite = images[2];
+    }
+    public void skin4()
+    {
+        clickimage.sprite = images[3];
+    }
+    public void skin5()
+    {
+        clickimage.sprite = images[4];
+    }
+    public void skin6()
+    {
+        clickimage.sprite = images[5];
+    }
+    public void skin7()
+    {
+        clickimage.sprite = images[6];
+    }
+    public void skin8()
+    {
+        clickimage.sprite = images[7];
+    }
+    public void skin9()
+    {
+        clickimage.sprite = images[8];
+    }
+    public void skin10()
+    {
+        clickimage.sprite = images[9];
+    }
+    public void skin11()
+    {
+        clickimage.sprite = images[10];
+    }
+    public void skin12()
+    {
+        clickimage.sprite = images[11];
+    }
+    public void skin13()
+    {
+        clickimage.sprite = images[12];
+    }
+    public void skin14()
+    {
+        clickimage.sprite = images[13];
+    }
+    public void skin15()
+    {
+        clickimage.sprite = images[14];
+    }
     IEnumerator IdleFarm()
     {
         yield return new WaitForSeconds(1);
@@ -224,7 +469,8 @@ public class MainMenu : MonoBehaviour
     }
     public void LIKVIDIROVAT()
     {
-        PlayerPrefs.SetInt("money", 0);
+        
+        PlayerPrefs.SetInt("money", 249);
         money = PlayerPrefs.GetInt("money");
         PlayerPrefs.SetInt("sec", 0);
         plus_on_sec = PlayerPrefs.GetInt("sec");
