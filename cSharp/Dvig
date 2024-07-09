@@ -1,0 +1,38 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor.U2D.Animation;
+using UnityEngine;
+
+public class Dvig : MonoBehaviour
+{
+    [SerializeField] private float _speed;
+    private Vector3 _input;
+    private Rigidbody2D _rig;
+    private bool _isMoving;
+    private AnimUprav _animations;
+    [SerializeField] private SpriteRenderer _characterSprite;
+    // Start is called before the first frame update
+    private void Start()
+    {
+        _rig = GetComponent<Rigidbody2D>();
+        _animations = GetComponentInChildren<AnimUprav>();
+    }
+
+    // Update is called once per frame
+    private void Update()
+    {
+        Move();
+    }
+    private void Move()
+    {
+        _input = new Vector2(Input.GetAxis("Horizontal"), 0);
+        transform.position += _input * _speed * Time.deltaTime;
+        _isMoving = _input.x!=0 ? true : false;
+        if (_input.x != 0)
+        {
+            
+            _characterSprite.flipX = _input.x>0 ? false : true;
+        }
+        _animations.ismoving = _isMoving;
+    }
+}
