@@ -1,0 +1,41 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System.Collections;
+public class Player : MonoBehaviour
+{
+    public GameObject bullet;
+
+    private const float MAX_LEFT= -3.35f;
+    private const float MAX_RIGHT= 3.35f;
+    private float speed = 3;
+    private float cooldown = 0.5f;
+    private bool isShooting;
+    //void Start()
+    //{
+        
+    //}
+    void Update()
+    {
+       if(Input.GetKey(KeyCode.A) && transform.position.x > MAX_LEFT)
+        {
+            transform.Translate(Vector2.left * Time.deltaTime * speed);
+        }
+        if (Input.GetKey(KeyCode.D) && transform.position.x < MAX_RIGHT)
+        {
+            transform.Translate(Vector2.right * Time.deltaTime * speed);
+        }
+        if(Input.GetKey(KeyCode.Space) && !isShooting)
+        {
+            StartCoroutine(Shoot());
+        }
+    }
+
+    private IEnumerator Shoot()
+    {
+        isShooting = true;
+        Instantiate(bullet, transform.position, Quaternion.identity);
+        yield return new WaitForSeconds(cooldown);  
+        isShooting = false;
+    }
+}
