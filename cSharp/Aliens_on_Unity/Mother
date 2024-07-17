@@ -1,0 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor.U2D.Sprites;
+using UnityEngine;
+
+public class Mother : MonoBehaviour
+{
+    public int scoreValue;
+    private const float MAX_LEFT = -5.5f;
+    private float speed = 5;
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.Translate(Vector2.left * Time.deltaTime * speed);
+        if(transform.position.x <= MAX_LEFT)
+        {
+            Destroy(gameObject);
+        }
+    }
+}
