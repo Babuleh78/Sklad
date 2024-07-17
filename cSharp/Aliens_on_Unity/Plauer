@@ -1,41 +1,83 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
+using Unity.VisualScripting;
+
 public class Player : MonoBehaviour
 {
+    public Stats ShipStats;
     public GameObject bullet;
-
-    private const float MAX_LEFT= -3.35f;
-    private const float MAX_RIGHT= 3.35f;
-    private float speed = 3;
-    private float cooldown = 0.5f;
+    private Vector2 offScreenPos = new Vector2(0, -20f);
+    private Vector2 startPos = new Vector2(0, -4.5f);
+    private const float MAX_LEFT= -5.5f;
+    private const float MAX_RIGHT= 5.5f;
+    
+    
     private bool isShooting;
-    //void Start()
-    //{
-        
-    //}
+    private void Start()
+    {
+        ShipStats.CurrentHealth = ShipStats.maxHealth;
+        ShipStats.currentLives = ShipStats.maxLives;
+        transform.position = startPos;
+
+        UIManager.UpdHelth(ShipStats.CurrentHealth);
+        UIManager.UpdLives(ShipStats.currentLives);
+    }
     void Update()
     {
        if(Input.GetKey(KeyCode.A) && transform.position.x > MAX_LEFT)
         {
-            transform.Translate(Vector2.left * Time.deltaTime * speed);
+            transform.Translate(Vector2.left * Time.deltaTime * ShipStats.speed);
         }
         if (Input.GetKey(KeyCode.D) && transform.position.x < MAX_RIGHT)
         {
-            transform.Translate(Vector2.right * Time.deltaTime * speed);
+            transform.Translate(Vector2.right * Time.deltaTime * ShipStats.speed);
         }
         if(Input.GetKey(KeyCode.Space) && !isShooting)
         {
             StartCoroutine(Shoot());
         }
     }
-
+    private void TakeDamage()
+    {
+        ShipStats.CurrentHealth--;
+        UIManager.UpdHelth(ShipStats.CurrentHealth);
+        if (ShipStats.CurrentHealth <= 0)
+        {
+            ShipStats.currentLives--;
+            UIManager.UpdLives(ShipStats.currentLives);
+           
+            if(ShipStats.currentLives <= 0)
+            {
+                //Game Over
+            }
+            else
+            {
+                StartCoroutine(Respawn());
+            }
+        }
+    }
     private IEnumerator Shoot()
     {
         isShooting = true;
         Instantiate(bullet, transform.position, Quaternion.identity);
-        yield return new WaitForSeconds(cooldown);  
+        yield return new WaitForSeconds(ShipStats.fireRate);  
         isShooting = false;
+    }
+
+    private IEnumerator Respawn()
+    {
+        transform.position = offScreenPos;
+        yield return new WaitForSeconds(2);
+        ShipStats.CurrentHealth = ShipStats.maxHealth;
+        transform.position = startPos;
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("HBullet"))
+        {
+            Destroy(collision.gameObject);
+            TakeDamage();
+        }
     }
 }
