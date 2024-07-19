@@ -1,0 +1,106 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
+using UnityEngine;
+
+public class MenuManager : MonoBehaviour
+{
+    public GameObject mainMenu;
+    public GameObject gameover;
+    public GameObject shop;
+    public GameObject inGame;
+    public GameObject pause;
+    public GameObject info;
+    public static MenuManager instance;
+
+    private void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public void OpenMain()
+    {
+
+        instance.mainMenu.SetActive(true);
+        instance.pause.SetActive(false);
+        instance.inGame.SetActive(false);
+    }
+
+    public static void GameOver()
+    {
+        instance.gameObject.SetActive(true);
+        instance.inGame.SetActive(false);
+    }
+    public  void Shop()
+    {
+        instance.mainMenu.SetActive(false);
+        instance.shop.SetActive(true);
+        
+    }
+    public static void CloseShop()
+    {
+        instance.mainMenu.SetActive(true);
+        instance.shop.SetActive(false);
+    }
+    public void InGame()
+    {
+        Time.timeScale = 1;
+        
+        instance.mainMenu.SetActive(false);
+        instance.pause.SetActive(false);
+        instance.shop.SetActive(false);
+        instance.gameover.SetActive(false);
+        instance.inGame.SetActive(true);
+
+        GameManager.SpawnNewWave();
+    }
+    public void OpenPause()
+    {
+        Time.timeScale = 0;
+        instance.inGame.SetActive(false);
+        instance.pause.SetActive(true);
+    }
+    public  void ClosePause()
+    {
+        Time.timeScale = 1;
+        instance.pause.SetActive(false);
+        instance.inGame.SetActive(true);
+        
+    }
+    public void ReturnToMain()
+    {
+        Time.timeScale = 1;
+        instance.gameover.SetActive(false);
+        instance.info.SetActive(false);
+        instance.inGame.SetActive(false);
+        instance.pause.SetActive(false);
+        instance.shop.SetActive(false);
+        instance.gameover.SetActive(false);
+
+        instance.mainMenu.SetActive(true);
+        GameManager.CancelGame();
+    }
+
+    public static void CloseWindow(GameObject go)
+    {
+        go.SetActive(false);
+
+    }
+
+    private void Start()
+    {
+        ReturnToMain();
+    }
+    public void OpenInfo()
+    {
+        instance.info.SetActive(true);
+    }
+}
