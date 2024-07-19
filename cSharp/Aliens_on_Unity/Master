@@ -7,46 +7,59 @@ public class MasterOfHohol : MonoBehaviour
     public GameObject bullet;
     private Vector3 hMoveDistance = new Vector3(0.05f, 0, 0);
     private Vector3 vMoveDistance = new Vector3(0, 0.15f, 0);
-    private Vector3 motherSpawn = new Vector3(3.72f, 3.45f, 0);
+    private Vector3 motherSpawn = new Vector3(5.5f, 4.5f, 0);
     public GameObject mother;
-    private const float MAX_LEFT = -3f;
-    private const float MAX_RIGHT = 3f;
-    private const float MAX_SPEED = 0.02f;
+    private const float MAX_LEFT = -5.2f;
+    private const float MAX_RIGHT = 5.2f;
+    private const float MAX_SPEED = 0.05f;
     private bool moveR;
     private float moveTimer = 0.01f;
     private const float moveTime = 0.005f;
-
+    private const float START_Y = -1.15f;
     private float motherTimer = 1f;
     private const float MOTHER_MIN = 15;
     private const float MOTHER_MAX = 30;
-
-    private float ShootTimer = 3f;
-    private const float ShootTime = 3f;
+    private bool entering = true;
+    private float ShootTimer = 0.5f;
+    private const float ShootTime = 1f;
     public static List<GameObject> allHohols = new List<GameObject>();
     void Start()
     {
         foreach(GameObject go in GameObject.FindGameObjectsWithTag("Hohol"))
             allHohols.Add(go);
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(moveTimer <= 0)
+        if (entering)
         {
-            MoveEnemy();
+            transform.Translate(Vector2.down * Time.deltaTime * 10);
+            if (transform.position.y <= START_Y)
+            {
+                entering = false;
+            }
         }
-        if(ShootTimer <= 0)
+        else
         {
-            Shoot();
+            if (moveTimer <= 0)
+            {
+                MoveEnemy();
+            }
+            if (ShootTimer <= 0)
+            {
+                Shoot();
+            }
+            if (motherTimer <= 0)
+            {
+                SpawnMother();
+            }
+                moveTimer -= Time.deltaTime;
+                ShootTimer -= Time.deltaTime;
+                motherTimer -= Time.deltaTime;
+            
         }
-        if(motherTimer <= 0)
-        {
-            SpawnMother();
-        }
-        moveTimer -= Time.deltaTime;
-        ShootTimer-= Time.deltaTime;
-        motherTimer -= Time.deltaTime;
     }
 
     private void SpawnMother()
@@ -58,6 +71,7 @@ public class MasterOfHohol : MonoBehaviour
     {
         if (allHohols.Count > 0)
         {
+            
             int hitMax = 0;
             for (int i = 0; i < allHohols.Count; i++)
             {
@@ -71,6 +85,7 @@ public class MasterOfHohol : MonoBehaviour
                 }
                 if (allHohols[i].transform.position.x > MAX_RIGHT || allHohols[i].transform.position.x < MAX_LEFT)
                 {
+                    
                     hitMax++;
                 }
             }
