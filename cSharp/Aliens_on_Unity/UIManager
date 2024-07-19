@@ -1,0 +1,79 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
+public class UIManager : MonoBehaviour
+{
+    public TextMeshProUGUI scoreText;
+    private int score;
+    public TextMeshProUGUI hscoreText;
+    private int hscore;
+    public TextMeshProUGUI coinsText;
+
+    public TextMeshProUGUI CityText;
+
+    private static UIManager instance;
+
+    private Color32 active = new Color(1, 1, 1, 1);
+    private Color32 inactive = new Color(1, 1, 1, 0.2f);
+    public Image[] lifeSprites;
+    public Image healthbar;
+    public Sprite[] healthbars;
+
+    public static void ResetUI()
+    {
+        instance.score = 0;
+        instance.scoreText.text = instance.score.ToString();
+    }
+    public static void UpdLives(int l)
+    {
+        foreach (Image i in instance.lifeSprites)
+            i.color = instance.inactive;
+        for (int i = 0; i<l; i++)
+        {
+            instance.lifeSprites[i].color = instance.active;
+        }
+    }
+    public static void UpdHelth(int he)
+    {
+        instance.healthbar.sprite = instance.healthbars[he];
+    }
+    public static void UpdScore(int s)
+    {
+        instance.score += s;
+        instance.scoreText.text = instance.score.ToString();
+    }
+    public static void UpdHScore(int hs)
+    {
+        if(instance.hscore < hs)
+        {
+            instance.hscore = hs;
+            instance.hscoreText.text = instance.hscore.ToString();
+        }
+        
+    }
+    public static int GetHs()
+    {
+        return instance.hscore;
+    }
+    public static void UpdTownn()
+    {
+        //
+    }
+    public static void UpdCoin()
+    {
+        instance.coinsText.text = Inventory.currentCoins.ToString();
+    }
+    private void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+}
