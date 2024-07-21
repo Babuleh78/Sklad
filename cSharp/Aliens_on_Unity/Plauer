@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public Stats ShipStats;
     public GameObject bullet;
     private Vector2 offScreenPos = new Vector2(0, -20f);
-    private Vector2 startPos = new Vector2(0, -4.5f);
+    private Vector2 startPos = new Vector2(0, -6.5f);
     private const float MAX_LEFT= -5.5f;
     private const float MAX_RIGHT= 5.5f;
     
@@ -46,10 +46,12 @@ public class Player : MonoBehaviour
         {
             ShipStats.currentLives--;
             UIManager.UpdLives(ShipStats.currentLives);
-           
-            if(ShipStats.currentLives <= 0)
+            ShipStats.CurrentHealth = ShipStats.maxHealth;
+            UIManager.UpdHelth(ShipStats.CurrentHealth);
+            if (ShipStats.currentLives <= 0)
             {
-                //Game Over
+                SaveManager.SaveProg();
+                MenuManager.GameOver();
             }
             else
             {
@@ -70,6 +72,8 @@ public class Player : MonoBehaviour
         transform.position = offScreenPos;
         yield return new WaitForSeconds(2);
         ShipStats.CurrentHealth = ShipStats.maxHealth;
+
+        UIManager.UpdHelth(ShipStats.CurrentHealth);
         transform.position = startPos;
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -78,6 +82,30 @@ public class Player : MonoBehaviour
         {
             Destroy(collision.gameObject);
             TakeDamage();
+        }
+    }
+    public void AddHealth()
+    {
+        if (ShipStats.CurrentHealth == ShipStats.maxHealth)
+        {
+            UIManager.UpdScore(250);
+        }
+        else
+        {
+            ShipStats.CurrentHealth++;
+            UIManager.UpdHelth(ShipStats.CurrentHealth);
+        }
+    }
+    public void AddLife()
+    {
+        if (ShipStats.currentLives == ShipStats.maxLives)
+        {
+            UIManager.UpdScore(1000);
+        }
+        else
+        {
+            ShipStats.currentLives++;
+            UIManager.UpdLives(ShipStats.currentLives);
         }
     }
 }
