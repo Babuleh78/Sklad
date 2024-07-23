@@ -2,37 +2,46 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
+
 public class MasterOfHohol : MonoBehaviour
 {
+    
     public GameObject bullet;
+    public Vector2 spawnPos = new Vector2(0, 10);
     private Vector3 hMoveDistance = new Vector3(0.05f, 0, 0);
     private Vector3 vMoveDistance = new Vector3(0, 0.15f, 0);
     private Vector3 motherSpawn = new Vector3(5.5f, 4.5f, 0);
     public GameObject mother;
     private const float MAX_LEFT = -5.2f;
     private const float MAX_RIGHT = 5.2f;
-    private const float MAX_SPEED = 0.05f;
+    public float MAX_SPEED = 0.05f;
     private bool moveR;
-    private float moveTimer = 0.01f;
-    private const float moveTime = 0.005f;
-    private const float START_Y = -1.15f;
+    public float moveTimer = 0.01f;
+    public float moveTime = 0.005f;
+    public float START_Y = -1.15f;
     private float motherTimer = 1f;
     private const float MOTHER_MIN = 15;
     private const float MOTHER_MAX = 30;
     private bool entering = true;
-    private float ShootTimer = 0.5f;
-    private const float ShootTime = 1f;
+    public float ShootTimer = 0.5f;
+    public float ShootTime = 1f;
     public static List<GameObject> allHohols = new List<GameObject>();
     void Start()
     {
+        
         foreach(GameObject go in GameObject.FindGameObjectsWithTag("Hohol"))
             allHohols.Add(go);
+
+       
         
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        
         if (entering)
         {
             transform.Translate(Vector2.down * Time.deltaTime * 10);
@@ -55,8 +64,8 @@ public class MasterOfHohol : MonoBehaviour
             {
                 SpawnMother();
             }
-                moveTimer -= Time.deltaTime;
-                ShootTimer -= Time.deltaTime;
+            moveTimer -= Time.deltaTime;
+            ShootTimer -= Time.deltaTime;
                 motherTimer -= Time.deltaTime;
             
         }
@@ -111,6 +120,7 @@ public class MasterOfHohol : MonoBehaviour
     private float GetMoveSpeed()
     {
         float f = allHohols.Count * moveTime;
+        
         if (f < MAX_SPEED)
         {
             return MAX_SPEED;
