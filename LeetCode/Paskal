@@ -1,0 +1,17 @@
+class Solution {
+public:
+    vector<int> getRow(int rowIndex) {
+        if(rowIndex == 0){
+            vector<int> m (1, 1);
+            return m;
+        }
+        vector<int> res (1, 1);
+        long long k = 1;
+        for(int i = 1; i<=rowIndex; i++){
+            long long val = k*(rowIndex - i+1)/i;
+            res.push_back(val);
+            k = val;
+        }
+        return res;
+    }
+};
