@@ -1,0 +1,23 @@
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int size = nums.size();
+        unordered_map<int, int> numMap;
+        for(int i = 0; i<size; i++){
+            if(numMap[nums[i]] == 0){
+                numMap[nums[i]] = 1;
+            } else{
+                numMap[nums[i]] +=1;
+            }
+        }
+        int max_count= (nums.size()/2);
+        int max_el = 0;
+        for(auto a : numMap){
+            
+            if(a.second>max_count){
+                max_el = a.first;
+            }
+        }
+        return max_el;
+    }
+};
