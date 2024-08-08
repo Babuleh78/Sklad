@@ -1,0 +1,30 @@
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        unordered_map<int, int> numMap;
+        vector<int> newnums;
+        int k = 0;
+        for(int i = 0; i<nums.size(); i++){
+            if(numMap[nums[i]]!=1){
+                numMap[nums[i]]=1;
+                k+=1;
+                newnums.push_back(nums[i]);
+            } 
+        }
+        nums = newnums;
+        return k;
+    }
+};
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        int j = 1;
+        for(int i = 1; i < nums.size(); i++){
+            if(nums[i] != nums[i - 1]){
+                nums[j] = nums[i];
+                j++;
+            }
+        }
+        return j;
+    }
+};
