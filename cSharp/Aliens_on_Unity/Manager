@@ -1,66 +1,120 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Tilemaps;
 using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
-public class UIManager : MonoBehaviour
+
+public class GameManager : MonoBehaviour
 {
-    public TextMeshProUGUI scoreText;
-    private int score;
-    public TextMeshProUGUI hscoreText;
-    private int hscore;
-    public TextMeshProUGUI coinsText;
+    public GameObject line;
+    public GameObject TrueLine;
+    public static float liney = -5f;
+   
 
-    public TextMeshProUGUI CityText;
-
-    private static UIManager instance;
-
-    private Color32 active = new Color(1, 1, 1, 1);
-    private Color32 inactive = new Color(1, 1, 1, 0.2f);
-    public Image[] lifeSprites;
-    public Image healthbar;
-    public Sprite[] healthbars;
-
-
-    public static void UpdLives(int l)
-    {
-        foreach (Image i in instance.lifeSprites)
-            i.color = instance.inactive;
-        for (int i = 0; i<l; i++)
-        {
-            instance.lifeSprites[i].color = instance.active;
-        }
-    }
-    public static void UpdHelth(int he)
-    {
-        instance.healthbar.sprite = instance.healthbars[he];
-    }
-    public static void UpdScore(int s)
-    {
-        instance.score += s;
-        instance.scoreText.text = instance.score.ToString();
-    }
-    public static void UpdHScore()
-    {
-        //
-    }
-    public static void UpdTownn()
-    {
-        //
-    }
-    public static void UpdCoin()
-    {
-        //
-    }
+    public GameObject currshields;
+    public GameObject MaxShield;
+    public GameObject[] HoholsSet;
+    private static bool need_reset;
+    
+    private GameObject currentSet;
+    
+    private Vector2 spawnPos = new Vector2 (0, 10);
+    private Vector2 spawnShield = new Vector2(-2.5f, -3);
+    private static GameManager instance;
+   
     private void Awake()
     {
         if(instance == null)
         {
             instance = this;
+
         }
         else
         {
             Destroy(gameObject);
         }
     }
+    public static void CancelGame()
+    {
+        instance.StopAllCoroutines();
+        foreach (GameObject a in GameObject.FindGameObjectsWithTag("HBullet"))
+            Destroy(a);
+        foreach (GameObject a in GameObject.FindGameObjectsWithTag("JBullet"))
+            Destroy(a);
+
+        MasterOfHohol.allHohols.Clear();
+        if(instance.currentSet!= null)
+        {
+            Destroy(instance.currentSet);
+        }
+        if (instance.currshields != null)
+        {
+            Destroy(instance.currshields);
+        }
+        if (instance.line != null)
+        {
+            Destroy (instance.line);
+        }
+        
+        UIManager.ResetUI();
+    }
+    
+    public IEnumerator SpawnLine()
+    {
+        if(line!= null)
+        {
+            Destroy(line);
+        }
+        yield return new WaitForSeconds(2);
+        Vector2 spawnPos = new Vector2(0, liney);
+        line  = Instantiate(TrueLine, spawnPos, Quaternion.identity);
+    }
+    public static void SpawnNewLine()
+    {
+        instance.StartCoroutine(instance.SpawnLine());
+    }
+    public static void SpawnNewShields()
+    {
+
+        instance.StartCoroutine(instance.SpawnShields());
+
+    }
+    public static bool is_reset()
+    {
+        return need_reset;
+    }
+    public static void set_reset(bool f)
+    {
+        need_reset = f;
+    }
+    public static void SpawnNewWave()
+    {
+       
+        MasterOfHohol.allHohols.Clear();
+        
+        instance.StartCoroutine(instance.SpawnWave());
+    }
+    private IEnumerator SpawnShields()
+    {
+        
+        if (currshields!= null)
+        {
+            Destroy(currshields);
+        }
+        yield return new WaitForSeconds(2);
+        currshields = Instantiate(MaxShield, spawnShield, Quaternion.identity);
+    }
+    private IEnumerator SpawnWave()
+    {
+        int number = Random.Range(0, HoholsSet.Length);
+        spawnPos = HoholsSet[number].GetComponent<MasterOfHohol>().spawnPos;
+        if(currentSet != null)
+        {
+            Destroy(currentSet);
+        }
+        yield return new WaitForSeconds(2);
+        currentSet = Instantiate(HoholsSet[number], spawnPos, Quaternion.identity);
+        //Ciy
+    }
+
 }
