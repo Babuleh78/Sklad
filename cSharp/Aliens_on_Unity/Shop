@@ -1,0 +1,169 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+public class NewBehaviourScript : MonoBehaviour
+{
+
+    public Button healthdbut;
+    public Button shootbut;
+    public Button shieldbut;
+    public Button speedbut;
+    public Button lifebut;
+    public Button MaxHelthbut;
+
+    public TextMeshProUGUI curGold;
+    public TextMeshProUGUI hcost;
+    public TextMeshProUGUI shocost;
+    public TextMeshProUGUI shicost;
+    public TextMeshProUGUI spcost;
+    public TextMeshProUGUI lcost;
+    public TextMeshProUGUI mlcost;
+
+    private int starthcost = 2;
+    private int startshocost = 3;
+    private int startshicost = 4;
+    private int startspcost = 5;
+    private int startlcost = 7;
+    private int startmlcost = 10;
+    private Player player;
+
+    void Start()
+    {
+        UpdUiAndText();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        curGold.text = Inventory.currentCoins + "P";
+        
+    }
+
+    public void BuyHealth()
+    {
+        if (PriceCheck(starthcost))
+        {
+            Inventory.currentCoins -= starthcost;
+            curGold.text = Inventory.currentCoins + "P";
+            starthcost += 1;
+            player.ShipStats.CurrentHealth = player.ShipStats.maxHealth;
+            SaveManager.SaveProg();
+            UpdUiAndText();
+            
+        }
+        else
+        {
+
+        }
+
+    }
+    public void BuyShoot()
+    {
+        if (PriceCheck(startshocost))
+        {
+            Inventory.currentCoins -= startshocost;
+            curGold.text = Inventory.currentCoins + "P";
+            startshocost += 1;
+            player.ShipStats.fireRate -= 0.05f;
+            SaveManager.SaveProg();
+            UpdUiAndText();
+
+        }
+        else
+        {
+
+        }
+    }
+    public void BuyShield()
+    {
+        if (PriceCheck(startshicost))
+        {
+            Inventory.currentCoins -= starthcost;
+            curGold.text = Inventory.currentCoins + "P";
+            GameManager.SpawnNewShields();
+            SaveManager.SaveProg();
+            UpdUiAndText();
+
+        }
+        else
+        {
+
+        }
+    }
+    public void BuySpeed()
+    {
+        if (PriceCheck(starthcost))
+        {
+            Inventory.currentCoins -= starthcost;
+            curGold.text = Inventory.currentCoins + "P";
+            startspcost += 1;
+            player.ShipStats.speed += 0.25f;
+            SaveManager.SaveProg();
+            UpdUiAndText();
+
+        }
+        else
+        {
+
+        }
+    }
+    public void BuyLive()
+    {
+        if (PriceCheck(starthcost))
+        {
+            Inventory.currentCoins -= starthcost;
+            curGold.text = Inventory.currentCoins + "P";
+            startlcost += 2;
+            player.ShipStats.currentLives += 1;
+            SaveManager.SaveProg();
+            UpdUiAndText();
+
+        }
+        else
+        {
+
+        }
+    }
+    public void BuyML()
+    {
+        if (PriceCheck(starthcost))
+        {
+            Inventory.currentCoins -= starthcost;
+            curGold.text = Inventory.currentCoins + "P";
+            starthcost += 10;
+            player.ShipStats.maxHealth += 1;
+            SaveManager.SaveProg();
+
+            UpdUiAndText();
+        }
+        else
+        {
+
+        }
+    }
+
+
+    private bool PriceCheck(int cost)
+    {
+        if (cost <= Inventory.currentCoins)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    private void UpdUiAndText()
+    {
+        curGold.text = Inventory.currentCoins + "P";
+        hcost.text = starthcost + "P";
+        shocost.text = startshocost + "P";
+        shicost.text = startshicost + "P";
+        spcost.text = startspcost + "P";
+        lcost.text = startlcost + "P"; 
+        mlcost.text = startmlcost + "P";
+    }
+    public void CheatMoney()
+    {
+        Inventory.currentCoins = 999;
+    }
+}
