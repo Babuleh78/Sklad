@@ -6,13 +6,14 @@ using TMPro;
 public class NewBehaviourScript : MonoBehaviour
 {
 
-    public Button healthdbut;
+    public Button healthbut;
     public Button shootbut;
     public Button shieldbut;
     public Button speedbut;
     public Button lifebut;
     public Button MaxHelthbut;
-
+    private Color32 active = new Color(1, 1, 1, 1);
+    private Color32 inactive = new Color(1, 1, 1, 0.2f);
     public TextMeshProUGUI curGold;
     public TextMeshProUGUI hcost;
     public TextMeshProUGUI shocost;
@@ -31,33 +32,34 @@ public class NewBehaviourScript : MonoBehaviour
 
     void Start()
     {
-        UpdUiAndText();
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        UpdUiAndText();
+        //player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         curGold.text = Inventory.currentCoins + "P";
         
     }
 
     public void BuyHealth()
     {
-        if (PriceCheck(starthcost))
+        if (PriceCheck(starthcost) && player.ShipStats.CurrentHealth < player.ShipStats.maxHealth)
         {
             Inventory.currentCoins -= starthcost;
             curGold.text = Inventory.currentCoins + "P";
             starthcost += 1;
+         
             player.ShipStats.CurrentHealth = player.ShipStats.maxHealth;
+            
+            UIManager.UpdHelth(player.ShipStats.CurrentHealth);
             SaveManager.SaveProg();
             UpdUiAndText();
             
         }
-        else
-        {
-
-        }
+        
 
     }
     public void BuyShoot()
     {
-        if (PriceCheck(startshocost))
+        if (PriceCheck(startshocost) && player.ShipStats.fireRate > 0.2)
         {
             Inventory.currentCoins -= startshocost;
             curGold.text = Inventory.currentCoins + "P";
@@ -67,10 +69,7 @@ public class NewBehaviourScript : MonoBehaviour
             UpdUiAndText();
 
         }
-        else
-        {
-
-        }
+       
     }
     public void BuyShield()
     {
@@ -83,14 +82,11 @@ public class NewBehaviourScript : MonoBehaviour
             UpdUiAndText();
 
         }
-        else
-        {
-
-        }
+       
     }
     public void BuySpeed()
     {
-        if (PriceCheck(starthcost))
+        if (PriceCheck(starthcost) && player.ShipStats.speed <12)
         {
             Inventory.currentCoins -= starthcost;
             curGold.text = Inventory.currentCoins + "P";
@@ -100,14 +96,11 @@ public class NewBehaviourScript : MonoBehaviour
             UpdUiAndText();
 
         }
-        else
-        {
-
-        }
+      
     }
     public void BuyLive()
     {
-        if (PriceCheck(starthcost))
+        if (PriceCheck(starthcost) && player.ShipStats.currentLives <3)
         {
             Inventory.currentCoins -= starthcost;
             curGold.text = Inventory.currentCoins + "P";
@@ -117,18 +110,15 @@ public class NewBehaviourScript : MonoBehaviour
             UpdUiAndText();
 
         }
-        else
-        {
-
-        }
+        
     }
     public void BuyML()
     {
-        if (PriceCheck(starthcost))
+        if (PriceCheck(starthcost) && player.ShipStats.maxHealth < 5)
         {
             Inventory.currentCoins -= starthcost;
             curGold.text = Inventory.currentCoins + "P";
-            starthcost += 10;
+            startmlcost += 10;
             player.ShipStats.maxHealth += 1;
             SaveManager.SaveProg();
 
@@ -152,18 +142,96 @@ public class NewBehaviourScript : MonoBehaviour
             return false;
         }
     }
-    private void UpdUiAndText()
+    public void UpdUiAndText()
+
     {
         curGold.text = Inventory.currentCoins + "P";
+        if (player.ShipStats.CurrentHealth == player.ShipStats.maxHealth || !PriceCheck(starthcost))
+        {
+            healthbut.image.color = inactive;
+        }
+        else
+        {
+            healthbut.image.color = active;
+        }
         hcost.text = starthcost + "P";
-        shocost.text = startshocost + "P";
+        if (!PriceCheck(startshocost))
+        {
+            shootbut.image.color = inactive;
+        }
+        else
+        {
+            shootbut.image.color = active;
+        }
+        if(player.ShipStats.fireRate == 0.2)
+        {
+
+            shocost.text = "MAX";
+        }
+        else
+        {
+            shocost.text = startshocost + "P";
+        }
+        if (!PriceCheck(startshicost))
+        {
+            shieldbut.image.color = inactive;
+        }
+        else
+        {
+            shieldbut.image.color = active;
+        }
         shicost.text = startshicost + "P";
-        spcost.text = startspcost + "P";
-        lcost.text = startlcost + "P"; 
-        mlcost.text = startmlcost + "P";
+        if (!PriceCheck(startspcost))
+        {
+            speedbut.image.color = inactive;
+        }
+        else
+        {
+            speedbut.image.color = active;
+        }
+        if(player.ShipStats.speed >= 12)
+        {
+            spcost.text = "MAX";
+        }
+        else
+        {
+            spcost.text = startspcost + "P";
+        }
+        if (!PriceCheck(startlcost))
+        {
+            lifebut.image.color = inactive;
+        }
+        else
+        {
+            lifebut.image.color = active;
+        }
+        if(player.ShipStats.currentLives == 3)
+        {
+            lifebut.image.color = inactive;
+        }
+        lcost.text = startlcost + "P";
+        if (!PriceCheck(startmlcost))
+        {
+            MaxHelthbut.image.color = inactive;
+        }
+        else
+        {
+            MaxHelthbut.image.color = active;
+        }
+        if (player.ShipStats.maxHealth == 5)
+        {
+            mlcost.text = "MAX";
+        }
+        else
+        {
+            mlcost.text = startmlcost + "P";
+        }
+       
+        
     }
     public void CheatMoney()
     {
         Inventory.currentCoins = 999;
+        UpdUiAndText();
     }
 }
