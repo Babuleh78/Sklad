@@ -1,0 +1,14 @@
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+         std::vector<int> Row1(n, 1);
+         for(int row = 1; row <m; row++){
+            std::vector<int> Rown(n, 1);
+            for(int col = 1; col <n; col++){
+                Rown[col] = Rown[col-1]+Row1[col];
+            }
+            Row1 = Rown;
+         }
+         return Row1[n-1];
+    }
+};
