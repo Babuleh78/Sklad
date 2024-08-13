@@ -1,0 +1,149 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor.ShaderGraph.Internal;
+using UnityEngine;
+
+public class AudioManager : MonoBehaviour
+{
+    private bool muted;
+
+
+    public AudioSource[] battleMusicSource;
+    public AudioSource[] WinSound;
+    public AudioSource[] LoseSound;
+    private AudioSource CurrAudioSource;
+    private int currentClipIndex = 0;
+    private bool isPlaying;
+    private float delay;
+
+    private const float delayTick = 0.05f;
+
+
+    private static AudioManager instance;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+
+    private void Start()
+    {
+        muted = PlayerPrefs.GetInt("MUTED") == 1;
+        if (muted)
+        {
+            AudioListener.pause = true;
+        }
+        CurrAudioSource = gameObject.AddComponent<AudioSource>(); // Добавление AudioSource к объекту
+        
+
+    }
+
+    public void ToggleMute()
+    {
+        muted = !muted;
+        if (muted)
+        {
+            PlayerPrefs.SetInt("MUTED", 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("MUTED", 0);
+        }
+        if (muted)
+        {
+            AudioListener.pause = true;
+        }
+    }
+
+    public static void PlayBattleMusic()
+    {
+        instance.isPlaying = true;
+        instance.StartCoroutine(instance.BattleSound());
+    }
+
+
+    public static void StopBattleMusic()
+    {
+        instance.isPlaying = false;
+        instance.StopCoroutine(instance.BattleSound());
+    }
+
+    public static void PWS()
+    {
+        instance.StartCoroutine(instance.PlayWinSound());
+    }
+    public static void PLS()
+    {
+        instance.StartCoroutine(instance.PlayLoseSound());
+    }
+    private IEnumerator PlayWinSound()
+
+    {
+        int random = Random.Range(0, WinSound.Length);
+        WinSound[random].Play();
+        while (isPlaying)
+        {
+            yield return null;
+
+        }
+        WinSound[random].Stop();
+    }
+    private IEnumerator PlayLoseSound()
+
+    {
+        int random = Random.Range(0, LoseSound.Length);
+        LoseSound[random].Play();
+        while (isPlaying)
+        {
+            yield return null;
+
+        }
+        LoseSound[random].Stop();
+    }
+    public static void UpdBattleMusicDelay(int i)
+    {
+        float delayTime = i * delayTick;
+
+        if (delayTime < 0.2f)
+        {
+            delayTime = 0.2f;
+        }
+        if (delayTime > 1)
+        {
+            delayTime = 1;
+        }
+        instance.delay = delayTime;
+    }
+
+    private IEnumerator BattleSound()
+       
+    {
+        int random = Random.Range(0, battleMusicSource.Length);
+        CurrAudioSource = battleMusicSource[random];
+        CurrAudioSource.Play();
+        while (isPlaying)
+        {
+            yield return null;
+            
+        }
+        CurrAudioSource.Stop();
+    }
+    void Update()
+    {
+        // Проверка, если аудиофайл закончился
+        if (!CurrAudioSource.isPlaying && currentClipIndex < battleMusicSource.Length)
+        {
+            StartCoroutine(BattleSound());
+        }
+    }
+
+    
+
+}
