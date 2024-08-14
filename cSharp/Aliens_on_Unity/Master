@@ -8,9 +8,11 @@ public class MasterOfHohol : MonoBehaviour
 {
     
     public GameObject bullet;
+    public GameObject sniperbullet;
+    public GameObject triplebullet;
     public Vector2 spawnPos = new Vector2(0, 10);
     private Vector3 hMoveDistance = new Vector3(0.05f, 0, 0);
-    private Vector3 vMoveDistance = new Vector3(0, 0.15f, 0);
+    private Vector3 vMoveDistance = new Vector3(0, 0.3f, 0);
     private Vector3 motherSpawn = new Vector3(5.5f, 4.5f, 0);
     public GameObject mother;
     private const float MAX_LEFT = -5.2f;
@@ -70,7 +72,7 @@ public class MasterOfHohol : MonoBehaviour
             
         }
     }
-
+    
     private void SpawnMother()
     {
         Instantiate(mother, motherSpawn, Quaternion.identity);
@@ -113,8 +115,25 @@ public class MasterOfHohol : MonoBehaviour
 
     private void Shoot()
     {
-        Vector2 pos = allHohols[Random.Range(0, allHohols.Count)].transform.position;
-        Instantiate(bullet, pos, Quaternion.identity);
+        int rand = Random.Range(0, allHohols.Count);
+        GameObject CurrHohol = allHohols[rand];
+        Vector2 pos = CurrHohol.transform.position;
+        if (CurrHohol.GetComponent<Hohol>().BulletName == "def")
+        {
+            Instantiate(bullet, pos, Quaternion.identity);
+        }
+        else if(CurrHohol.GetComponent<Hohol>().BulletName == "sni")
+        {
+            Instantiate(sniperbullet, pos, Quaternion.identity);
+        } else if(CurrHohol.GetComponent<Hohol>().BulletName == "tri")
+        {
+            Instantiate(triplebullet, pos, Quaternion.identity);
+        }
+        else
+        {
+            Debug.Log("Ошибка с пулей");
+        }
+       
         ShootTimer = ShootTime;
     }
     private float GetMoveSpeed()
