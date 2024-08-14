@@ -1,0 +1,48 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+public class Hohol : MonoBehaviour
+{
+    
+    public int scoreValue;
+    public GameObject explosion;
+    public GameObject coinPref;
+    public GameObject lifePref;
+    public GameObject healthPref;
+    public int health = 1;
+    protected int LIFE_CHANCE = 1;
+    protected int HEALTH_CHANCE = 3;
+    protected int COIN_CHANCE = 7;
+    public string BulletName;
+    public void Kill()
+    {
+        UIManager.UpdScore(scoreValue);
+        MasterOfHohol.allHohols.Remove(gameObject);
+        int rand = Random.Range(0, 100);
+
+        if(rand <= LIFE_CHANCE)
+        {
+            Instantiate(lifePref, transform.position, Quaternion.identity);
+        } else if(rand <= HEALTH_CHANCE)
+        {
+            Instantiate(healthPref, transform.position, Quaternion.identity);
+
+        } else if (rand <= COIN_CHANCE)
+        {
+            Instantiate(coinPref, transform.position, Quaternion.identity);
+        }
+        Instantiate(explosion, transform.position, Quaternion.identity);
+        if(MasterOfHohol.allHohols.Count == 0)
+        {
+            AudioManager.PWS();
+            MenuManager.OpenShop();
+            GameManager.SpawnNewWave();
+            GameManager.SpawnNewLine();
+           
+        }
+        Destroy(gameObject);
+    }
+
+}
