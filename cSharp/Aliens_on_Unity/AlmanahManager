@@ -1,0 +1,49 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
+
+public class AlmanahManager : MonoBehaviour
+{
+    public Image[] images;
+    public Sprite[] Sprites;
+    
+    public Dictionary<string, int> OpenMap = new Dictionary<string, int>();
+    private static AlmanahManager instance;
+    private void Start()
+    {
+        OpenMap["com"] = 0;
+        OpenMap["kis"] = 1;
+        OpenMap["sni"] = 2;
+        OpenMap["tan"] = 3;
+        OpenMap["tri"] = 4;
+    }
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        instance.images[0].sprite = instance.Sprites[0];
+        instance.images[0].color = new Color(1, 1, 1, 1);
+        OpenMap["com"] = 0;
+        OpenMap["kis"] = 1;
+        OpenMap["sni"] = 2;
+        OpenMap["tan"] = 3;
+        OpenMap["tri"] = 4;
+    }
+
+    public static void Open(string s)
+    {
+        Debug.Log(s);
+        //instance.images[0].sprite = instance.Sprites[0];
+        //Debug.Log(OpenMap[s]);
+        //instance.images[OpenMap[s]].GetComponent<Image>().sprite = instance.Sprites[OpenMap[s]];
+    }
+}
