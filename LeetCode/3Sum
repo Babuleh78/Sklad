@@ -1,0 +1,33 @@
+//bad
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        vector<vector<int>> vec;
+        vector<int> mas{0, 0, 0};
+        
+        for(int k = nums.size()-1; k>=2; k--){
+            for(int i = 0; i <= nums.size()- 3 ; i++){
+                for(int j = i+1; j <k ; j++){
+                    if(nums[i]+nums[j]+nums[k] == 0){
+                        mas[0] = nums[i];
+                        mas[1] = nums[j];
+                        mas[2] = nums[k];
+                        sort(mas.begin(), mas.end());
+                        bool flag = true;
+                        for(int p = 0; p<vec.size(); p++){
+                            if(vec[p] == mas){
+                                flag = false;
+                                break;
+                            }
+                        }
+                        if(flag){
+                            vec.push_back(mas);
+                        }
+                        
+                    }
+                }
+            }
+        }
+        return vec;
+   }
+};
