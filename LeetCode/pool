@@ -2,28 +2,22 @@ class Solution {
 public:
     int maxArea(vector<int>& h) {
          int l = 0;
- int right = 0;
- int left = 0;
- while (left != h.size() - 1) {
-     if (right >= h.size() - 1) {
-         left++;
-         right = left + 1;
-         if (right >= h.size()) {
-             break;
-         }
-     }
-     else {
-         right++;
-     }
-     if (h[right] > h[left]) {
-         l = max(l, (right - left) * h[left]);
-
-     }
-     else {
-         l = max(l, (right - left) * h[right]);
-     }
-     
- }
+        int right = h.size() - 1;
+        int left = 0;
+        if(h.size() ==2){
+            return min(h[0], h[1]);
+        }
+        while (left != h.size() - 2) {
+            if (h[right] >= h[left]) {
+            l = max(l, (right - left) * h[left]);
+            left++;
+            right = h.size() - 1;
+            }
+             else {
+                l = max(l, (right - left) * h[right]);
+                right--;
+             }
+        }
         return l;
     }
 };
