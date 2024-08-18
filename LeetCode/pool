@@ -21,3 +21,22 @@ public:
         return l;
     }
 };
+class Solution {
+public:
+    int maxArea(vector<int>& h) {
+         int l = 0;
+        int right = h.size() - 1;
+        int left = 0;      
+        while (left<right) {
+            l = max(l, (right - left) * min(h[left], h[right]));
+            if (h[right] > h[left]) {          
+             left++;          
+            }
+             else {               
+                right--;
+             }
+
+        }
+        return l;
+    }
+};
