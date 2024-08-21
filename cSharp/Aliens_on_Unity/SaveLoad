@@ -1,0 +1,58 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+public static class SAveLoad
+{
+    private static string fileName = "SaveData.txt";
+    private static string directName = "SaveData";
+    public static void SaveState(SaveObj so)
+    {
+        if (!DirectExists())
+        {
+            Directory.CreateDirectory(Application.persistentDataPath + "/" + directName);
+            
+        }
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(GetSavePath());
+        bf.Serialize(file, so);
+        file.Close();
+    }
+
+    public static SaveObj LoadState()
+    {
+        SaveObj so = new SaveObj();
+        if (SaveExists())
+        {
+            try
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                FileStream file = File.Open(GetSavePath(), FileMode.Open);
+                so = (SaveObj)bf.Deserialize(file);
+            } catch (SerializationException)
+            {
+                Debug.LogWarning("СОСИ ХУЙ, БЫДЛО, НЕ СОХРАНЯЕТСЯ ТВОЯ ПАРАША");
+            }
+
+        }
+       
+        return so;
+    }
+
+   
+    private static bool SaveExists()
+    {
+        return File.Exists(GetSavePath());
+    }
+    private static bool DirectExists()
+    {
+        return Directory.Exists(Application.persistentDataPath + "/" + directName);
+    }
+
+    private static string GetSavePath()
+    {
+        return Application.persistentDataPath + "/" + directName +"/" + fileName;
+}
+}
