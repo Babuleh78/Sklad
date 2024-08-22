@@ -1,0 +1,36 @@
+class Solution {
+public:
+    vector<string> fizzBuzz(int n) {
+        int three = 3;
+        int five = 5;
+        vector<string> vec;
+        
+        int i = 1;
+        while (three <= n || five <= n) {
+            if (three == five && three == i) {
+                vec.push_back("FizzBuzz");
+                three += 3;
+                five += 5;
+            }
+            else if (i == three) {
+                vec.push_back("Fizz");
+                three += 3;
+                }
+            else if (i == five) {
+                vec.push_back("Buzz");
+                five += 5;
+            }
+            else {
+                vec.push_back(to_string(i));
+                }
+            i++;
+        }
+        if(vec.size() == 0){
+            vec.push_back("1");
+            if(n == 2){
+                vec.push_back("2");
+            }
+        }
+        return vec;
+    }
+};
