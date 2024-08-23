@@ -1,26 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Tilemaps;
+
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    
     public GameObject line;
     public GameObject TrueLine;
-    public static float liney = -5f;
-   
-
+    public static float liney = -4.6f;
     public GameObject currshields;
     public GameObject MaxShield;
-    public GameObject[] HoholsSet;
+    public GameObject[] VeryEasySet;
+    public GameObject[] HoholsSetEasy;
+    public GameObject[] HoholsSetMed;
+    public GameObject[] HoholsSetHard;
     private static bool need_reset;
-    
+    public static bool buy_shield;
     private GameObject currentSet;
-    
+    private int pred = 0;
+    public bool PlayerCanMove;
     private Vector2 spawnPos = new Vector2 (0, 10);
     private Vector2 spawnShield = new Vector2(-2.5f, -3);
-    private static GameManager instance;
+    public static GameManager instance;
+    
    
     private void Awake()
     {
@@ -33,15 +37,17 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
     }
     public static void CancelGame()
     {
+        
         instance.StopAllCoroutines();
         foreach (GameObject a in GameObject.FindGameObjectsWithTag("HBullet"))
             Destroy(a);
         foreach (GameObject a in GameObject.FindGameObjectsWithTag("JBullet"))
             Destroy(a);
-
+        UIManager.ResetVolna();
         MasterOfHohol.allHohols.Clear();
         if(instance.currentSet!= null)
         {
@@ -61,16 +67,25 @@ public class GameManager : MonoBehaviour
     
     public IEnumerator SpawnLine()
     {
-        if(line!= null)
+
+        if (instance.line != null)
         {
-            Destroy(line);
+            Destroy(instance.line);
+            
         }
         yield return new WaitForSeconds(2);
+       
         Vector2 spawnPos = new Vector2(0, liney);
-        line  = Instantiate(TrueLine, spawnPos, Quaternion.identity);
+        instance.line  = Instantiate(TrueLine, spawnPos, Quaternion.identity);
     }
     public static void SpawnNewLine()
     {
+        if (liney <= -3.6)
+        {
+            
+            liney += 0.05f;
+           
+        }
         instance.StartCoroutine(instance.SpawnLine());
     }
     public static void SpawnNewShields()
@@ -97,24 +112,84 @@ public class GameManager : MonoBehaviour
     private IEnumerator SpawnShields()
     {
         
-        if (currshields!= null)
+        if (instance.currshields != null)
         {
-            Destroy(currshields);
+            Destroy(instance.currshields);
+            
         }
         yield return new WaitForSeconds(2);
-        currshields = Instantiate(MaxShield, spawnShield, Quaternion.identity);
+        instance.currshields = Instantiate(MaxShield, spawnShield, Quaternion.identity);
     }
     private IEnumerator SpawnWave()
+       
     {
-        int number = Random.Range(0, HoholsSet.Length);
-        spawnPos = HoholsSet[number].GetComponent<MasterOfHohol>().spawnPos;
-        if(currentSet != null)
+        if(UIManager.GetVolna() <= 4)
         {
-            Destroy(currentSet);
+            int number = Random.Range(0, VeryEasySet.Length);
+            while (instance.pred == number)
+            {
+                number = Random.Range(0, VeryEasySet.Length);
+            }
+            pred = number;
+            spawnPos = VeryEasySet[number].GetComponent<MasterOfHohol>().spawnPos;
+            if (currentSet != null)
+            {
+                Destroy(currentSet);
+            }
+            yield return new WaitForSeconds(2);
+            currentSet = Instantiate(VeryEasySet[number], spawnPos, Quaternion.identity);
         }
-        yield return new WaitForSeconds(2);
-        currentSet = Instantiate(HoholsSet[number], spawnPos, Quaternion.identity);
-        //Ciy
+       
+        else if (UIManager.GetVolna() <= 10 && UIManager.GetVolna() >= 4)
+        {
+            int number = Random.Range(0, HoholsSetEasy.Length);
+            while(instance.pred == number)
+            {
+                number = Random.Range(0, HoholsSetEasy.Length);
+            }
+            pred = number;
+            spawnPos = HoholsSetEasy[number].GetComponent<MasterOfHohol>().spawnPos;
+            if (currentSet != null)
+            {
+                Destroy(currentSet);
+            }
+            yield return new WaitForSeconds(2);
+            currentSet = Instantiate(HoholsSetEasy[number], spawnPos, Quaternion.identity);
+        } else if(UIManager.GetVolna() >=10 && UIManager.GetVolna() <= 20)
+        {
+            int number = Random.Range(0, HoholsSetEasy.Length);
+            while (instance.pred == number)
+            {
+                number = Random.Range(0, HoholsSetEasy.Length);
+            }
+            pred = number;
+            spawnPos = HoholsSetMed[number].GetComponent<MasterOfHohol>().spawnPos;
+            if (currentSet != null)
+            {
+                Destroy(currentSet);
+            }
+            yield return new WaitForSeconds(2);
+            currentSet = Instantiate(HoholsSetMed[number], spawnPos, Quaternion.identity);
+        }
+        else
+        {
+            int number = Random.Range(0, HoholsSetEasy.Length);
+            while (instance.pred == number)
+            {
+                number = Random.Range(0, HoholsSetEasy.Length);
+            }
+            pred = number;
+            spawnPos = HoholsSetHard[number].GetComponent<MasterOfHohol>().spawnPos;
+            if (currentSet != null)
+            {
+                Destroy(currentSet);
+            }
+            yield return new WaitForSeconds(2);
+            currentSet = Instantiate(HoholsSetHard[number], spawnPos, Quaternion.identity);
+        }
+        
+        UIManager.UpdVolna();
+       
     }
 
 }
