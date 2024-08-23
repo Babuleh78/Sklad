@@ -17,6 +17,23 @@ public class JeniaBullet : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        
+
+        if (collision.gameObject.CompareTag("Hohol"))
+
+        {
+            collision.gameObject.GetComponent<Hohol>().health -= 1;
+            if (collision.gameObject.GetComponent<Hohol>().health <= 0)
+            {
+                Destroy(gameObject);
+                collision.gameObject.GetComponent<Hohol>().Kill();
+            }
+           
+            Destroy(gameObject);
+        }
+        if (collision.gameObject.CompareTag("HBullet"))
+        {
+            Destroy(collision.gameObject);
+            Destroy(gameObject);
+        }
     }
 }
