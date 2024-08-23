@@ -12,6 +12,8 @@ public class MenuManager : MonoBehaviour
     public GameObject inGame;
     public GameObject pause;
     public GameObject info;
+    public GameObject Almanah;
+    public GameObject Obuchenie;
     public static MenuManager instance;
 
     private void Awake()
@@ -24,8 +26,20 @@ public class MenuManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
+        
+        SoundManager.PlayRandomSound();
 
+    }
+    public void OpenObuch()
+    {
+        
+        Obuchenie.SetActive(true);
+    }
+    public void OpenAlmanah()
+    {
+        instance.mainMenu.SetActive(false);
+        instance.Almanah.SetActive(true);
+    }
     public void OpenMain()
     {
 
@@ -33,33 +47,45 @@ public class MenuManager : MonoBehaviour
         instance.pause.SetActive(false);
         instance.inGame.SetActive(false);
     }
-
+    public static void CloseAlm()
+    {
+        instance.Almanah.SetActive(false);
+    }
     public static void GameOver()
     {
-        instance.gameObject.SetActive(true);
+        instance.gameover.SetActive(true);
         instance.inGame.SetActive(false);
+        Time.timeScale = 0;
     }
-    public  void Shop()
-    {
-        instance.mainMenu.SetActive(false);
-        instance.shop.SetActive(true);
-        
-    }
+  
     public static void CloseShop()
     {
-        instance.mainMenu.SetActive(true);
+        Time.timeScale = 1;
         instance.shop.SetActive(false);
+    }
+    public static void OpenShop()
+    {
+        Time.timeScale = 0;
+        Inventory.currentCoins += 2;
+        UIManager.UpdCoin();
+       
+        GameManager.buy_shield = false;
+        instance.shop.SetActive(true);
     }
     public void InGame()
     {
         Time.timeScale = 1;
         
+        UIManager.ResetVolna();
+        GameManager.set_reset(true);
+        instance.Almanah.SetActive(false);
         instance.mainMenu.SetActive(false);
         instance.pause.SetActive(false);
         instance.shop.SetActive(false);
         instance.gameover.SetActive(false);
         instance.inGame.SetActive(true);
-
+        GameManager.SpawnNewShields();
+        GameManager.SpawnNewLine();
         GameManager.SpawnNewWave();
     }
     public void OpenPause()
@@ -77,7 +103,10 @@ public class MenuManager : MonoBehaviour
     }
     public void ReturnToMain()
     {
-        Time.timeScale = 1;
+        Time.timeScale = 0;
+        
+        instance.Obuchenie.SetActive(false);    
+        instance.Almanah.SetActive(false);
         instance.gameover.SetActive(false);
         instance.info.SetActive(false);
         instance.inGame.SetActive(false);
@@ -87,6 +116,7 @@ public class MenuManager : MonoBehaviour
 
         instance.mainMenu.SetActive(true);
         GameManager.CancelGame();
+
     }
 
     public static void CloseWindow(GameObject go)
@@ -97,10 +127,12 @@ public class MenuManager : MonoBehaviour
 
     private void Start()
     {
+        
         ReturnToMain();
     }
     public void OpenInfo()
     {
+        //PlayerPrefs.DeleteAll();
         instance.info.SetActive(true);
     }
 }
