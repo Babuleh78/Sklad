@@ -8,20 +8,111 @@ public class AlmanahManager : MonoBehaviour
 {
     public Image[] images;
     public Sprite[] Sprites;
-    
+    public GameObject ComPanel;
+    public GameObject KisPanel;
+    public GameObject SniPanel;
+    public GameObject TanPanel;
+    public GameObject TriPanel;
+    public GameObject ShiPanel;
+    public GameObject PulPanel;
+    public GameObject HeaPanel;
     public Dictionary<string, int> OpenMap = new Dictionary<string, int>();
-    private static AlmanahManager instance;
+    bool zapoln;
+    public int[] helpnum;
+    public static AlmanahManager instance;
     private void Start()
     {
-        OpenMap["com"] = 0;
-        OpenMap["kis"] = 1;
-        OpenMap["sni"] = 2;
-        OpenMap["tan"] = 3;
-        OpenMap["tri"] = 4;
+        
+       
+    }
+    public static void CloseAll()
+    {
+        AlmanahManager.instance.ComPanel.SetActive(false);
+        AlmanahManager.instance.KisPanel.SetActive(false);
+        AlmanahManager.instance.SniPanel.SetActive(false);
+        AlmanahManager.instance.TanPanel.SetActive(false);
+        AlmanahManager.instance.TriPanel.SetActive(false);
+        AlmanahManager.instance.ShiPanel.SetActive(false);
+        AlmanahManager.instance.PulPanel.SetActive(false);
+        AlmanahManager.instance.HeaPanel.SetActive(false);
+    }
+    public void Escape()
+    {
+        CloseAll();
+        MenuManager.CloseAlm();
+    }
+    public void openCom() { 
+    
+        if (instance.OpenMap["com"] == -1) { 
+            CloseAll();
+            AlmanahManager.instance.ComPanel.SetActive(true);
+        }
+    }
+    public void openKis()
+    {
+        if (instance.OpenMap["kis"] == -1)
+        {
+            CloseAll();
+            AlmanahManager.instance.KisPanel.SetActive(true);
+        }
+    }
+    public void openSni()
+    {
+        if (instance.OpenMap["sni"] == -1)
+        {
+            CloseAll();
+            AlmanahManager.instance.SniPanel.SetActive(true);
+        }
+    }
+    public void openTan()
+    {
+        if (instance.OpenMap["tan"] == -1)
+        {
+            CloseAll();
+            AlmanahManager.instance.TanPanel.SetActive(true);
+        }
+    }
+    public void openTri()
+    {
+        if (instance.OpenMap["tri"] == -1)
+        {
+            CloseAll();
+            AlmanahManager.instance.TriPanel.SetActive(true);
+        }
     }
 
+    public void openShi()
+    {
+        if (instance.OpenMap["shi"] == -1)//|| instance.images[5].sprite == instance.Sprites[5]
+        {
+            CloseAll();
+            AlmanahManager.instance.ShiPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("Не работает");
+
+        }
+    }
+    public void openPul()
+    {
+        if (instance.OpenMap["pul"] == -1)
+        {
+            CloseAll();
+            AlmanahManager.instance.PulPanel.SetActive(true);
+        }
+    }
+    public void openHea()
+    {
+        if (instance.OpenMap["hea"] == -1)
+        {
+            CloseAll();
+            AlmanahManager.instance.HeaPanel.SetActive(true);
+        }
+    }
     private void Awake()
     {
+        
         if (instance == null)
         {
             instance = this;
@@ -30,20 +121,41 @@ public class AlmanahManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        instance.images[0].sprite = instance.Sprites[0];
-        instance.images[0].color = new Color(1, 1, 1, 1);
-        OpenMap["com"] = 0;
-        OpenMap["kis"] = 1;
-        OpenMap["sni"] = 2;
-        OpenMap["tan"] = 3;
-        OpenMap["tri"] = 4;
+        if (!instance.zapoln)
+        {
+            SaveManager.LoadAlm();
+            int i = 0;
+            foreach(int a in OpenMap.Values)
+            {
+                if(a == -1)
+                {
+                    instance.images[i].sprite = instance.Sprites[i];
+                    instance.images[i].color = new Color(1, 1, 1, 1);
+                }
+                i++;
+            }
+            
+            instance.zapoln = true;
+
+        }
+
     }
 
     public static void Open(string s)
     {
-        Debug.Log(s);
-        //instance.images[0].sprite = instance.Sprites[0];
-        //Debug.Log(OpenMap[s]);
-        //instance.images[OpenMap[s]].GetComponent<Image>().sprite = instance.Sprites[OpenMap[s]];
+        if (instance!=null){
+            if (instance.OpenMap[s] != -1)
+            {
+                
+                instance.images[instance.OpenMap[s]].sprite = instance.Sprites[instance.OpenMap[s]];
+                instance.images[instance.OpenMap[s]].color = new Color(1, 1, 1, 1);
+                SaveManager.SaveAlm(s);
+                instance.OpenMap[s] = -1;
+
+            }
+        }
+            
+        
     }
 }
+
