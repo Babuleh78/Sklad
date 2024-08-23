@@ -1,0 +1,24 @@
+class Solution {
+public:
+    bool canConstruct(string ransomNote, string magazine) {
+        unordered_map<char, int> CharMap;
+        if(ransomNote.size() > magazine.size()){
+            return false;
+        }
+        bool flag = true;
+        for(int i = 0; i<magazine.size(); i++){
+            CharMap[magazine[i]]+= 1;
+        }
+        for(int i = 0; i<ransomNote.size(); i++){
+            if(CharMap[ransomNote[i]] > 0){
+                CharMap[ransomNote[i]] --;
+            } else{
+                return false;
+            }
+        }
+
+
+        return flag;
+    }
+
+};
