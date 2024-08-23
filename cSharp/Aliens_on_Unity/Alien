@@ -12,10 +12,12 @@ public class Hohol : MonoBehaviour
     public GameObject lifePref;
     public GameObject healthPref;
     public int health = 1;
-    protected int LIFE_CHANCE = 1;
-    protected int HEALTH_CHANCE = 3;
-    protected int COIN_CHANCE = 7;
+    public int LIFE_CHANCE = 1;
+    public int HEALTH_CHANCE = 3;
+    public int COIN_CHANCE = 7;
     public string BulletName;
+    public string type;
+    
     public void Kill()
     {
         UIManager.UpdScore(scoreValue);
@@ -36,13 +38,18 @@ public class Hohol : MonoBehaviour
         Instantiate(explosion, transform.position, Quaternion.identity);
         if(MasterOfHohol.allHohols.Count == 0)
         {
-            AudioManager.PWS();
+            GameManager.instance.PlayerCanMove = false;
             MenuManager.OpenShop();
+            WinAndLose.PlayWinSound();
             GameManager.SpawnNewWave();
             GameManager.SpawnNewLine();
-           
         }
         Destroy(gameObject);
+        AlmanahManager.Open(type);
     }
+    //private void ImageUpdate(string t)
+    //{
+    //    MasterOfHohol.images[MasterOfHohol.open_picture].sprite = UIManager.Sprites[MasterOfHohol.OpenMap[t]];
+    //}
 
 }
