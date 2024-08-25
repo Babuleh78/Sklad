@@ -1,0 +1,9 @@
+class Solution {
+public:
+    bool isPerfectSquare(int num) {
+        
+        long long int integer = sqrt(num);
+        double fl = sqrt(num);
+        return fl == integer ? true : false;
+    }
+};
