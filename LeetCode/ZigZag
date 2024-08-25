@@ -1,0 +1,54 @@
+class Solution {
+public:
+    string convert(string s, int numRows) {
+        string ns;
+        if(numRows == 1){
+            return s;
+        }
+        
+        char matrix[numRows][s.size()];
+          for (int i = 0; i < numRows; ++i) {
+     for (int j = 0; j < s.size(); ++j) {
+         matrix[i][j] = ' ';
+     }
+ }
+ 
+        int numZig = numRows - 1;
+        int n = 0;
+        int k =0;
+        int i =0;
+       while (i != s.size()) {
+            if (numZig == 0 || numZig == numRows - 1) {
+                matrix[n][k] = s[i];
+        if (n == numRows - 1) {
+            n = 0;
+            k++;
+            numZig = numZig - 1 > 0 ? numZig - 1 : numRows - 1;
+        }
+        else {
+            n += 1;
+        }
+    }
+    else {
+        for (int j = 0; j < numRows; j++) {
+            matrix[j][k] = ' ';
+        }
+        matrix[numZig][k] = s[i];
+        n = 0;
+        k++;
+        numZig = numZig - 1 > 0 ? numZig - 1 : numRows - 1;
+    }
+    i++;
+}
+    for (int i = 0; i < numRows ; i++) {
+        for (int j = 0; j < s.size(); j++) {
+            if (matrix[i][j] != ' ') {
+                ns += matrix[i][j];
+            }
+       
+        }
+    
+        }
+        return ns;
+    }
+};
