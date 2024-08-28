@@ -1,0 +1,23 @@
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        unordered_map<int, int> NumMap;
+        for(int i = 0; i<nums.size(); i++){
+            NumMap[nums[i]]+=1;
+        }
+        int nulls = NumMap[0];
+        int ones = NumMap[1];
+        int twos = NumMap[2];
+        cout << nulls << " " << ones << " " << twos;
+        for(int i = 0; i<nulls; i++){
+            nums[i] = 0;
+        }
+        for(int j = nulls; j<nulls+ones; j++){
+            nums[j] = 1;
+        }
+        for(int k = ones+nulls; k<ones+twos+nulls; k++){
+            nums[k] = 2;
+        }
+
+    }
+};
