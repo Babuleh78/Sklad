@@ -68,3 +68,38 @@ public:
         return vec;
    }
 };
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        vector<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        int left = 0;
+        int right = nums.size()-1;
+        for(int left = 0;left<nums.size(); left++){
+            if(left!=0 && nums[left] == nums[left-1]){
+                continue;
+            }
+            int vall = nums[left];
+            int curr = left+1;
+            int right = nums.size()-1;
+            while(curr < right){
+                int summ = vall+nums[curr]+nums[right];
+
+                if(summ>0){
+                    right --;
+
+                } else if(summ < 0){
+
+                    curr++;
+                } else{
+                    res.push_back({vall, nums[curr], nums[right]});
+                    curr++;
+                    while(nums[curr] == nums[curr-1] && curr<right){
+                        curr++;
+                    }
+                }
+            }
+        }
+        return res;
+   }
+};
