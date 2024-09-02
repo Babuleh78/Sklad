@@ -1,0 +1,45 @@
+#include <vector>
+using namespace std;
+
+// Определение структуры узл
+class Solution {
+public:
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        vector<vector<int>> ans;
+        if (root == nullptr) {
+            return ans;
+        }
+
+        vector<TreeNode*> currentLevel = { root };
+        bool leftToRight = true; // Указывает направление обхода
+
+        while (!currentLevel.empty()) {
+            vector<int> levelValues;
+            vector<TreeNode*> nextLevel;
+
+            for (TreeNode* node : currentLevel) {
+                levelValues.push_back(node->val); // Сохраняем значение узла
+
+                // Добавляем детей для следующего уровня
+                if (node->left) {
+                    nextLevel.push_back(node->left);
+                }
+                if (node->right) {
+                    nextLevel.push_back(node->right);
+                }
+            }
+
+            // Меняем порядок при необходимости
+            if (!leftToRight) {
+                reverse(levelValues.begin(), levelValues.end());
+            }
+
+            ans.push_back(levelValues); // Добавляем уровень в ответ 
+
+            currentLevel = nextLevel; // Переход к следующему уровню
+            leftToRight = !leftToRight; // Сменить направление
+        }
+
+        return ans;
+    }
+};
