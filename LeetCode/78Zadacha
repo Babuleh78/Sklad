@@ -1,0 +1,23 @@
+class Solution {
+public:
+    vector<vector<int>> subsets(vector<int>& nums) {
+        vector<vector<int>> vec;
+        vector<int> helpvec;
+        vec.push_back({});
+        int n =1;
+        vec.push_back({nums[0]});
+        while(n!=nums.size()){
+            int newnumber = nums[n];
+            vec.push_back({newnumber});
+            for(int i = 1; i<pow(2, n); i++){             
+                vector<int> helpvec = vec[i];
+                helpvec.push_back(newnumber);
+                vec.push_back(helpvec);
+            }
+            n+=1;
+
+
+        }
+        return vec;
+    }
+};
