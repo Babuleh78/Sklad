@@ -1,0 +1,22 @@
+class Solution {
+public:
+    bool isSubsequence(string s, string t) {
+        int count = 0;
+        int pointer = 0;
+        for(char a : s){
+            for(int i = pointer; i<=t.size(); i++){
+                if(i == t.size()){
+                    return false;
+                }
+                if(a == t[i]){
+                    count+=1;
+                    pointer = i+1;
+                    cout << pointer;
+                    break;
+                }
+                
+            }
+        }
+        return count == s.size();
+    }
+};
