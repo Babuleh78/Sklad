@@ -1,0 +1,54 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(head == nullptr){
+            return head;
+        }
+        ListNode* dummy = new ListNode();
+        int max_in_list = 0;
+        dummy->next = head;
+        unordered_map<int, int> Map;
+        while(head!= nullptr){
+            
+            Map[head->val]+=1;
+            max_in_list = max(max_in_list, head->val);
+            head =  head->next;
+        }
+        head = dummy->next;
+        if(head->val == max_in_list && head->next!=nullptr){
+            return nullptr;
+        }
+        ListNode* superdummy = new ListNode();
+        superdummy->next = dummy;
+        dummy->next = nullptr;
+        
+        dummy = new ListNode(); // Создаем "dummy" узел для удобства
+        ListNode* tail = dummy; // Указатель на последний узел результирующего списка
+
+         while (head != nullptr) {
+        // Проверяем, если значение уже встречалось только один раз
+        if (Map[head->val] == 1) {
+            // Создаем новый узел
+            ListNode* newNode = new ListNode();
+            newNode->val = head->val;
+
+            // Присоединяем новый узел к результирующему списку
+            tail->next = newNode;
+            tail = newNode; // Обновляем указатель на последний узел
+        } 
+        head = head->next; // Переходим к следующему узлу
+    }
+
+    return dummy->next;
+    }
+};
