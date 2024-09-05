@@ -1,0 +1,42 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    void flatten(TreeNode* root) {
+        if(root == nullptr || (root ->left == nullptr && root->right == nullptr)){
+            return;
+        }
+        vector<int> vec;
+        Helper(root, vec);
+        for(int a : vec){
+            cout << a;
+        }
+        for(int i = 1; i<vec.size(); i++){
+            TreeNode* newNode = new TreeNode();
+            newNode->val = vec[i];
+            root->left = nullptr;
+            root->right = newNode;
+            root = root->right;
+            
+        }
+        
+        
+    }
+    void Helper(TreeNode* root, vector<int>& vec){
+        if(root == nullptr){
+            return;
+        }
+        vec.push_back(root->val);
+        Helper(root->left, vec);
+        Helper(root->right, vec);
+    }
+};
