@@ -13,8 +13,8 @@ class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
         vector<int> ans;
-        Helper(root, ans);
-        return ans;
+        Helper(root, ans);//повтороный выбор
+        return ans; 
     }
     void Helper(TreeNode* node, vector<int>& vec){
         if(node == nullptr){
