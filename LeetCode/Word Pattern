@@ -1,0 +1,32 @@
+class Solution {
+public:
+    bool wordPattern(string pattern, string s) {
+        std::unordered_map<char, std::string> Map;
+        std::unordered_map<std::string, char> AnotherMap;
+        std::istringstream iss(s);
+        std::string str;
+        int i = 0;
+
+        for (char a : pattern) {
+            if (!(iss >> str)) { // Чтение слова из строки
+                return false; // Количество символов и слов не совпадает
+            }
+
+            // Проверка соответствия между символом и словом
+            if (Map[a].empty() && AnotherMap[str] == 0) {
+                Map[a] = str; // Заполнение mapping для символа
+                AnotherMap[str] = a; // Заполнение mapping для слова
+            } 
+            else if (Map[a] != str || AnotherMap[str] != a) {
+                return false; // Слова не соответствуют шаблону
+            }
+        }
+
+        // После цикла, должны быть больше не оставшихся слов
+        if (iss >> str) {
+            return false; // Если остались лишние слова
+        }
+
+        return true; // Все проверки пройдены
+    }
+};
