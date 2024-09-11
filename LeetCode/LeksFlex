@@ -1,0 +1,19 @@
+class Solution {
+public:
+    void add(int i, int n, vector<int>& result) {
+        if (i > n) return;
+        result.push_back(i);
+        for (int j = 0; j <= 9; j++) {
+            int newNumber = i * 10 + j;
+            add(newNumber, n, result);
+        }
+    }
+    vector<int> lexicalOrder(int n) {
+        vector<int> result;
+        for (int i = 1; i <= 9; i++) {
+            add(i, n, result);
+        }
+        
+        return result;
+    }
+};
