@@ -26,6 +26,28 @@
       й </pre>
     <code> int a = 5 </code>
   </body>
-
-
 </html>
+---------------------------------------------------------------------------------
+<!DOCTYPE html>
+<html><!--Главный тэг-->
+  <head> <!--Юзер не видит-->
+    <meta charset="utf-8">
+    <meta name = "author" content="Painkiller">
+    <meta name = "description" content = "Test">
+    <!-- Для ботов-->
+    <title> Бабулобби</title>
+  </head>
+  <body> <!--Юзер видит-->
+    <ol start = "7" type = "I">
+      <li> Купи пиво </li>
+      <li> Купи водку </li>
+      <li> Купи виски </li>
+    </ol>
+    <ul type = "square">
+      <li> Купи пиво </li>
+      <li> Купи водку </li>
+      <li> Купи виски </li>
+    </ul>
+  </body>
+</html>
+---------------------------------------------------------------------------------
