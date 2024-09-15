@@ -1,9 +1,10 @@
+<!DOCTYPE html>
 <html><!--Главный тэг-->
   <head> <!--Юзер не видит-->
+    <meta charset="utf-8">
+    <title> Бабулобби</title>
     <body> <!--Юзер видит-->
       Бабулех
     </body>
   </head>
 </html>
-
-
