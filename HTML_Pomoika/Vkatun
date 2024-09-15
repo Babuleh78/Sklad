@@ -51,3 +51,16 @@
   </body>
 </html>
 ---------------------------------------------------------------------------------
+<!DOCTYPE html>
+<html lang = "ru"><!--А зач lang-->
+  <head> <!--Юзер не видит-->
+  </head>
+  <body> <!--Юзер видит-->
+    <a href = "#rrr" > Вниз </a>
+     <a target="_blank" href = "https://www.songsterr.com/a/wsa/motorhead-born-to-raise-hell-tab-s35500"> Перейти к Бабулеху</a> <!-- ssilka -->
+     <a href = "about.html"> иди </a>
+
+     <a name ="rrr"></a>
+  </body>
+</html>
+---------------------------------------------------------------------------------
