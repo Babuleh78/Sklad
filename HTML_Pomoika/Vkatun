@@ -2,9 +2,30 @@
 <html><!--Главный тэг-->
   <head> <!--Юзер не видит-->
     <meta charset="utf-8">
+    <meta name = "author" content="Painkiller">
+    <meta name = "description" content = "Test">
+    <!-- Для ботов-->
     <title> Бабулобби</title>
-    <body> <!--Юзер видит-->
-      Бабулех
-    </body>
   </head>
+  <body> <!--Юзер видит-->
+    <h1>Самый главный самый важный</h1>
+    <h1>Не такой главный и важный</h1>
+    <p> Просто текст </p>
+    <p> Он жир -> <b> ДА Я</b> </p>
+    <p> <strong> Stronger free and brave </strong> </p>
+    <p> <em> Ого, <strike>курсив</strike> </em> <p>
+    <p> a<sup>2</sup></p>
+    H<sub>2</sub>0<br> <!-- Otstup -->
+    <br><hr>
+    <abbr title="Хуйня">HTML</abbr> <!-- Пояснение-->
+    <address>
+      Moscow, Russia
+    </address>
+    <pre> Я ТУ
+      т гла в ны
+      й </pre>
+    <code> int a = 5 </code>
+  </body>
+
+
 </html>
