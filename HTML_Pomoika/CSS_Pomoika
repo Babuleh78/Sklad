@@ -55,4 +55,8 @@ div b {
   text-decoration:  overline;
   text-decoration-color: green;
 }
+.main_link:active{
+  text-decoration: line-through;
+}
+
 ---------------------------------------------------------
