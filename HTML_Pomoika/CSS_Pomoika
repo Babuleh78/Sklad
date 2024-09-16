@@ -44,3 +44,15 @@ div b {
     </div>
   </body>
 </html>
+---------------------------------------------------------
+.main_link{
+  color: red;
+  text-decoration: line-through;
+}
+
+.main_link:hover{
+  color: blue;
+  text-decoration:  overline;
+  text-decoration-color: green;
+}
+---------------------------------------------------------
