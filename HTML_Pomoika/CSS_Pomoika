@@ -16,3 +16,31 @@
   </body>
 </html>
 ---------------------------------------------------------
+.main{
+  color: blue;
+  font-style: italic;
+}
+#SVO{
+  color: green
+}
+div b {
+  color: red
+}
+<!DOCTYPE html>
+<html lang = "ru">
+  <head>
+    <title>HTML+CSS</title>
+    <link rel = "stylesheet" href ="CSS/rofl.css">
+    <!-- <style>
+      b{
+        color: red
+      }
+    </style> -->
+  </head>
+  <body>
+    <p class = "main"> Люблю я вкус <i id = "SVO">СВОбоды</i>, <b>Шашур Шашур</b></p>
+    <div>
+      <p> Люблю я вкус <i id = "SVO">СВОбоды</i>, <b>Шашур Шашур</b></p>
+    </div>
+  </body>
+</html>
