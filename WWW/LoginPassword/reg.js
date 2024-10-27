@@ -15,18 +15,17 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
 
   // Инициализация приложения Firebase
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app); // Получаем экземпляр аутентификации
+  const auth = getAuth(app); 
 
   document.getElementById('button_reg').addEventListener('click', function(event) {
       event.preventDefault();
 
-      const email = document.getElementById('username_reg').value + "@example.com"; // либо другое поле для email
+      const email = document.getElementById('username_reg').value + "@example.com"; 
       const password = document.getElementById('password_reg').value;
 
       // Создание пользователя
       createUserWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
-              // Успешная регистрация
               const user = userCredential.user;
               console.log('Пользователь зарегистрирован:', user);
               alert('Регистрация успешна!');
