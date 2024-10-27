@@ -1,0 +1,13 @@
+.main_link{
+  color: red;
+  text-decoration: line-through;
+}
+
+.main_link:hover{
+  color: blue;
+  text-decoration:  overline;
+  text-decoration-color: green;
+}
+.main_link:active{
+  text-decoration: line-through;
+}
