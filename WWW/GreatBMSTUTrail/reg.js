@@ -15,7 +15,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
       measurementId: "G-TRCG7E5HPC"
   };
 
-  // Инициализация приложения Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app); 
 
