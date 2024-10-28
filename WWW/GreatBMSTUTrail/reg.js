@@ -22,8 +22,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
 
       const email = document.getElementById('username_reg').value + "@example.com"; 
       const password = document.getElementById('password_reg').value;
-
-      // Создание пользователя
+    
       createUserWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
               const user = userCredential.user;
