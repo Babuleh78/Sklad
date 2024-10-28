@@ -1,5 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
   import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
+  import { getFirestore, doc, setDoc} from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js';
+
 
   // Ваш код инициализации Firebase
   
@@ -17,6 +19,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app); 
 
+  const db = getFirestore(app);
   document.getElementById('button_reg').addEventListener('click', function(event) {
       event.preventDefault();
 
@@ -28,6 +31,8 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
               const user = userCredential.user;
               console.log('Пользователь зарегистрирован:', user);
               alert('Регистрация успешна!');
+              
+              addFieldsToUser(user.uid);
           })
           .catch((error) => {
               const errorCode = error.code;
@@ -36,3 +41,20 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
               alert('Ошибка: ' + errorMessage);
           });
   });
+  async function addFieldsToUser (userId) {
+    const userRef = doc(db, "users", userId); // Ссылка на документ пользователя
+
+    console.log("Попытка обновить документ для пользователя:", userId);
+
+    try {
+        await setDoc(userRef, {
+            rating: 5, // Добавление поля "рейтинг"
+            textValue: "Это текстовое значение" // Добавление текстового поля
+        }, { merge: true }); // Используйте merge для объединения данных
+        console.log("Поля успешно добавлены.");
+        window.open("index.html");
+    } catch (e) {
+        console.error("Ошибка при добавлении полей: ", e);
+        alert("Ошибка при добавлении полей: " + e.message); // Уведомление пользователя об ошибке
+    }
+}

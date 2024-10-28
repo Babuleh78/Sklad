@@ -16,10 +16,10 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
 
   document.getElementById('button_log').addEventListener('click', function(e) {
     e.preventDefault(); 
-    const email = document.getElementById('username_log').value;
+    const email = document.getElementById('username_log').value + "@example.com";
     const password = document.getElementById('password_log').value;
 
-    signInWithEmailAndPassword(auth, email, password) // Исправлено здесь
+    signInWithEmailAndPassword(auth, email, password) 
         .then((userCredential) => {
             const user = userCredential.user;
             window.open("index.html");
@@ -29,5 +29,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
             const errorMessage = error.message;
             document.getElementById('message').textContent = "Ошибка: " + errorMessage;
         });
+    
 
   });
