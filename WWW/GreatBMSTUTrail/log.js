@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
-  import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
+  import { getAuth, signInWithEmailAndPassword} from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
   
   const firebaseConfig = {
       apiKey: "AIzaSyCRBI8odC_xkOQWvm3RQByJsqQ1XsrL3WA",
@@ -14,11 +14,12 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app); 
 
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
+  document.getElementById('button_log').addEventListener('click', function(e) {
     e.preventDefault(); 
     const email = document.getElementById('username_log').value;
     const password = document.getElementById('password_log').value;
-    auth.signInWithEmailAndPassword(auth, email, password)
+
+    signInWithEmailAndPassword(auth, email, password) // Исправлено здесь
         .then((userCredential) => {
             const user = userCredential.user;
             window.open("index.html");
@@ -28,6 +29,5 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
             const errorMessage = error.message;
             document.getElementById('message').textContent = "Ошибка: " + errorMessage;
         });
-
 
   });
