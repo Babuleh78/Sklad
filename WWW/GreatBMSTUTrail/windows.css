@@ -1,0 +1,13 @@
+.modal{
+    background-color: none;
+   
+    width: 200px;
+    height: 100px;
+}
+
+.modal.content{
+    font-size: 20px; /* Исходный размер текста */
+    font-family: "Montserrat", sans-serif;
+    cursor: pointer;
+    color: #3498db;
+}

@@ -16,9 +16,9 @@ body {
     margin-top: 0;
 }
 
-.sidebar a {
+.sidebar button {
     display: block; 
-    color: white; 
+    color: #3498db; 
     text-decoration: none; 
     padding: 10px 0; 
     transition: background-color 0.3s; 

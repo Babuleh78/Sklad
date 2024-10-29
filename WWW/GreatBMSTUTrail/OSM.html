@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="styleformap.css">
     <link rel="stylesheet" href="view.css">
+    <link rel = "stylesheet" href = "windows.css"> 
     <script src="https://kit.fontawesome.com/dfff5cd86e.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
@@ -17,19 +18,26 @@
   <body>
     <div class="sidebar">
         <h2>Меню</h2>
-        <a href="#info">Информация о сайте</a>
-        <a href="#profile">Профиль пользователя</a>
-        <a href="#settings">Настройки</a>
-        <a href="#help">Помощь</a>
-        <a href="#logout">Выход</a>
+        <button  id="open_user">Пользователь</button>
+        
+
+        
     </div>
-    
+    <div id="user_info" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close_user"></span>
+            <h2>Пользователь</h2>
+            <p>Имя: Иван Иванов</p>
+            <p>Возраст: 30 лет</p>
+            <p>Email: ivan@example.com</p>
+        </div>
+    </div>
     <div class="content">
         <div id="map" class = "map"></div>
     </div>
     
 
-
+    <script src = "open.js"></script>
     </div>
     <script src="https://api.maptiler.com/maps/streets/tiles.js">
 
