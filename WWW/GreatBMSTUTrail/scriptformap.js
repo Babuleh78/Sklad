@@ -46,7 +46,6 @@ function init() {
       iconImageOffset: [-10, -10]
     });
     myballoon.events.add('balloonopen', function () {
-      console.log("Пиздец");
       const incrementButton = document.getElementById('ZButton');
       const visitorCountElement = document.getElementById('visitorCount');
       incrementButton.addEventListener('click', function () {
