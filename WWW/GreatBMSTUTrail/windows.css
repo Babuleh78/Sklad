@@ -1,11 +1,12 @@
 .modal{
     background-color: none;
    
-    width: 200px;
-    height: 100px;
+   
 }
 
 .modal.content{
+    width: 200px;
+    height: 100px;
     font-size: 20px; /* Исходный размер текста */
     font-family: "Montserrat", sans-serif;
     cursor: pointer;
