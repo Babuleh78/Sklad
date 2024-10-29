@@ -51,7 +51,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
             textValue: "Это текстовое значение" // Добавление текстового поля
         }, { merge: true }); // Используйте merge для объединения данных
         console.log("Поля успешно добавлены.");
-        window.open("index.html");
+        window.open("OSM.html");
     } catch (e) {
         console.error("Ошибка при добавлении полей: ", e);
         alert("Ошибка при добавлении полей: " + e.message); // Уведомление пользователя об ошибке

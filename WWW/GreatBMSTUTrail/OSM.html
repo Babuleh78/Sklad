@@ -9,12 +9,25 @@
     <title>Display a map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="styleformap.css">
+    <link rel="stylesheet" href="view.css">
     <script src="https://kit.fontawesome.com/dfff5cd86e.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
   </head>
   <body>
-    <div id="map" class = "map">
+    <div class="sidebar">
+        <h2>Меню</h2>
+        <a href="#info">Информация о сайте</a>
+        <a href="#profile">Профиль пользователя</a>
+        <a href="#settings">Настройки</a>
+        <a href="#help">Помощь</a>
+        <a href="#logout">Выход</a>
+    </div>
+    
+    <div class="content">
+        <div id="map" class = "map"></div>
+    </div>
+    
 
 
     </div>
