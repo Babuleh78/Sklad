@@ -31,7 +31,11 @@ if (idToken) {
     const userId = decodedPayload.user_id; // Идентификатор пользователя
     const email = decodedPayload.email; // Электронная почта пользователя
     const name = decodedPayload.name; // Имя пользователя (если указано)
+    const parts = email.split('@');
 
+
+    const username = parts[0];
+    nickname.textContent = username;
     console.log(`User ID: ${userId}`);
     console.log(`Email: ${email}`);
     console.log(`Name: ${name}`);
