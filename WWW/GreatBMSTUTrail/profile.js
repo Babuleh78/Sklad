@@ -1,5 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
   import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
+  import jwtDecode from 'jwt-decode';
+
   const firebaseConfig = {
     apiKey: "AIzaSyCRBI8odC_xkOQWvm3RQByJsqQ1XsrL3WA",
     authDomain: "nightofthelongknives-b66e2.firebaseapp.com",
@@ -14,11 +16,19 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); 
 const currentUser = auth.currentUser;
 const nickname = document.getElementById("name");
-const idToken = localStorage.getItem('firebaseIdToken');
 
+const idToken = localStorage.getItem('firebaseIdToken');
 if (idToken) {
-  console.log("Retrieved ID Token:", idToken);
-  
-} else {
-  console.log("No ID token found. User may not be authenticated.");
+    // Декодируем токен
+    const decodedToken = jwtDecode(idToken);
+    console.log("Decoded Token:", decodedToken);
+
+    // Получаем информацию о пользователе
+    const userId = decodedToken.user_id; // Идентификатор пользователя
+    const email = decodedToken.email; // Электронная почта пользователя
+    const name = decodedToken.name; // Имя пользователя (если указано)
+
+    console.log(`User ID: ${userId}`);
+    console.log(`Email: ${email}`);
+    console.log(`Name: ${name}`);
 }
