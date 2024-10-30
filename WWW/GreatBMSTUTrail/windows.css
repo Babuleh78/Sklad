@@ -1,21 +1,27 @@
+/* Общие стили для модального окна */
 .modal {
-    background-color: black;
-    height: 300px; 
-    width: 400px; 
-    position: relative;
-    margin-left: 150px;
-    z-index: 100;
-    
-    border-radius: 10px; 
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+    display: none; /* Скрыто по умолчанию */
+    position: fixed; /* Фиксированное позиционирование */
+    z-index: 1000; /* Обеспечивает отображение поверх других элементов */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ширина на весь экран */
+    height: 100%; /* Высота на весь экран */
+    background-color: rgba(0, 0, 0, 0); /* Темный полупрозрачный фон */
 }
 
+/* Контент модального окна */
+.modal-content {
+    position: absolute; /* Абсолютное позиционирование для модального контента */
+    left: 130px;
+    background-color: white; /* Белый фон для контента */
+    padding: 20px; /* Отступы */
+    border-radius: 5px; /* Скругленные углы */
+}
 
-.modal-content{
-    width: 250px;
-    min-height: 100px;  /* Set a minimum height to make sure the content has space */
-    font-size: 20px; /* Исходный размер текста */
-    font-family: "Montserrat", sans-serif;
-    cursor: pointer;
-    color: #3498db;
+/* Кнопка закрытия */
+.close {
+    cursor: pointer; /* Курсор для кнопки закрытия */
+    float: right; /* Правое выравнивание */
+    left: 100px;
 }
