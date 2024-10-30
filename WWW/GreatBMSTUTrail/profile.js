@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
   import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
-  import jwtDecode from 'jwt-decode';
+
 
   const firebaseConfig = {
     apiKey: "AIzaSyCRBI8odC_xkOQWvm3RQByJsqQ1XsrL3WA",
@@ -19,14 +19,18 @@ const nickname = document.getElementById("name");
 
 const idToken = localStorage.getItem('firebaseIdToken');
 if (idToken) {
-    // Декодируем токен
-    const decodedToken = jwtDecode(idToken);
-    console.log("Decoded Token:", decodedToken);
+    // JWT состоит из трех частей: заголовок, полезная нагрузка и подпись
+    const payload = idToken.split('.')[1]; // Получаем часть, содержащую полезную нагрузку
+
+    // Декодируем полезную нагрузку из Base64URL
+    const decodedPayload = JSON.parse(decodeURIComponent(escape(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))));
+
+    console.log("Decoded Token:", decodedPayload);
 
     // Получаем информацию о пользователе
-    const userId = decodedToken.user_id; // Идентификатор пользователя
-    const email = decodedToken.email; // Электронная почта пользователя
-    const name = decodedToken.name; // Имя пользователя (если указано)
+    const userId = decodedPayload.user_id; // Идентификатор пользователя
+    const email = decodedPayload.email; // Электронная почта пользователя
+    const name = decodedPayload.name; // Имя пользователя (если указано)
 
     console.log(`User ID: ${userId}`);
     console.log(`Email: ${email}`);
