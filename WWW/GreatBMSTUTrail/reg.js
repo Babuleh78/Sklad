@@ -1,9 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
   import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
   import { getFirestore, doc, setDoc} from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js';
-
-
-  // Ваш код инициализации Firebase
   
   const firebaseConfig = {
       apiKey: "AIzaSyCRBI8odC_xkOQWvm3RQByJsqQ1XsrL3WA",
@@ -16,21 +13,18 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app); 
-
+  const auth = getAuth(app);    
   const db = getFirestore(app);
   document.getElementById('button_reg').addEventListener('click', function(event) {
       event.preventDefault();
 
-      const email = document.getElementById('username_reg').value + "@example.com"; 
+      const nickname = document.getElementById('username_reg').value + "@example.com"; 
       const password = document.getElementById('password_reg').value;
     
-      createUserWithEmailAndPassword(auth, email, password)
+      createUserWithEmailAndPassword(auth, nickname, password)
           .then((userCredential) => {
               const user = userCredential.user;
               console.log('Пользователь зарегистрирован:', user);
-              alert('Регистрация успешна!');
-              
               addFieldsToUser(user.uid);
           })
           .catch((error) => {
@@ -40,7 +34,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
               alert('Ошибка: ' + errorMessage);
           });
   });
-  async function addFieldsToUser (userId) {
+    async function addFieldsToUser (userId) {
     const userRef = doc(db, "users", userId); // Ссылка на документ пользователя
 
     console.log("Попытка обновить документ для пользователя:", userId);
@@ -51,7 +45,8 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
             textValue: "Это текстовое значение" // Добавление текстового поля
         }, { merge: true }); // Используйте merge для объединения данных
         console.log("Поля успешно добавлены.");
-        window.open("OSM.html");
+        
+        window.open("OSM.html", "_self");
     } catch (e) {
         console.error("Ошибка при добавлении полей: ", e);
         alert("Ошибка при добавлении полей: " + e.message); // Уведомление пользователя об ошибке

@@ -1,0 +1,24 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
+  const firebaseConfig = {
+    apiKey: "AIzaSyCRBI8odC_xkOQWvm3RQByJsqQ1XsrL3WA",
+    authDomain: "nightofthelongknives-b66e2.firebaseapp.com",
+    projectId: "nightofthelongknives-b66e2",
+    storageBucket: "nightofthelongknives-b66e2.appspot.com",
+    messagingSenderId: "1085351862604",
+    appId: "1:1085351862604:web:c28fbd08e96b9026006fe9",
+    measurementId: "G-TRCG7E5HPC"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app); 
+const currentUser = auth.currentUser;
+const nickname = document.getElementById("name");
+const idToken = localStorage.getItem('firebaseIdToken');
+
+if (idToken) {
+  console.log("Retrieved ID Token:", idToken);
+  
+} else {
+  console.log("No ID token found. User may not be authenticated.");
+}

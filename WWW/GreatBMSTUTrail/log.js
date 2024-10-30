@@ -22,7 +22,11 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
     signInWithEmailAndPassword(auth, email, password) 
         .then((userCredential) => {
             const user = userCredential.user;
-            window.open("OSM.html");
+            user.getIdToken(true).then((idToken) => {
+                localStorage.setItem('firebaseIdToken', idToken);
+                console.log("Открываю");
+                window.location.href = "OSM.html"; // Измените здесь
+              });
         })
         .catch((error) => {
             const errorCode = error.code;
