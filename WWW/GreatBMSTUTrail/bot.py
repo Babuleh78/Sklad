@@ -13,7 +13,7 @@ ALLOWED_UPDATES = ['message', 'edited_message']
 bot = Bot(token = os.getenv('TOKEN'))
 
 dp = Dispatcher() 
-dp.include_router(user_private_router)
+dp.include_router(user_router)
 
 async def main() -> None:
     await bot.delete_webhook(drop_pending_updates=True)
