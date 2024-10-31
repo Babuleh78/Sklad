@@ -20,9 +20,8 @@
     border-radius: 15px; /* Скругленные углы */
 }
 
-/* Кнопка закрытия */
 .close {
-    cursor: pointer; /* Курсор для кнопки закрытия */
-    float: right; /* Правое выравнивание */
+    cursor: pointer; 
+    float: right; 
     left: 100px;
 }

@@ -23,13 +23,11 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
         .then((userCredential) => {
             const user = userCredential.user;
             user.getIdToken(true).then((idToken) => {
-                localStorage.setItem('firebaseIdToken', idToken);
-                console.log("Открываю");
-                window.location.href = "OSM.html"; // Измените здесь
+                localStorage.setItem('firebaseIdTokenLog', idToken);
+                window.location.href = "OSM.html"; 
               });
         })
         .catch((error) => {
-            const errorCode = error.code;
             const errorMessage = error.message;
             document.getElementById('message').textContent = "Ошибка: " + errorMessage;
         });

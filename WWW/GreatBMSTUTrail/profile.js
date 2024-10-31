@@ -17,20 +17,21 @@ const auth = getAuth(app);
 const currentUser = auth.currentUser;
 const nickname = document.getElementById("name");
 
-const idToken = localStorage.getItem('firebaseIdToken');
-if (idToken) {
+const idTokenLog = localStorage.getItem('firebaseIdTokenLog');
+const idTokenReg = localStorage.getItem('firebaseIdTokenReg');
+if (idTokenReg || idTokenLog) {
     // JWT состоит из трех частей: заголовок, полезная нагрузка и подпись
-    const payload = idToken.split('.')[1]; // Получаем часть, содержащую полезную нагрузку
+    if(idTokenReg){
+      const payload = idTokenReg.split('.')[1]; // Получаем часть, содержащую полезную нагрузку
+    } else{
+      const payload = idTokenLog.split('.')[1]; // Получаем часть, содержащую полезную нагрузку
+    }
 
-    // Декодируем полезную нагрузку из Base64URL
     const decodedPayload = JSON.parse(decodeURIComponent(escape(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))));
 
     console.log("Decoded Token:", decodedPayload);
-
-    // Получаем информацию о пользователе
-    const userId = decodedPayload.user_id; // Идентификатор пользователя
-    const email = decodedPayload.email; // Электронная почта пользователя
-    const name = decodedPayload.name; // Имя пользователя (если указано)
+    const userId = decodedPayload.user_id; 
+    const email = decodedPayload.email;
     const parts = email.split('@');
 
 

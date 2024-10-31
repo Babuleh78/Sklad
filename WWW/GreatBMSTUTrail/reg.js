@@ -25,7 +25,11 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
           .then((userCredential) => {
               const user = userCredential.user;
               console.log('Пользователь зарегистрирован:', user);
-              addFieldsToUser(user.uid);
+              user.getIdToken(true).then((idToken) => {
+                  localStorage.setItem('firebaseIdTokenReg', idToken);
+                  addFieldsToUser(user.uid);
+                });
+              
           })
           .catch((error) => {
               const errorCode = error.code;
@@ -46,7 +50,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
         }, { merge: true }); // Используйте merge для объединения данных
         console.log("Поля успешно добавлены.");
         
-        window.open("OSM.html", "_self");
+        window.location.href = "OSM.html"; 
     } catch (e) {
         console.error("Ошибка при добавлении полей: ", e);
         alert("Ошибка при добавлении полей: " + e.message); // Уведомление пользователя об ошибке
