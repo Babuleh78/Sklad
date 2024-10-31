@@ -11,3 +11,10 @@ ADMIN_ID = os.getenv('ADMIN')
 IS_ADMIN = False
 IGNORE_CASE = False
 bot = Bot(token = os.getenv('TOKEN'))
+
+@user_router.message(F.text.lower().contains("ш"))
+async def info_panel(message: types.Message):
+    await message.answer("ЧЕГО ЧЕГО НАХУЙ, ЭТО ЧЕ, ШАШУРА?")
+@user_router.message(or_f(Command('tryme'), (F.text.lower().contains("проверк"))))
+async def process_callback_button(message: types.Message):
+    await message.answer("Назовись, боец")
