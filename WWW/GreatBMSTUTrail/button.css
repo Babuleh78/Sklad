@@ -1,14 +1,7 @@
-* {
-    box-sizing: border-box;
-}
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f0f0f0;
+.image-button{
+    z-index: 10;
+    pointer-events: auto; 
 }
 .container {
     display: flex;
@@ -22,31 +15,25 @@ body {
     object-fit: cover;
 }
 .button-grid {
-    gap: 10px; /* Отступы между кнопками */
+  
     
     display: grid;
     grid-template-columns: repeat(4, 1fr);
 }
 
 button {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     font-size: 24px;
-    cursor:grab;
     border: none;
     background-color: none;
     transition: background-color 0.3s;
+    position: relative;
+    z-index: 10;
 }
 button:hover {
-    color: aqua; /* Цвет текста при наведении */
     background-color: rgba(0, 0, 0, 0.1); /* Полупрозрачный фон при наведении */
-}
-button:active {
-    transform: scale(0.5); /* Уменьшение размера кнопки при нажатии */
-    color: lightblue; /* Цвет при нажатии */
-}
-.button-active {
-    transform: 0.3s;
+    border: 10px solid black; 
 }
 .image-button.active {
     transform: scale(0.5); /* Уменьшение размера кнопки в два раза */
