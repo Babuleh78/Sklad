@@ -4,10 +4,16 @@
     pointer-events: auto; 
 }
 .container {
+    position: fixed; /* фиксируем контейнер относительно всего документа */
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0; /* контейнер занимает весь экран */
     display: flex;
     justify-content: center;
     align-items: center;
-    
+    background-color: rgba(0, 0, 0, 0.5); /* затемнение фона */
+    z-index: 1000; /* контейнер будет выше всех других элементов */
 }
 .image-button img {
     width: 100%;
