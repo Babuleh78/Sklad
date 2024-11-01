@@ -43,7 +43,7 @@
 img {
     display: block; /* Убираем отступы вокруг изображения */
 }
-button {
+.image-button {
     width: 100px;
     height: 100px;
     font-size: 24px;
@@ -68,10 +68,30 @@ button {
 .image-button::before {
     content: '';
     position: absolute;
-    /* top: -5px; 
-    left: -5px; 
-    right: -5px; 
-    bottom: -5px;  
-    border: 5px solid black; */
     pointer-events: none; /* Чтобы клики проходили сквозь границу */
+}
+.go-button {
+    position: fixed;
+    font-weight: 500;
+    font-size: 30px;
+    font-style: unset;
+    background-color: #4CAF50; /* Зеленый фон */
+    border: none; 
+    left: 50%; /* Устанавливаем левую границу на 50% */
+    top:80%;
+    transform: translate(-50%, -50%); /* Сдвигаем кнопку на половину её ширины и высоты */
+    display: flex;
+    align-items: center; /* Центрирование текста по вертикали */
+    justify-content: center; /* Центрирование текста по горизонтали */
+    color: white; /* Белый текст */
+    text-decoration: none; /* Без подчеркивания */
+    cursor: pointer; /* Указатель при наведении */
+    border-radius: 8px; /* Закругленные углы */
+    padding: 15px 30px; /* Отступы для кнопки */
+    transition: background-color 0.3s, transform 0.3s; /* Плавный переход */
+}
+
+.go-button:hover {
+    background-color: #45a049; /* Цвет при наведении */
+    transform: translate(-50%, -50%) scale(1.15); /* Увеличение при наведении */
 }
