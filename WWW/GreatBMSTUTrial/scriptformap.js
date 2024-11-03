@@ -10,6 +10,8 @@ let info = ["Раковая опухоль на теле Строгино. Та�
 
 
 ];
+
+
 let visitors = 0;
 const count = 2;
 function init() {
