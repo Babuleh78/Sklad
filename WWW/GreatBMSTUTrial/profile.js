@@ -1,6 +1,17 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
   import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
 
+  fetch('http://localhost:8080/add-user', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ name: 'John Doe', email: 'john.doe@example.com' })
+})
+.then(response => response.text())
+.then(data => console.log(data))
+.catch(error => console.error('Ошибка:', error));
+  
 
   const firebaseConfig = {
     apiKey: "AIzaSyCRBI8odC_xkOQWvm3RQByJsqQ1XsrL3WA",
@@ -46,5 +57,5 @@ if (idTokenReg || idTokenLog) {
     nickname.textContent = username;
     console.log(`User ID: ${userId}`);
     console.log(`Email: ${email}`);
-    console.log(`Name: ${name}`);
+   
 }

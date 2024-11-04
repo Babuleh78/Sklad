@@ -25,7 +25,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
             user.getIdToken(true).then((idToken) => {
                 localStorage.clear();
                 localStorage.setItem('firebaseIdTokenLog', idToken);
-                // window.location.href = "OSM.html"; 
+                window.location.href = "OSM.html"; 
               });
         })
         .catch((error) => {
