@@ -19,17 +19,24 @@ const nickname = document.getElementById("name");
 
 const idTokenLog = localStorage.getItem('firebaseIdTokenLog');
 const idTokenReg = localStorage.getItem('firebaseIdTokenReg');
+
+console.log('idTokenReg:', idTokenReg);
+console.log('idTokenLog:', idTokenLog);
+
 if (idTokenReg || idTokenLog) {
-    // JWT состоит из трех частей: заголовок, полезная нагрузка и подпись
-    if(idTokenReg){
-      const payload = idTokenReg.split('.')[1]; // Получаем часть, содержащую полезную нагрузку
-    } else{
-      const payload = idTokenLog.split('.')[1]; // Получаем часть, содержащую полезную нагрузку
+    let payload;
+    
+    if(idTokenReg && idTokenReg.trim() !== '') {
+        payload = idTokenReg.split('.')[1];
+    } else if (idTokenLog && idTokenLog.trim() !== '') {
+        payload = idTokenLog.split('.')[1];
     }
+    console.log("payload", payload);
 
     const decodedPayload = JSON.parse(decodeURIComponent(escape(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))));
+      
 
-    console.log("Decoded Token:", decodedPayload);
+
     const userId = decodedPayload.user_id; 
     const email = decodedPayload.email;
     const parts = email.split('@');

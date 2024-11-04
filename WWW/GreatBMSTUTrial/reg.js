@@ -17,7 +17,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
   const db = getFirestore(app);
   document.getElementById('button_reg').addEventListener('click', function(event) {
       event.preventDefault();
-
+      console.log('Зашлт');
       const nickname = document.getElementById('username_reg').value + "@example.com"; 
       const password = document.getElementById('password_reg').value;
     
@@ -26,8 +26,11 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
               const user = userCredential.user;
               console.log('Пользователь зарегистрирован:', user);
               user.getIdToken(true).then((idToken) => {
+                
+                localStorage.clear();
                   localStorage.setItem('firebaseIdTokenReg', idToken);
-                  addFieldsToUser(user.uid);
+                //   addFieldsToUser(user.uid);
+                window.location.href = "OSM.html"; 
                 });
               
           })
