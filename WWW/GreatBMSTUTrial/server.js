@@ -1,10 +1,9 @@
 const express = require('express');
 const path = require('path');
-
 const app = express();
 const PORT = 8080;
 
-// Обслуживание статических файлов из текущей директории
+var connection = require("./database");
 app.use(express.static(__dirname));
 
 // Обработка маршрута /LogIn
@@ -15,4 +14,8 @@ app.get('/LogIn', (req, res) => {
 // Запуск сервера
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
+    connection.connect(function(err){
+        if(err) throw err;
+        console.log("Connect");
+    })
 });

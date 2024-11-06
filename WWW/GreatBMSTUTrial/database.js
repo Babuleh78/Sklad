@@ -1,27 +1,25 @@
-const mysql = require('mysql2');
+// var express = require("express");
+// var mysql = require("mysql");
+// var app = express();
 
-// Создайте подключение к базе данных
-const connection = mysql.createConnection({
-  host: 'localhost', // 127.0.0.1
-  user: 'root',     
-  password: 'root',     
-  database: 'project',
-  port: 8888
+// app.get('/', function(req, res){
+//     res.send(
+//         'Шашура'
+//     )
+// });
+
+// app.listen(3000, function(){
+//     console.log(
+//         'port 3000'
+//     )
+// });
+var mysql = require("mysql");
+
+var connection = mysql.createConnection({
+    host: 'localhost',
+    database: 'project',
+    user: 'root',
+    password: 'root'
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.error('Ошибка подключения: ' + err.stack);
-    return;
-  }
-  console.log('Подключено как ID ' + connection.threadId);
-});
-
-connection.query('SELECT * FROM user', (error, results) => {
-  if (error) {
-    throw error;
-  }
-  console.log(results);
-});
-
-connection.end();
+module.exports = connection;
