@@ -33,7 +33,6 @@ if (idTokenReg || idTokenLog) {
     const parts = email.split('@');
     const username = parts[0];
     nickname.textContent = username;
-    localStorage.setItem('UID', userId);
     if(idTokenReg){
         fetch('http://localhost:3000/addUserReg', {
             method: 'POST',

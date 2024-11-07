@@ -41,21 +41,4 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
               alert('Ошибка: ' + errorMessage);
           });
   });
-    async function addFieldsToUser (userId) {
-    const userRef = doc(db, "users", userId); // Ссылка на документ пользователя
-
-    console.log("Попытка обновить документ для пользователя:", userId);
-
-    try {
-        await setDoc(userRef, {
-            rating: 5, // Добавление поля "рейтинг"
-            textValue: "Это текстовое значение" // Добавление текстового поля
-        }, { merge: true }); // Используйте merge для объединения данных
-        console.log("Поля успешно добавлены.");
-        
-        window.location.href = "OSM.html"; 
-    } catch (e) {
-        console.error("Ошибка при добавлении полей: ", e);
-        alert("Ошибка при добавлении полей: " + e.message); // Уведомление пользователя об ошибке
-    }
-}
+   
