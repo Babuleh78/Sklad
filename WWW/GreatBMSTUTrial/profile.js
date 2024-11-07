@@ -20,31 +20,36 @@ const nickname = document.getElementById("name");
 const idTokenLog = localStorage.getItem('firebaseIdTokenLog');
 const idTokenReg = localStorage.getItem('firebaseIdTokenReg');
 
-console.log('idTokenReg:', idTokenReg);
-console.log('idTokenLog:', idTokenLog);
-
 if (idTokenReg || idTokenLog) {
     let payload;
-    
     if(idTokenReg && idTokenReg.trim() !== '') {
         payload = idTokenReg.split('.')[1];
     } else if (idTokenLog && idTokenLog.trim() !== '') {
         payload = idTokenLog.split('.')[1];
     }
-    console.log("payload", payload);
-
     const decodedPayload = JSON.parse(decodeURIComponent(escape(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))));
-      
-
-
     const userId = decodedPayload.user_id; 
     const email = decodedPayload.email;
     const parts = email.split('@');
-
-
     const username = parts[0];
     nickname.textContent = username;
-    console.log(`User ID: ${userId}`);
-    console.log(`Email: ${email}`);
-   
+    fetch('http://localhost:3000/addUser', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: username })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Ошибка при добавлении пользователя');
+        }
+        return response.text();
+    })
+    .then(data => {
+        console.log(data); // Успешное добавление
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+    });
 }
