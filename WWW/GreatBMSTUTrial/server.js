@@ -23,26 +23,22 @@ app.get('/RID', async (req, res) => {
         res.status(500).json({ error: 'Ошибка при получении данных' });
     } 
 });
-app.post('/addUserReg', (req, res) => {
-    console.log("ОбработкаРегистрации");
-    const username = req.body.username;
 
-    const sql = 'INSERT INTO user (usertoken, stars) VALUES (?, ?)';
-    const values = [username, 0];
 
-    connection.query(sql, values, (error, results) => {
+app.post('/visit', (req, res) => {
+    const { userId, placeId } = req.body;
+
+    const query = 'INSERT INTO visits (iduser, idplace) VALUES (?, ?)';
+    connection.query(query, [userId, placeId], (error, results) => {
         if (error) {
-            console.error('Ошибка при выполнении запроса:', error);
-            return res.status(500).send('Ошибка при добавлении пользователя');
+            if (error.code === 'ER_DUP_ENTRY') {
+                return res.json({ success: false, message: 'Уже было' });
+            }
+            return res.status(500).json({ success: false, message: 'Опять хуйня произошла' });
         }
-        console.log('Пользователь добавлен:', results);
-        res.status(201).send('Пользователь успешно добавлен');
+        res.json({ success: true });
     });
-
-    
 });
-
-// Запуск сервера
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
     connection.connect(function(err) {
