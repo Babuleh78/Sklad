@@ -33,23 +33,25 @@ if (idTokenReg || idTokenLog) {
     const parts = email.split('@');
     const username = parts[0];
     nickname.textContent = username;
-    fetch('http://localhost:3000/addUser', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username: username })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Ошибка при добавлении пользователя');
-        }
-        return response.text();
-    })
-    .then(data => {
-        console.log(data); // Успешное добавление
-    })
-    .catch(error => {
-        console.error('Ошибка:', error);
-    });
+    if(idTokenReg){
+        fetch('http://localhost:3000/addUserReg', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username: username })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка при добавлении пользователя');
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log(data); // Успешное добавление
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+    }
 }

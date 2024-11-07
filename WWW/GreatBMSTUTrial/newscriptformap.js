@@ -102,4 +102,20 @@ for (let i = 0; i < count; i++) {
           visitorCount.textContent = visitors;
       });
   });
+  
 }
+const fetchData = async () => {
+  try {
+      const response = await fetch('http://localhost:3000/RID'); // Запрос к серверу
+      if (!response.ok) {
+          throw new Error('Сеть ответила с ошибкой: ' + response.status);
+      }
+      const data = await response.json(); // Преобразуем ответ в JSON
+      console.log('Полученные данные:', data); // Выводим данные в консоль
+
+  } catch (error) {
+      console.error('Ошибка при получении данных:', error);
+  }
+};
+
+fetchData();

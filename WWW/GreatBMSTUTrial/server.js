@@ -4,9 +4,9 @@ const mysql = require('mysql2'); // Не забудьте подключить m
 const app = express();
 const PORT = 3000; 
 const cors = require('cors');
+const { closeConnectionDB, getDataFromDB } = require('./readfromsql');
 app.use(cors());
 app.use(express.json());
-// Создание подключения к базе данных
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -14,20 +14,32 @@ const connection = mysql.createConnection({
     database: 'project',
     port: 8888
 });
+app.get('/RID', async (req, res) => {
+    try {
+        const data = await getDataFromDB(); 
+        res.json(data); 
+    } catch (error) {
+        console.error('Ошибка:', error);
+        res.status(500).json({ error: 'Ошибка при получении данных' });
+    } 
+});
+app.post('/addUserReg', (req, res) => {
+    console.log("ОбработкаРегистрации");
+    const username = req.body.username;
 
-app.post('/addUser', (req, res) => {
-    console.log("Обработка");
-    const username = req.body.username; // Получаем username из тела запроса
+    const sql = 'INSERT INTO user (usertoken, stars) VALUES (?, ?)';
+    const values = [username, 0];
 
-    // const sql = 'INSERT INTO users (username) VALUES (?)';
-    // connection.query(sql, [username], (error, results) => {
-    //     if (error) {
-    //         console.error('Ошибка при вставке пользователя:', error);
-    //         return res.status(500).send('Ошибка при вставке пользователя');
-    //     }
-    //     console.log('Пользователь добавлен с ID:', results.insertId);
-    //     res.status(200).send('Пользователь успешно добавлен');
-    // });
+    connection.query(sql, values, (error, results) => {
+        if (error) {
+            console.error('Ошибка при выполнении запроса:', error);
+            return res.status(500).send('Ошибка при добавлении пользователя');
+        }
+        console.log('Пользователь добавлен:', results);
+        res.status(201).send('Пользователь успешно добавлен');
+    });
+
+    
 });
 
 // Запуск сервера
