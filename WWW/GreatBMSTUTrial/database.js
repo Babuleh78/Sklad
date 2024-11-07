@@ -1,37 +1,32 @@
-const mysql = require('mysql');
 const express = require('express');
-const path = require('path');
+const mysql = require('mysql2'); // Не забудьте подключить mysql2
 const app = express();
-const PORT = 8080;
-const connection = mysql.createConnection({
-  host: 'localhost', // адрес сервера, по умолчанию localhost
-  user: 'root', // имя пользователя
-  password: 'root', // пароль
-  database: 'project', // имя базы данных
-  port: 8888 // порт, на котором работает MySQL
-});
-connection.connect(err => {
-    if (err) {
-      console.error('Ошибка подключения:', err);
-      return;
-    }
-    console.log('Соединение с базой данных установлено!');
-  });
-  connection.query('SELECT * FROM user', (err, results, fields) => {
-    if (err) {
-      console.error('Ошибка запроса:', err);
-      return;
-    }
-    console.log('Результаты:', results);
-  });
-app.use(express.static(path.join(__dirname, 'public')));
+const PORT = 3000; 
 
-app.get('/LogIn', (req, res) => {
-    res.sendFile(path.join(__dirname, 'LogIn.html'));
+// Middleware для парсинга данных формы
+app.use(express.urlencoded({ extended: true })); // Для парсинга application/x-www-form-urlencoded
+app.use(express.json()); // Для парсинга application/json
+
+// Создание подключения к базе данных
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'root',
+    database: 'project',
+    port: 8888
+});
+
+// Обработка POST-запроса
+app.post('/add', (req, res) => {
+    console.log("POST работает");
+    
 });
 
 // Запуск сервера
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
-    
+    connection.connect(function(err) {
+        if (err) throw err;
+        console.log("Подключение к базе данных успешно!");
+    });
 });

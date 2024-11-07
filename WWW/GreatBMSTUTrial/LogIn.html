@@ -15,28 +15,25 @@
   <body>
     <div class="wrapper">
     
-      <form method="POST" action="register.php">
-        <h1> Login </h1>
+      <form id="loginForm">
+        <h1> Войти </h1>
         <div class="input-box">
-            <input type="text" name="username_log" placeholder="Имя" required id = "username_log">
+            <input type="text" name="username_log" placeholder="Имя" required id="username_log">
             <i class='bx bxs-user-circle'></i>
         </div>
         <div class="input-box">
-            <input type="password" name="password_log" placeholder="Пароль" required id = "password_log">
+            <input type="password" name="password_log" placeholder="Пароль" required id="password_log">
             <i class='bx bx-lock'></i>
         </div>
-        <div class="remember">
-            <label for=""><input type="checkbox" name="remember"> Запомнить меня?</label>
-        </div>
-
-        <button type="submit" class="btn" id ="button_log">
+        <button type="submit" class="btn" id="button_log">
             Войти
         </button>
-
+    
         <div class="register-link">
             <p> Создать аккаунт <a href="Reg.html"> Регистрация </a></p>
         </div>
-    </form>
+      </form>
+      
   </div>
   <div class="container" id = "container">
     <div type = "text" class = "textblyat" style="color: white;">
@@ -92,10 +89,13 @@
         <img src="uebanstvo/HUINA (3_3).png"" alt="Кнопка">
       </button> 
       <some class="some">
+      <form>
       <button class="go-button" id = "go-button" type ="button">
          ПОДТВЕРДИТЬ
       </button> 
-      </some>
+      </form>
+    </some>
+
       <script src = "captcha.js"></script>
     </div>  
   </body>

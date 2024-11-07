@@ -1,6 +1,12 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
   import { getAuth, signInWithEmailAndPassword} from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
   
+
+
+
+
+
+  
   const firebaseConfig = {
       apiKey: "AIzaSyCRBI8odC_xkOQWvm3RQByJsqQ1XsrL3WA",
       authDomain: "nightofthelongknives-b66e2.firebaseapp.com",
