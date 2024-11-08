@@ -119,22 +119,41 @@ app.post('/visit', (req, res) => {
 });
 app.post('/addUserReg', (req, res) => {
     const username = req.body.username;
-
     const sql = 'INSERT INTO user (usertoken, stars) VALUES (?, ?)';
-    const values = [username, 0];
+    const userValues = [username, 0];
 
-    connection.query(sql, values, (error, results) => {
+    connection.query(sql, userValues, (error, results) => {
         if (error) {
             console.error('Ошибка при выполнении запроса:', error);
             return res.status(500).send('Ошибка при добавлении пользователя');
         }
+        
         console.log('Пользователь добавлен:', results);
-        res.status(201).send('Пользователь успешно добавлен');
+
+        const userId = results.insertId; 
+        const visitQuery = 'INSERT INTO visits (user_id, place_id, is_visit) VALUES (?, ?, ?)';
+        const visitPromises = [];
+        for (let i = 1; i <= 5; i++) {
+            visitPromises.push(new Promise((resolve, reject) => {
+                connection.query(visitQuery, [userId, i, 0], (error, results) => {
+                    if (error) {
+                        console.error('Ошибка при выполнении запроса:', error);
+                        return reject(error);
+                    }
+                    resolve(results);
+                });
+            }));
+        }
+        Promise.all(visitPromises)
+            .then(() => {
+                res.status(201).send('Пользователь успешно добавлен и посещения зарегистрированы');
+            })
+            .catch(err => {
+                console.error('Ошибка при добавлении посещений:', err);
+                res.status(500).send('Ошибка при добавлении посещений');
+            });
     });
-
-    
 });
-
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
     connection.connect(function(err) {
