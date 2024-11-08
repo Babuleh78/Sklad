@@ -28,7 +28,7 @@ const myballoonTemplate = `
     </div>
 `;
 let balloons = [myballoonTemplate, myballoonTemplate, myballoonTemplate];
-let count = 2;
+let count = 13;
 L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,{ //style URL
   tileSize: 512,
   zoomOffset: -1,
@@ -87,34 +87,94 @@ const fetchData = async () => {
             const ZButton = document.getElementById(uniqueZButtonId);
             const visitorCount = document.getElementById(uniqueVisitorCountId);
             const infospan = document.getElementById(uniqueInfoId);
-      
-            // Устанавливаем уникальный текст для каждого всплывающего окна
-            infospan.textContent = placeinfo; //изменили 
-      
-            ZButton.addEventListener("click", function() {
-              const userName = document.getElementById("name").textContent;
-              const placeId = ZButton.id[ZButton.id.length-1] +1;
-              fetch('http://localhost:3000/visit', {
+            let isVisit = 0;
+            let count = -1;
+            const userName = document.getElementById("name").textContent;
+            const placeId = parseInt(ZButton.id[ZButton.id.length-1])+1;
+            fetch('http://localhost:3000/check_visit', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({username: userName, placeId: placeId })
+            })
+            .then(response => {
+              if (!response.ok) {
+                  throw new Error('Хуйня с чеком');
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data.success) {
+                console.log(data);
+                isVisit = data.is_visit;
+              } else {
+                  console.error(data.message); 
+              }
+              })
+              .catch(error => {
+              console.error('Ошибка:', error);
+              
+              });
+            fetch('http://localhost:3000/get_count', {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
                   },
-                  body: JSON.stringify({ username: userName, placeId: placeId })
-              })
-              .then(response => {
+                  body: JSON.stringify({placeId: placeId })
+            })
+            .then(response => {
                   if (!response.ok) {
-                      throw new Error('Хуйня с чеком');
+                      throw new Error('Хуйня с гетом');
                   }
-                  return response.text();
+                  return response.json();
               })
               .then(data => {
-                  console.log(data); 
+                  if (data.success) {
+                    
+                    count = data.count;
+                    visitorCount.textContent = count;
+                } else {
+                    console.error(data.message); 
+                }
               })
               .catch(error => {
                   console.error('Ошибка:', error);
+                  
               });
-              visitors++;
-              visitorCount.textContent = visitors;
+            infospan.textContent = placeinfo; 
+      
+            ZButton.addEventListener("click", function() {
+              
+              
+              if(isVisit == 0){
+                  isVisit = 1;  
+                  fetch('http://localhost:3000/visit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: userName, placeId: placeId })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Хуйня с чеком');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                      count+=1;
+                      visitorCount.textContent = count;
+                  } else {
+                      console.error(data.message); 
+                  }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);              
+                });
+              }
+                
           });
         });
         
