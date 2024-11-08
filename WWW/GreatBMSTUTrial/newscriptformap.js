@@ -1,3 +1,4 @@
+
 const key = 'F3Eh4Wsa3QzZb0pMVkSZ';
 const map = L.map('map').setView([55.75476845750829,37.621749677246086], 11); //starting position
 let visitors = 0;
@@ -27,7 +28,7 @@ const myballoonTemplate = `
     </div>
 `;
 let balloons = [myballoonTemplate, myballoonTemplate, myballoonTemplate];
-let count = 1;
+let count = 2;
 L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,{ //style URL
   tileSize: 512,
   zoomOffset: -1,
@@ -44,8 +45,8 @@ const fetchData = async () => {
       }
       const data = await response.json(); // Преобразуем ответ в JSON
       console.log('Полученные данные:', data); // Выводим данные в консоль
-      for (let i = 0; i < 1; i++) {
-        const Element = data[0];
+      for (let i = 0; i < count; i++) {
+        const Element = data[i];
      
         const placeinfo = Element.placeinfo;   
         const coor_x = Element.coor_x; 
@@ -91,6 +92,27 @@ const fetchData = async () => {
             infospan.textContent = placeinfo; //изменили 
       
             ZButton.addEventListener("click", function() {
+              const userName = document.getElementById("name").textContent;
+              const placeId = ZButton.id[ZButton.id.length-1] +1;
+              fetch('http://localhost:3000/visit', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ username: userName, placeId: placeId })
+              })
+              .then(response => {
+                  if (!response.ok) {
+                      throw new Error('Хуйня с чеком');
+                  }
+                  return response.text();
+              })
+              .then(data => {
+                  console.log(data); 
+              })
+              .catch(error => {
+                  console.error('Ошибка:', error);
+              });
               visitors++;
               visitorCount.textContent = visitors;
           });
