@@ -28,7 +28,7 @@ const myballoonTemplate = `
     </div>
 `;
 let balloons = [myballoonTemplate, myballoonTemplate, myballoonTemplate];
-let count = 13;
+let count = 31;
 L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,{ //style URL
   tileSize: 512,
   zoomOffset: -1,
