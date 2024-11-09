@@ -74,6 +74,21 @@ app.post('/check_visit', (req, res) => {
         }
     });
 });
+app.post('/get_hse_count', (req, res) =>{
+    const query1 = 'SELECT COUNT(idplace) AS hse_count FROM place'; 
+    
+    connection.query(query1,null, (error, results)=>{
+        if (error) {
+            console.error("Ошибка", error);
+            return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
+        }
+        if(results.length>0){
+            const hse_count = results[0].hse_count;
+            res.json({ success: true, hse_count });
+        }
+    })
+
+});
 app.post('/visit', (req, res) => {
     const { username, placeId } = req.body;
     const query1 = 'SELECT iduser FROM user WHERE usertoken = ?'; 
@@ -119,39 +134,50 @@ app.post('/visit', (req, res) => {
 });
 app.post('/addUserReg', (req, res) => {
     const username = req.body.username;
-    const sql = 'INSERT INTO user (usertoken, stars) VALUES (?, ?)';
-    const userValues = [username, 0];
-
-    connection.query(sql, userValues, (error, results) => {
+    const count = req.body.count;
+    console.log(count);
+    const checkUserQuery = 'SELECT COUNT(*) AS count FROM user WHERE usertoken = ?';
+    connection.query(checkUserQuery, [username], (error, results) => {
         if (error) {
             console.error('Ошибка при выполнении запроса:', error);
-            return res.status(500).send('Ошибка при добавлении пользователя');
+            return res.status(500).send('Ошибка при проверке пользователя');
         }
-        
-        console.log('Пользователь добавлен:', results);
+        if (results[0].count > 0) {
+            return res.status(200).send('Пользователь с таким именем уже зарегистрирован');
+        }
+        const sql = 'INSERT INTO user (usertoken, stars) VALUES (?, ?)';
+        const userValues = [username, 0];
+        connection.query(sql, userValues, (error, results) => {
+            if (error) {
+                console.error('Ошибка при выполнении запроса:', error);
+                return res.status(500).send('Ошибка при добавлении пользователя');
+            }
 
-        const userId = results.insertId; 
-        const visitQuery = 'INSERT INTO visits (user_id, place_id, is_visit) VALUES (?, ?, ?)';
-        const visitPromises = [];
-        for (let i = 1; i <= 5; i++) {
-            visitPromises.push(new Promise((resolve, reject) => {
-                connection.query(visitQuery, [userId, i, 0], (error, results) => {
-                    if (error) {
-                        console.error('Ошибка при выполнении запроса:', error);
-                        return reject(error);
-                    }
-                    resolve(results);
+            
+            const userId = results.insertId; 
+            const visitQuery = 'INSERT INTO visits (user_id, place_id, is_visit) VALUES (?, ?, ?)';
+            const visitPromises = [];
+            for (let i = 1; i <= count; i++) {
+                visitPromises.push(new Promise((resolve, reject) => {
+                    connection.query(visitQuery, [userId, i, 0], (error, results) => {
+                        if (error) {
+                            console.error('Ошибка при выполнении запроса:', error);
+                            return reject(error);
+                        }
+                        resolve(results);
+                    });
+                }));
+            }
+
+            Promise.all(visitPromises)
+                .then(() => {
+                    res.status(201).send('Пользователь успешно добавлен и посещения зарегистрированы');
+                })
+                .catch(err => {
+                    console.error('Ошибка при добавлении посещений:', err);
+                    res.status(500).send('Ошибка при добавлении посещений');
                 });
-            }));
-        }
-        Promise.all(visitPromises)
-            .then(() => {
-                res.status(201).send('Пользователь успешно добавлен и посещения зарегистрированы');
-            })
-            .catch(err => {
-                console.error('Ошибка при добавлении посещений:', err);
-                res.status(500).send('Ошибка при добавлении посещений');
-            });
+        });
     });
 });
 app.listen(PORT, () => {

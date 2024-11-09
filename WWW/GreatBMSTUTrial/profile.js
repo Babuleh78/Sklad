@@ -33,25 +33,59 @@ if (idTokenReg || idTokenLog) {
     const parts = email.split('@');
     const username = parts[0];
     nickname.textContent = username;
-    if(idTokenReg){
-        fetch('http://localhost:3000/addUserReg', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username: username })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка при добавлении пользователя');
+    if (idTokenReg) { //Называл себя бы максимально скромно - гений, запустил бы пафосную смену поколение, Prodigy, Chemical Brothers, Дядя Fatboy и Slim, пришла Эра 2R2R-а Сим-Селявим!
+        const getHseCount = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/get_hse_count', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Ошибка с получением количества вышек');
+                }
+    
+                const data = await response.json();
+                if (data.success) {
+                    return data.hse_count; 
+                } else {
+                    console.error(data.message);
+                    return null; 
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                return null; 
             }
-            return response.text();
-        })
-        .then(data => {
-            console.log(data); // Успешное добавление
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-        });
+        };
+    
+        const addUserReg = async (username, count) => {
+            try {
+                const response = await fetch('http://localhost:3000/addUserReg', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: username, count: count })
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Ошибка при добавлении пользователя');
+                }
+                const data = await response.text();
+                console.log(data); 
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        };
+
+        (async () => {
+            const count = await getHseCount(); 
+            if (count !== -1) { 
+                await addUserReg(username, count);
+            }
+        })();
     }
 }

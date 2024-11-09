@@ -28,7 +28,31 @@ const myballoonTemplate = `
     </div>
 `;
 let balloons = [myballoonTemplate, myballoonTemplate, myballoonTemplate];
-let count = 31;
+let count = -1;
+fetch('http://localhost:3000/get_hse_count', {
+  method: 'POST',
+  headers: {
+      'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+})
+.then(response => {
+  if (!response.ok) {
+      throw new Error('Хуйня с получением количества вышек');
+  }
+  return response.json();
+})
+.then(data => {
+  if (data.success) {
+    count = data.hse_count;
+  } else {
+      console.error(data.message); 
+  }
+  })
+  .catch(error => {
+  console.error('Ошибка:', error);
+  
+  });
 L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,{ //style URL
   tileSize: 512,
   zoomOffset: -1,
