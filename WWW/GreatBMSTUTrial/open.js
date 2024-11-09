@@ -12,13 +12,16 @@ function closeModal(modal) {
     modal.style.display = "none";
 }
 userBtn.onclick = function() {
+    closeAll();
     openModal(modalUser);
 }
 
 journalBtn.onclick = function() {
+    closeAll();
     openModal(modalJournal);
 }
 infoBtn.onclick = function(){
+    closeAll();
     openModal(modalinfo);
 }
 

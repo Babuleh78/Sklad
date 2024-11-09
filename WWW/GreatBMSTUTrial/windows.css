@@ -1,21 +1,23 @@
-/* Общие стили для модального окна */
+
 .modal {
-    display: none; /* Скрыто по умолчанию */
-    position: fixed; /* Фиксированное позиционирование */
-    z-index: 1000; /* Обеспечивает отображение поверх других элементов */
+    display: none; 
+    position: fixed; 
+    z-index: 401; 
     left: 0;
     top: 0;
-    width: 100%; /* Ширина на весь экран */
-    height: 100%; /* Высота на весь экран */
-    background-color: rgba(0, 0, 0, 0); /* Темный полупрозрачный фон */
+    margin-left: 110px;
+    width: calc(90% + 50px);
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 1); 
 }
-
-/* Контент модального окна */
+.cool_btn{
+    z-index: 402;
+}
 .modal-content {
-    position: absolute; /* Абсолютное позиционирование для модального контента */
-    left: 130px;
+    left:5px;
+    position: absolute; 
     margin-top: 100px;
-    background-color: white; /* Белый фон для контента */
-    padding: 20px; /* Отступы */
-    border-radius: 15px; /* Скругленные углы */
+    background-color: white; 
+    padding: 20px; 
+    border-radius: 15px; 
 }
