@@ -1,10 +1,9 @@
 const modalUser  = document.getElementById("user_info");
 const modalJournal = document.getElementById("user_journal");
+const modalinfo = document.getElementById("info");
 const userBtn = document.getElementById("open_user");
 const journalBtn = document.getElementById("open_journal");
-const closeUserBtn = document.getElementById("close_user");
-const closeJournalBtn = document.getElementById("close_journal");
-
+const infoBtn = document.getElementById("open_info");
 function openModal(modal) {
     modal.style.display = "block";
 }
@@ -19,14 +18,10 @@ userBtn.onclick = function() {
 journalBtn.onclick = function() {
     openModal(modalJournal);
 }
-
-closeUserBtn.onclick = function() {
-    closeModal(modalUser );
+infoBtn.onclick = function(){
+    openModal(modalinfo);
 }
 
-closeJournalBtn.onclick = function() {
-    closeModal(modalJournal);
-}
 
 window.onclick = function(event) {
     switch(event.target){
@@ -34,5 +29,15 @@ window.onclick = function(event) {
             closeModal(modalUser);
         case modalJournal:
             closeModal(modalJournal);
+        case modalinfo:
+            closeModal(modalinfo);
+
+        break;
     }
+}
+
+closeAll = function(){
+    closeModal(modalinfo);
+    closeModal(modalJournal);
+    closeModal(modalUser);
 }

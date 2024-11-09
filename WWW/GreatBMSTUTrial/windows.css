@@ -19,9 +19,3 @@
     padding: 20px; /* Отступы */
     border-radius: 15px; /* Скругленные углы */
 }
-
-.close {
-    cursor: pointer; 
-    float: right; 
-    left: 100px;
-}
