@@ -44,3 +44,4 @@ closeAll = function(){
     closeModal(modalJournal);
     closeModal(modalUser);
 }
+closeAll();
