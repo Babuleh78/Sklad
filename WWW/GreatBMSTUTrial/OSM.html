@@ -6,7 +6,7 @@
     
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Display a map</title>
+    <title>Уничтожь их</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="styleformap.css">
     <link rel="stylesheet" href="view.css">
@@ -18,7 +18,7 @@
     <div class="sidebar">
         <h2>Меню</h2>
         <button  id="open_user">Пользователь</button>
-        
+        <button id = "open_journal"> Журнал </button>
 
         
     </div>
@@ -32,6 +32,15 @@
         </div>
         <script type = "module" src = "profile.js"></script>
     </div>
+    <div id="hse_list" class="modal">
+      <div class="modal-content">
+          <div class="close" id="close_user"></div>
+          <h2>Боевой журнал</h2>
+          <p> Твои заслуги </p>
+
+      </div>
+      <script type = "module" src = "profile.js"></script>
+  </div>
     
     <div class="content">
         <div id="map" class = "map"></div>

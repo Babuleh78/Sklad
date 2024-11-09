@@ -135,7 +135,6 @@ app.post('/visit', (req, res) => {
 app.post('/addUserReg', (req, res) => {
     const username = req.body.username;
     const count = req.body.count;
-    console.log(count);
     const checkUserQuery = 'SELECT COUNT(*) AS count FROM user WHERE usertoken = ?';
     connection.query(checkUserQuery, [username], (error, results) => {
         if (error) {
