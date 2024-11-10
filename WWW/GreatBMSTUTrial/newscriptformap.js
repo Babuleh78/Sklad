@@ -29,30 +29,6 @@ const myballoonTemplate = `
 `;
 let balloons = [myballoonTemplate, myballoonTemplate, myballoonTemplate];
 let count = -1;
-// fetch('http://localhost:3000/get_hse_count', {
-//   method: 'GET',
-//   headers: {
-//       'Content-Type': 'application/json'
-//   },
-//   body: JSON.stringify({})
-// })
-// .then(response => {
-//   if (!response.ok) {
-//       throw new Error('Хуйня с получением количества вышек');
-//   }
-//   return response.json();
-// })
-// .then(data => {
-//   if (data.success) {
-//     count = data.hse_count;
-//   } else {
-//       console.error(data.message); 
-//   }
-//   })
-//   .catch(error => {
-//   console.error('Ошибка:', error);
-  
-//   });
 async function get_hse_count() {
   try {
     const response = await fetch('http://localhost:3000/get_hse_count');
@@ -60,13 +36,16 @@ async function get_hse_count() {
         throw new Error(`Ошибка Хуяшибка: ${response.status}`);
     }
     const data = await response.json();
-    count = data.get_hse_count;
-
+    console.log(data);
+    count = data.hse_count;
+    return count;
 } catch (error) {
     console.error("Error fetching data:", error.message); 
   }
-}
-get_hse_count();
+}(async () => {
+  count = await get_hse_count();
+})();
+console.log("получили", count);
 L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,{ //style URL
   tileSize: 512,
   zoomOffset: -1,
@@ -154,32 +133,22 @@ const fetchData = async () => {
               console.error('Ошибка:', error);
               
               });
-            fetch('http://localhost:3000/get_count', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({placeId: placeId })
-            })
-            .then(response => {
+              async function get_visit_count() {
+                try {
+                  const response = await fetch('http://localhost:3000/get_visit_count');
                   if (!response.ok) {
-                      throw new Error('Хуйня с гетом');
+                      throw new Error(`Ошибка: ${response.status}`);
                   }
-                  return response.json();
-              })
-              .then(data => {
-                  if (data.success) {
-                    
-                    count = data.count;
-                    visitorCount.textContent = count;
-                } else {
-                    console.error(data.message); 
+                  const data = await response.json();
+                  console.log(data);
+                  count = data.visit_count;
+                  return count;
+              } catch (error) {
+                  console.error("Error fetching data:", error.message); 
                 }
-              })
-              .catch(error => {
-                  console.error('Ошибка:', error);
-                  
-              });
+              }(async () => {
+                count = await get_visit_count();
+              })();
             infospan.textContent = placeinfo; 
       
             ZButton.addEventListener("click", function() {

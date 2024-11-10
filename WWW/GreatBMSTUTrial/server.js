@@ -7,6 +7,7 @@ const cors = require('cors');
 const { closeConnectionDB, getDataFromDB } = require('./readfromsql');
 const { UserRecord } = require('firebase-admin/auth');
 const { error } = require('console');
+const { constrainedMemory } = require('process');
 app.use(cors());
 app.use(express.json());
 const connection = mysql.createConnection({
@@ -25,7 +26,7 @@ app.get('/RID', async (req, res) => {
         res.status(500).json({ error: 'Ошибка при получении данных' });
     } 
 });
-app.post('/get_count', (req, res) => {
+app.get('/get_visit_count', (req, res) => {
     const { placeId } = req.body;
     if (!placeId) {
         return res.status(400).json({ success: false, message: 'placeId не указан' });
@@ -38,7 +39,7 @@ app.post('/get_count', (req, res) => {
         }
         if (results.length > 0) {
             const count = results[0].visit_count; 
-            res.json({ success: true, count});
+            res.json({ success: true, visit_count});
         } else {
             res.json({ success: false, message: 'Место не найдено' });
         }
@@ -83,7 +84,6 @@ app.get('/get_hse_count', (req, res) => {
         }
         if (results.length > 0) {
             const hse_count = results[0].hse_count;
-            console.log(hse_count);
             res.json({ success: true, hse_count });
         } else {
             res.json({ success: true, hse_count: 0 }); 
@@ -177,7 +177,15 @@ app.post('/addUserReg', (req, res) => {
         });
     });
 });
+app.post('/addNote', (req, res) =>{
+    const currentDate = new Date();
+    const year = currentDate.getFullYear(); 
+    const month = currentDate.getMonth() + 1; 
+    const day = currentDate.getDate(); 
+    const dateJournal = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;//padStart для 01 и тд
+    const {userId } = req.body.userId;
 
+});
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
     connection.connect(function(err) {
