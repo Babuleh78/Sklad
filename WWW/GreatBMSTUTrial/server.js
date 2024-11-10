@@ -74,20 +74,21 @@ app.post('/check_visit', (req, res) => {
         }
     });
 });
-app.post('/get_hse_count', (req, res) =>{
+app.get('/get_hse_count', (req, res) => {
     const query1 = 'SELECT COUNT(idplace) AS hse_count FROM place'; 
-    
-    connection.query(query1,null, (error, results)=>{
+    connection.query(query1, null, (error, results) => {
         if (error) {
             console.error("Ошибка", error);
             return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
         }
-        if(results.length>0){
+        if (results.length > 0) {
             const hse_count = results[0].hse_count;
+            console.log(hse_count);
             res.json({ success: true, hse_count });
+        } else {
+            res.json({ success: true, hse_count: 0 }); 
         }
-    })
-
+    });
 });
 app.post('/visit', (req, res) => {
     const { username, placeId } = req.body;
@@ -151,8 +152,6 @@ app.post('/addUserReg', (req, res) => {
                 console.error('Ошибка при выполнении запроса:', error);
                 return res.status(500).send('Ошибка при добавлении пользователя');
             }
-
-            
             const userId = results.insertId; 
             const visitQuery = 'INSERT INTO visits (user_id, place_id, is_visit) VALUES (?, ?, ?)';
             const visitPromises = [];
@@ -167,7 +166,6 @@ app.post('/addUserReg', (req, res) => {
                     });
                 }));
             }
-
             Promise.all(visitPromises)
                 .then(() => {
                     res.status(201).send('Пользователь успешно добавлен и посещения зарегистрированы');
@@ -179,6 +177,7 @@ app.post('/addUserReg', (req, res) => {
         });
     });
 });
+
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
     connection.connect(function(err) {

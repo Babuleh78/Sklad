@@ -16,7 +16,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); 
 const currentUser = auth.currentUser;
 const nickname = document.getElementById("name");
-
 const idTokenLog = localStorage.getItem('firebaseIdTokenLog');
 const idTokenReg = localStorage.getItem('firebaseIdTokenReg');
 
@@ -34,33 +33,22 @@ if (idTokenReg || idTokenLog) {
     const username = parts[0];
     nickname.textContent = username;
     if (idTokenReg) { //Называл себя бы максимально скромно - гений, запустил бы пафосную смену поколение, Prodigy, Chemical Brothers, Дядя Fatboy и Slim, пришла Эра 2R2R-а Сим-Селявим!
-        const getHseCount = async () => {
+        let count = -1;
+        async function get_hse_count() {
             try {
-                const response = await fetch('http://localhost:3000/get_hse_count', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({})
-                });
-    
+                const response = await fetch('http://localhost:3000/get_hse_count');
                 if (!response.ok) {
-                    throw new Error('Ошибка с получением количества вышек');
+                    throw new Error(`Ошибка: ${response.status}`);
                 }
-    
                 const data = await response.json();
-                if (data.success) {
-                    return data.hse_count; 
-                } else {
-                    console.error(data.message);
-                    return null; 
-                }
+                count = data.hse_count; 
+                return count; 
             } catch (error) {
-                console.error('Ошибка:', error);
-                return null; 
+                console.error("Error fetching data:", error.message);
+                return -1; 
             }
-        };
-    
+        }
+
         const addUserReg = async (username, count) => {
             try {
                 const response = await fetch('http://localhost:3000/addUserReg', {
@@ -70,21 +58,20 @@ if (idTokenReg || idTokenLog) {
                     },
                     body: JSON.stringify({ username: username, count: count })
                 });
-    
+        
                 if (!response.ok) {
                     throw new Error('Ошибка при добавлении пользователя');
                 }
                 const data = await response.text();
-                console.log(data); 
+                console.log(data);
             } catch (error) {
                 console.error('Ошибка:', error);
             }
         };
-
         (async () => {
-            const count = await getHseCount(); 
-            if (count !== -1) { 
-                await addUserReg(username, count);
+            const hseCount = await get_hse_count(); 
+            if (hseCount !== -1) { 
+                await addUserReg(username, hseCount); 
             }
         })();
     }
