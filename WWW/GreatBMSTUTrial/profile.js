@@ -16,6 +16,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); 
 const currentUser = auth.currentUser;
 const nickname = document.getElementById("name");
+const avatar = document.getElementById("avatar");
+const pick_avatar = document.getElementById("pick_avatar");
 const idTokenLog = localStorage.getItem('firebaseIdTokenLog');
 const idTokenReg = localStorage.getItem('firebaseIdTokenReg');
 
@@ -74,5 +76,14 @@ if (idTokenReg || idTokenLog) {
                 await addUserReg(username, hseCount); 
             }
         })();
+    }
+}
+pick_avatar.style.display = "none"
+avatar.onclick = function(){
+    if (pick_avatar.style.display === "block") {
+    
+        pick_avatar.style.display = "none";
+    } else {
+        pick_avatar.style.display = "block";
     }
 }

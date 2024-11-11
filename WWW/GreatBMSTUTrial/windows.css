@@ -42,4 +42,33 @@
     background-image: url('avatars/BEGEMOT85.jpg');
     background-size: cover;
     background-position: center;
+    cursor: pointer;    
+}
+.avatarpick{
+    position: relative; 
+    bottom:90px;
+    width: 70px;
+    height: 70px;
+    left: 10px;
+    border-radius: 50%;
+    margin-top: 110px;
+    background-image: url('avatars/BEGEMOT85.jpg');
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;    
+    margin-left: auto;
+    margin-right: auto;
+}
+.spin{
+    display: flex;          /* Включаем Flexbox */
+    justify-content: flex-start;
+    align-items: center;    
+    width: 400px;
+    height: 100px;
+    gap: 10px;       
+    border-radius: 28px;
+    background-color: green; 
+    overflow-x: auto;        
+    overflow-y: hidden;    
+    white-space: nowrap;       
 }
