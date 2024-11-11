@@ -5,24 +5,40 @@ const userBtn = document.getElementById("open_user");
 const journalBtn = document.getElementById("open_journal");
 const infoBtn = document.getElementById("open_info");
 function openModal(modal) {
-    modal.style.display = "block";
-}
 
+        modal.style.display = "block";
+   
+}
 function closeModal(modal) {
     modal.style.display = "none";
 }
 userBtn.onclick = function() {
-    closeAll();
-    openModal(modalUser);
+    if (modalUser.style.display === "block") {
+    
+        modalUser.style.display = "none";
+    } else {
+        closeAll();
+        openModal(modalUser);
+    }
 }
 
 journalBtn.onclick = function() {
-    closeAll();
-    openModal(modalJournal);
+    if (modalJournal.style.display === "block") {
+        
+        modalJournal.style.display = "none";
+    } else {
+        closeAll();
+        openModal(modalJournal);
+    }
 }
 infoBtn.onclick = function(){
-    closeAll();
-    openModal(modalinfo);
+    if (modalinfo.style.display === "block") {
+    
+        modalinfo.style.display = "none";
+    } else {
+        closeAll();
+        openModal(modalinfo);
+    }
 }
 
 

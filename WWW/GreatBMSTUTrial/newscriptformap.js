@@ -45,8 +45,7 @@ async function get_hse_count() {
 }(async () => {
   count = await get_hse_count();
 })();
-console.log("получили", count);
-L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,{ //style URL
+L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,{ 
   tileSize: 512,
   zoomOffset: -1,
   minZoom: 1,
