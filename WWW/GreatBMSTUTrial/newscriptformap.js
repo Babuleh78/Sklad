@@ -135,7 +135,7 @@ const fetchData = async () => {
               });
               async function get_visit_count() {
                 try {
-                  const response = await fetch('http://localhost:3000/get_visit_count');
+                  const response = await fetch(`http://localhost:3000/get_visit_count?placeId=${encodeURIComponent(i)}`);
                   if (!response.ok) {
                       throw new Error(`Ошибка: ${response.status}`);
                   }

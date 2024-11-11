@@ -27,7 +27,7 @@ app.get('/RID', async (req, res) => {
     } 
 });
 app.get('/get_visit_count', (req, res) => {
-    const { placeId } = req.body;
+    const { placeId } = req.query;
     if (!placeId) {
         return res.status(400).json({ success: false, message: 'placeId не указан' });
     }
@@ -39,7 +39,7 @@ app.get('/get_visit_count', (req, res) => {
         }
         if (results.length > 0) {
             const count = results[0].visit_count; 
-            res.json({ success: true, visit_count});
+            res.json({ success: true, count});
         } else {
             res.json({ success: false, message: 'Место не найдено' });
         }
