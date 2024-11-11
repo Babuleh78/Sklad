@@ -4,10 +4,7 @@ const mysql = require('mysql2'); // Не забудьте подключить m
 const app = express();
 const PORT = 3000; 
 const cors = require('cors');
-const { closeConnectionDB, getDataFromDB } = require('./readfromsql');
-const { UserRecord } = require('firebase-admin/auth');
-const { error } = require('console');
-const { constrainedMemory } = require('process');
+const { getDataFromDB } = require('./readfromsql');
 app.use(cors());
 app.use(express.json());
 const connection = mysql.createConnection({
