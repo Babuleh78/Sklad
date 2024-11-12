@@ -51,7 +51,7 @@
     height: 70px;
     left: 10px;
     border-radius: 50%;
-    margin-top: 110px;
+    margin-top: 105px;
     background-image: url('avatars/BEGEMOT85.jpg');
     background-size: cover;
     background-position: center;
@@ -60,7 +60,7 @@
     margin-right: auto;
 }
 .spin{
-    display: flex;          /* Включаем Flexbox */
+    display: flex;          
     justify-content: flex-start;
     align-items: center;    
     width: 400px;
