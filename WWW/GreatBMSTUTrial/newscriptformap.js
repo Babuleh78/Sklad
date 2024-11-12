@@ -28,7 +28,7 @@ const myballoonTemplate = `
     </div>
 `;
 let balloons = [myballoonTemplate, myballoonTemplate, myballoonTemplate];
-let count = -1;
+let counthse = -1;
 async function get_hse_count() {
   try {
     const response = await fetch('http://localhost:3000/get_hse_count');
@@ -99,55 +99,22 @@ const fetchData = async () => {
             .addTo(map)
             .bindPopup(balloonHTML); // Добавление всплывающего окна
       
-        marker.on('popupopen', function() {
-            const ZButton = document.getElementById(uniqueZButtonId);
-            const visitorCount = document.getElementById(uniqueVisitorCountId);
-            const infospan = document.getElementById(uniqueInfoId);
-            let isVisit = 0;
-            let count = -1;
-            const userName = document.getElementById("name").textContent;
-            const placeId = parseInt(ZButton.id[ZButton.id.length-1])+1;
-            fetch('http://localhost:3000/check_visit', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({username: userName, placeId: placeId })
-            })
-            .then(response => {
-              if (!response.ok) {
-                  throw new Error('Хуйня с чеком');
-              }
-              return response.json();
-            })
-            .then(data => {
-              if (data.success) {
-                console.log(data);
-                isVisit = data.is_visit;
-              } else {
-                  console.error(data.message); 
-              }
-              })
-              .catch(error => {
-              console.error('Ошибка:', error);
-              
-              });
-              async function get_visit_count() {
-                try {
-                  const response = await fetch(`http://localhost:3000/get_visit_count?placeId=${encodeURIComponent(i)}`);
-                  if (!response.ok) {
-                      throw new Error(`Ошибка: ${response.status}`);
-                  }
-                  const data = await response.json();
-                  console.log(data);
-                  count = data.visit_count;
-                  return count;
+            marker.on('popupopen', async function() {
+              const ZButton = document.getElementById(uniqueZButtonId);
+              const visitorCount = document.getElementById(uniqueVisitorCountId);
+              const infospan = document.getElementById(uniqueInfoId);
+              const userName = document.getElementById("name").textContent;
+              const placeId = parseInt(ZButton.id[ZButton.id.length - 1]) + 1;
+              try {
+                  const visitData = await checkVisit(userName, placeId);
+                  isVisit = visitData.success ? visitData.is_visit : 0;
+      
+                  counthse = await getVisitCount(placeId);
+                  visitorCount.textContent = counthse;
+                  console.log(counthse);
               } catch (error) {
-                  console.error("Error fetching data:", error.message); 
-                }
-              }(async () => {
-                count = await get_visit_count();
-              })();
+                  console.error('Ошибка:', error);
+              }
             infospan.textContent = placeinfo; 
       
             ZButton.addEventListener("click", function() {
@@ -164,14 +131,16 @@ const fetchData = async () => {
                 })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Хуйня с чеком');
+                        throw new Error('Ошибка уже хз какая, давай там сам думай');
                     }
                     return response.json();
                 })
                 .then(data => {
                     if (data.success) {
-                      count+=1;
-                      visitorCount.textContent = count;
+                      console.log("Успешно");
+                      console.log(data);
+                      visitorCount.textContent = data.count;
+                      
                   } else {
                       console.error(data.message); 
                   }
@@ -189,5 +158,28 @@ const fetchData = async () => {
       console.error('Ошибка при получении данных:', error);
   }
 };
+async function checkVisit(username, placeId) {
+  const response = await fetch('http://localhost:3000/check_visit', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, placeId })
+  });
+  if (!response.ok) {
+      throw new Error('Ошибка при проверке посещения');
+  }
 
+  return response.json();
+}
+
+async function getVisitCount(placeId) {
+  const response = await fetch(`http://localhost:3000/get_visit_count?placeId=${encodeURIComponent(placeId)}`);
+  if (!response.ok) {
+      throw new Error(`Ошибка: ${response.status}`);
+  }
+  const data = await response.json();
+  console.log(data);
+  return data.count;
+}
 fetchData();

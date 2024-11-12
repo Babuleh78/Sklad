@@ -110,58 +110,53 @@ app.get('/get_hse_count', (req, res) => {
             }
         });
     });
-//ПОСЕТИТЬ (КАК ЖЕ ОНО УБОГО НАПИСАНО)
-app.post('/visit', (req, res) => {
+//ПОСЕТИТЬ (КАК ЖЕ ОНО УБОГО НАПИСАНО) уже не убого, жаль, что мне лень все на такие же рельсы переводить
+app.post('/visit', async (req, res) => {
     const { username, placeId } = req.body;
-    const query1 = 'SELECT iduser FROM user WHERE usertoken = ?'; 
-    connection.query(query1, [username], (error, results) => {
-        if (error) {
-            console.error("Ошибка", error);
-            return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
+    console.log("на месте");
+    try {
+        const [userResults] = await query('SELECT iduser FROM user WHERE usertoken = ?', [username]);
+        if (userResults.length === 0) {
+            return res.json({ success: false, message: 'Пользователь не найден' });
         }
-        if (results.length > 0) {
-            const idUser  = results[0].iduser; 
-            const query2 = 'UPDATE place SET visit_count = visit_count + 1 WHERE idplace = ?';
-            connection.query(query2, [placeId], (error) => {
-                if (error) {
-                    console.error("Ошибка при обновлении", error);
-                    return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
-                }
-                const query3 = 'SELECT is_visit FROM visits WHERE user_id = ? AND place_id = ?'; 
-                connection.query(query3, [idUser , placeId], (error, results) => {
-                    if (error) {
-                        console.error("Ошибка при получении значения", error);
-                        return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
-                    }
+        console.log(userResults);
+        const idUser = userResults.iduser;
+        console.log(idUser);
+        await query('UPDATE place SET visit_count = visit_count + 1 WHERE idplace = ?', [placeId]);
+        const [visitResults] = await query('SELECT is_visit FROM visits WHERE user_id = ? AND place_id = ?', [idUser , placeId]);
+        const isVisit = visitResults.is_visit;
+        if (!isVisit) {
+            await query('UPDATE visits SET is_visit = 1 WHERE user_id = ? AND place_id = ?', [idUser , placeId]);
+            await query('UPDATE user SET stars = stars + 1 WHERE iduser = ?', [idUser ]);
+            const results = await query('SELECT visit_count FROM place WHERE idplace = ?', [placeId]);
 
-                    if (results.length > 0) {
-                        const isVisit = results[0].is_visit;
-                        const query4 = 'UPDATE visits SET is_visit = 1 WHERE user_id = ? AND place_id = ?';
-                        connection.query(query4, [idUser , placeId], (error) => {
-                            if (error) {
-                                console.error("Ошибка при обновлении статуса посещения", error);
-                                return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
-                            }
-                            res.json({ success: true, isVisit });
-                        });
-                        const query5 = 'UPDATE user SET stars = start+1 WHERE (`iduser` = ?);'
-                        connection.query(query5, [idUser], (error)=>{
-                            if (error) {
-                                console.error("Ошибка при начислении звезд", error);
-                                return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
-                            }
-                            res.json({ success: true });
-                        })
-                    } else {
-                        res.json({ success: false, message: 'Посещение не найдено' });
-                    }
-                });
-            });
-        } else {    
-            res.json({ success: false, message: 'Пользователь не найден' });
+            if (results.length > 0) {
+                const count = results[0].visit_count; // Получаем значение visit_count
+                console.log("Возвращаем", count);
+                return res.json({ success: true, count: count }); // Возвращаем успешный ответ
+            } else {
+            
+            return res.json({ success: false, message: 'Этого не может быть, промежуток должен быть' });
         }
-    });
+        } else {
+            return res.json({ success: false, message: 'Посещение не найдено' });
+        }
+    } catch (error) {
+        console.error("Ошибка", error);
+        return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
+    }
 });
+
+function query(sql, params) {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, params, (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            resolve(results);
+        });
+    });
+}
 //ДОБАВИТЬ ПОЛЬЗОВАТЕЛЯ
 app.post('/addUserReg', (req, res) => {
     const username = req.body.username;
@@ -248,6 +243,25 @@ app.post('/SetAvatar', (req, res)=>{
         
     });
 });
+//ДОБАВИТЬ ЗАПИСЬ О ПОСЕЩЕНИИ
+app.post('addNote', (req, res)=>{
+    const{userName, placeId} = req.body;
+    const query1 = 'SELECT note FROM place WHERE(idplace = ?);';
+    
+    connection.query(query1, [placeId], (error, results)=>{
+        if(error){
+            console.error('Ошибка при добавлении информации о посещении', error);
+            return res.status(500).send('Ошибка при добавлении информации о посещении');
+        } else{
+            const info = results[0].note;
+            const str = `${userName} ЛИКВИДИРОВАЛ ${info}`;
+            return res.json({success: true, text: str});
+        }
+    })
+
+})
+
+
 //СЛУШАТЬ
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);

@@ -31,6 +31,7 @@
     padding: 20px;
     border-radius: 28px;
     text-align: center;
+    justify-content: center;
 }
 .avatar{
     position: relative; 
@@ -71,4 +72,8 @@
     overflow-x: auto;        
     overflow-y: hidden;    
     white-space: nowrap;       
+}
+.note{
+    position: relative;
+    bottom: 20px;
 }
