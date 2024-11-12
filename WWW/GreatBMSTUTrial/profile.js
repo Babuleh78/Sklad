@@ -20,6 +20,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); 
 const currentUser = auth.currentUser;
 const nickname = document.getElementById("name");
+
+const nicknamej = document.getElementById("namej");
 const stars = document.getElementById("stars");
 const avatar = document.getElementById("avatar");
 const pick_avatar = document.getElementById("pick_avatar");
@@ -40,7 +42,7 @@ if (idTokenReg || idTokenLog) {
     const parts = email.split('@');
     username = parts[0];
     nickname.textContent = username;
-
+    nicknamej.textContent = username;
    
     if (idTokenReg) { //Называл себя бы максимально скромно - гений, запустил бы пафосную смену поколение, Prodigy, Chemical Brothers, Дядя Fatboy и Slim, пришла Эра 2R2R-а Сим-Селявим!
         let count = -1;

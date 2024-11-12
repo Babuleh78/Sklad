@@ -113,15 +113,12 @@ app.get('/get_hse_count', (req, res) => {
 //ПОСЕТИТЬ (КАК ЖЕ ОНО УБОГО НАПИСАНО) уже не убого, жаль, что мне лень все на такие же рельсы переводить
 app.post('/visit', async (req, res) => {
     const { username, placeId } = req.body;
-    console.log("на месте");
     try {
         const [userResults] = await query('SELECT iduser FROM user WHERE usertoken = ?', [username]);
         if (userResults.length === 0) {
             return res.json({ success: false, message: 'Пользователь не найден' });
         }
-        console.log(userResults);
         const idUser = userResults.iduser;
-        console.log(idUser);
         await query('UPDATE place SET visit_count = visit_count + 1 WHERE idplace = ?', [placeId]);
         const [visitResults] = await query('SELECT is_visit FROM visits WHERE user_id = ? AND place_id = ?', [idUser , placeId]);
         const isVisit = visitResults.is_visit;
@@ -132,7 +129,6 @@ app.post('/visit', async (req, res) => {
 
             if (results.length > 0) {
                 const count = results[0].visit_count; 
-                console.log("Возвращаем", count);
                 return res.json({ success: true, count: count }); 
             } else {
             
@@ -202,16 +198,6 @@ app.post('/addUserReg', (req, res) => {
         });
     });
 });
-//ДОБАВИТЬ ЗАПИСЬ В ЖУРНАЛ
-app.post('/addNote', (req, res) =>{
-    const currentDate = new Date();
-    const year = currentDate.getFullYear(); 
-    const month = currentDate.getMonth() + 1; 
-    const day = currentDate.getDate(); 
-    const dateJournal = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;//padStart для 01 и тд
-    const {userId } = req.body.userId;
-
-});
 //ПОЛУЧИТЬ НОМЕР АВЫ
 app.get('/GetAvatar', (req, res)=>{
     const {userName} = req.query;
@@ -244,8 +230,8 @@ app.post('/SetAvatar', (req, res)=>{
     });
 });
 //ДОБАВИТЬ ЗАПИСЬ О ПОСЕЩЕНИИ
-app.post('addNote', (req, res)=>{
-    const{userName, placeId} = req.body;
+app.post('/addNote', (req, res)=>{
+    const{username, placeId} = req.body;
     const query1 = 'SELECT note FROM place WHERE(idplace = ?);';
     
     connection.query(query1, [placeId], (error, results)=>{
@@ -254,8 +240,8 @@ app.post('addNote', (req, res)=>{
             return res.status(500).send('Ошибка при добавлении информации о посещении');
         } else{
             const info = results[0].note;
-            const str = `${userName} ЛИКВИДИРОВАЛ ${info}`;
-            return res.json({success: true, text: str});
+            const str = `${username} ЛИКВИДИРОВАЛ ${info}`;
+            return res.json({success: true, string: str});
         }
     })
 
