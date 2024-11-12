@@ -131,9 +131,9 @@ app.post('/visit', async (req, res) => {
             const results = await query('SELECT visit_count FROM place WHERE idplace = ?', [placeId]);
 
             if (results.length > 0) {
-                const count = results[0].visit_count; // Получаем значение visit_count
+                const count = results[0].visit_count; 
                 console.log("Возвращаем", count);
-                return res.json({ success: true, count: count }); // Возвращаем успешный ответ
+                return res.json({ success: true, count: count }); 
             } else {
             
             return res.json({ success: false, message: 'Этого не может быть, промежуток должен быть' });
