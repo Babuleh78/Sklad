@@ -11,16 +11,18 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
     appId: "1:1085351862604:web:c28fbd08e96b9026006fe9",
     measurementId: "G-TRCG7E5HPC"
 };
-
+let username = "ОШИБКА";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); 
 const currentUser = auth.currentUser;
 const nickname = document.getElementById("name");
+const stars = document.getElementById("stars");
 const avatar = document.getElementById("avatar");
 const pick_avatar = document.getElementById("pick_avatar");
 const idTokenLog = localStorage.getItem('firebaseIdTokenLog');
 const idTokenReg = localStorage.getItem('firebaseIdTokenReg');
-
+// console.log(idTokenLog );
+// console.log(idTokenReg);
 if (idTokenReg || idTokenLog) {
     let payload;
     if(idTokenReg && idTokenReg.trim() !== '') {
@@ -32,24 +34,12 @@ if (idTokenReg || idTokenLog) {
     const userId = decodedPayload.user_id; 
     const email = decodedPayload.email;
     const parts = email.split('@');
-    const username = parts[0];
+    username = parts[0];
     nickname.textContent = username;
+
+   
     if (idTokenReg) { //Называл себя бы максимально скромно - гений, запустил бы пафосную смену поколение, Prodigy, Chemical Brothers, Дядя Fatboy и Slim, пришла Эра 2R2R-а Сим-Селявим!
         let count = -1;
-        async function get_hse_count() {
-            try {
-                const response = await fetch('http://localhost:3000/get_hse_count');
-                if (!response.ok) {
-                    throw new Error(`Ошибка: ${response.status}`);
-                }
-                const data = await response.json();
-                count = data.hse_count; 
-                return count; 
-            } catch (error) {
-                console.error("Error fetching data:", error.message);
-                return -1; 
-            }
-        }
 
         const addUserReg = async (username, count) => {
             try {
@@ -66,16 +56,36 @@ if (idTokenReg || idTokenLog) {
                 }
                 const data = await response.text();
                 console.log(data);
+                stars.textContent = count;
             } catch (error) {
+                
                 console.error('Ошибка:', error);
             }
         };
         (async () => {
-            const hseCount = await get_hse_count(); 
-            if (hseCount !== -1) { 
-                await addUserReg(username, hseCount); 
-            }
+            await addUserReg(username, 0); 
+            
         })();
+    } else{
+        async function get_hse_count_for_user(username) {
+            try {
+                const response = await fetch(`http://localhost:3000/get_hse_count_for_user?userName=${encodeURIComponent(username)}`);
+                if (!response.ok) {
+                    throw new Error(`Ошибка: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                console.log(data.hse_count_user);
+                count = data.hse_count_user; 
+                stars.textContent = count;
+                return count; 
+            } catch (error) {
+                console.error("Error fetching data:", error.message);
+                return -1; 
+            }
+        }
+        console.log(username);
+        const hseCount = await get_hse_count_for_user(username); 
     }
 }
 pick_avatar.style.display = "none"

@@ -2,10 +2,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
   import { getAuth, signInWithEmailAndPassword} from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js';
   
 
-
-
-
-
   
   const firebaseConfig = {
       apiKey: "AIzaSyCRBI8odC_xkOQWvm3RQByJsqQ1XsrL3WA",
@@ -36,8 +32,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
         })
         .catch((error) => {
             const errorMessage = error.message;
-            document.getElementById('message').textContent = "Ошибка: " + errorMessage;
+            console.log(errorMessage);
         });
-    
 
   });

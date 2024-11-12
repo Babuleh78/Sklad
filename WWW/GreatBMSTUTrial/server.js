@@ -14,6 +14,7 @@ const connection = mysql.createConnection({
     database: 'project',
     port: 8888
 });
+//СЧИТЫВАНИЕ ДАННЫХ
 app.get('/RID', async (req, res) => {
     try {
         const data = await getDataFromDB(); 
@@ -23,6 +24,7 @@ app.get('/RID', async (req, res) => {
         res.status(500).json({ error: 'Ошибка при получении данных' });
     } 
 });
+//ПОЛУЧИТЬ СКОЛЬКО ПОСЕТИЛИ КАЖДОЕ МЕСТО ДЛЯ ЗАГРУЗКИ КАРТЫ
 app.get('/get_visit_count', (req, res) => {
     const { placeId } = req.query;
     if (!placeId) {
@@ -42,6 +44,7 @@ app.get('/get_visit_count', (req, res) => {
         }
     });
 });
+//ПРОВЕРИТЬ БЫЛ ЛИ ПОЛЬЗОВАТЕЛЬ
 app.post('/check_visit', (req, res) => {
     const { username, placeId } = req.body;
 
@@ -72,6 +75,7 @@ app.post('/check_visit', (req, res) => {
         }
     });
 });
+//ПОЛУЧИТЬ КОЛИЧЕСТВО ВСЕХ ВЫШЕК
 app.get('/get_hse_count', (req, res) => {
     const query1 = 'SELECT COUNT(idplace) AS hse_count FROM place'; 
     connection.query(query1, null, (error, results) => {
@@ -87,6 +91,25 @@ app.get('/get_hse_count', (req, res) => {
         }
     });
 });
+//ПОСЕТИТЬ КОЛИЧЕСТВО ДЛЯ КОНКРЕТНОГО ПОЛЬЗОВАТЕЛЯ
+    app.get('/get_hse_count_for_user', (req, res) => {
+        const { userName } = req.query;
+        
+        const query1 = 'SELECT stars AS hse_count_user FROM user WHERE usertoken = ?'; 
+        connection.query(query1, [userName], (error, results) => {
+            if (error) {
+                console.error("Ошибка", error);
+                return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
+            }
+            if (results.length > 0) {
+                const hse_count_user = results[0].hse_count_user;
+                res.json({ success: true, hse_count_user});
+            } else {
+                res.json({ success: true, hse_count_user: -1 }); 
+            }
+        });
+    });
+//ПОСЕТИТЬ (КАК ЖЕ ОНО УБОГО НАПИСАНО)
 app.post('/visit', (req, res) => {
     const { username, placeId } = req.body;
     const query1 = 'SELECT iduser FROM user WHERE usertoken = ?'; 
@@ -120,6 +143,14 @@ app.post('/visit', (req, res) => {
                             }
                             res.json({ success: true, isVisit });
                         });
+                        const query5 = 'UPDATE user SET stars = start+1 WHERE (`iduser` = ?);'
+                        connection.query(query5, [idUser], (error)=>{
+                            if (error) {
+                                console.error("Ошибка при начислении звезд", error);
+                                return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
+                            }
+                            res.json({ success: true });
+                        })
                     } else {
                         res.json({ success: false, message: 'Посещение не найдено' });
                     }
@@ -130,6 +161,7 @@ app.post('/visit', (req, res) => {
         }
     });
 });
+//ДОБАВИТЬ ПОЛЬЗОВАТЕЛЯ
 app.post('/addUserReg', (req, res) => {
     const username = req.body.username;
     const count = req.body.count;
@@ -174,6 +206,7 @@ app.post('/addUserReg', (req, res) => {
         });
     });
 });
+//ДОБАВИТЬ ЗАПИСЬ В ЖУРНАЛ
 app.post('/addNote', (req, res) =>{
     const currentDate = new Date();
     const year = currentDate.getFullYear(); 
@@ -183,6 +216,7 @@ app.post('/addNote', (req, res) =>{
     const {userId } = req.body.userId;
 
 });
+
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
     connection.connect(function(err) {
