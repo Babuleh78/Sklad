@@ -11,6 +11,10 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
     appId: "1:1085351862604:web:c28fbd08e96b9026006fe9",
     measurementId: "G-TRCG7E5HPC"
 };
+//Да, мне лень делать отдельную сущность для изображений, связывать ее с пользователем и тд, сами этим занимайтесь. Кто занимайтесь то? Ты один в комнате
+let avatar_mas = ["url('avatars/BAZA.jpeg')", "url('avatars/BEGEMOT85.jpg')","url('avatars/FUCK.png')", "url('avatars/ZVEZDA.png')", "url('avatars/PIVO.png')", 
+    "url('avatars/SLON.png')", "url('avatars/OCHKI.jpg')", "url('avatars/KPTCH.jpg')"
+]
 let username = "ОШИБКА";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); 
@@ -80,18 +84,34 @@ if (idTokenReg || idTokenLog) {
                 stars.textContent = count;
                 return count; 
             } catch (error) {
-                console.error("Error fetching data:", error.message);
+                console.error(error.message);
                 return -1; 
             }
         }
-        console.log(username);
-        const hseCount = await get_hse_count_for_user(username); 
+        await get_hse_count_for_user(username); 
+        async function get_user_avatar(username) {
+            try {
+                const response = await fetch(`http://localhost:3000/GetAvatar?userName=${encodeURIComponent(username)}`);
+                if (!response.ok) {
+                    throw new Error(`Ошибка: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log(data);
+                return data.avatar;
+            } catch (error) {
+                console.error(error.message);
+                return -1; 
+            }
+        }
+        const av = await get_user_avatar(username); 
+        avatar.style.backgroundImage = avatar_mas[av];
+        
     }
 }
 pick_avatar.style.display = "none"
 avatar.onclick = function(){
     if (pick_avatar.style.display === "block") {
-    
+        
         pick_avatar.style.display = "none";
     } else {
         pick_avatar.style.display = "block";

@@ -5,6 +5,7 @@ const app = express();
 const PORT = 3000; 
 const cors = require('cors');
 const { getDataFromDB } = require('./readfromsql');
+const { error } = require('console');
 app.use(cors());
 app.use(express.json());
 const connection = mysql.createConnection({
@@ -216,7 +217,38 @@ app.post('/addNote', (req, res) =>{
     const {userId } = req.body.userId;
 
 });
-
+//ПОЛУЧИТЬ НОМЕР АВЫ
+app.get('/GetAvatar', (req, res)=>{
+    const {userName} = req.query;
+    const query1 = 'SELECT picid FROM user WHERE usertoken = ?';
+    connection.query(query1, [userName], (error, results)=>{
+        if (error) {
+            console.error('Ошибка при получении аватарки:', error);
+            return res.status(500).send('Ошибка при получении аватарки');
+        }
+        else{
+            const picid = results[0].picid;
+            return res.json({success: true, avatar: picid});
+        }
+        
+    });
+});
+//ЗАПИСАТЬ НОМЕР АВЫ
+app.post('/SetAvatar', (req, res)=>{
+    const {userName, picId} = req.body;
+    const query1 = 'UPDATE user SET picid = ? WHERE (usertoken = ?);';
+    connection.query(query1, [picId, userName], (error, results)=>{
+        if (error) {
+            console.error('Ошибка при изменении аватарки', error);
+            return res.status(500).send('Ошибка при изменении аватарки');
+        }
+        else{
+            return res.json({success: true});
+        }
+        
+    });
+});
+//СЛУШАТЬ
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
     connection.connect(function(err) {
