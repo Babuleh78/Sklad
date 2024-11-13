@@ -2,42 +2,40 @@ let notes = [];
 const Container = document.getElementById('entries');
 const addBtn = document.getElementById('addEntryButton');
 
-function updateDisplay() {
+async function updateDisplay() {
     Container.innerHTML = '';
+    const notes = await get_notes(); // Сохраняем результат в переменную notes
+    console.log(notes);
+
+    if (notes === -1) {
+        Container.innerHTML = '<p>Ошибка при получении записей</p>'; 
+        return; 
+    }
 
     if (notes.length === 0) {
         Container.innerHTML = '<p>Нет записей</p>'; 
     } else {
-        notes.forEach((entry, index) => {
+        notes.forEach((entry) => {
             const Element = document.createElement('p');
-            Element.textContent = `${entry}`;
+            Element.textContent = entry.text; 
             Container.appendChild(Element);
         });
     }
 }
 
-addBtn.addEventListener('click', async () => {//ДОПИЛИТЬ
-    const username = document.getElementById("namej").textContent;
-    const placeId = 2;
-
+async function get_notes() {
     try {
-        const res = await fetch('http://localhost:3000/addNote', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, placeId })
-        });
-
-        if (!res.ok) {
-            throw new Error('Ошибка при добавлении');
+        const response = await fetch(`http://localhost:3000/getNote`);
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.status}`);
         }
-        const newEntry = await res.json(); 
-        console.log(newEntry);
-        notes.push(newEntry.string); 
-        updateDisplay(); 
+        const data = await response.json();
+        console.log(data);
+        return data.text;
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error(error.message);
+        return -1; 
     }
-});
+}
+
 updateDisplay();

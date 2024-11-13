@@ -230,24 +230,39 @@ app.post('/SetAvatar', (req, res)=>{
     });
 });
 //ДОБАВИТЬ ЗАПИСЬ О ПОСЕЩЕНИИ
-app.post('/addNote', (req, res)=>{
-    const{username, placeId} = req.body;
-    const query1 = 'SELECT note FROM place WHERE(idplace = ?);';
-    
-    connection.query(query1, [placeId], (error, results)=>{
-        if(error){
-            console.error('Ошибка при добавлении информации о посещении', error);
-            return res.status(500).send('Ошибка при добавлении информации о посещении');
-        } else{
-            const info = results[0].note;
-            const str = `${username} ЛИКВИДИРОВАЛ ${info}`;
-            return res.json({success: true, string: str});
+app.post('/addNote', async (req, res) => {
+    const { username, placeId } = req.body;
+    const query1 = 'SELECT note FROM place WHERE idplace = ?;';
+    try {
+        const [results] = await connection.promise().query(query1, [placeId]);
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'Запись не найдена' });
+        }
+
+        const info = results[0].note;
+        const str = `${username} ЛИКВИДИРОВАЛ ${info}`;
+        const query2 = 'INSERT INTO notes (text) VALUES (?);';
+        await connection.promise().query(query2, [str]);
+        return res.json({ success: true, note: str });
+    } catch (error) {
+        console.error('Ошибка при обработке запроса', error);
+        return res.status(500).json({ success: false, message: 'Ошибка при обработке запроса' });
+    }
+});
+//ПОЛУЧИТЬ ЗАПИСИ
+app.get('/getNote', (req, res)=>{
+    const query1 = 'SELECT text FROM notes';
+    connection.query(query1, null, (error, results)=>{
+        if (error) {
+            console.error('Ошибка при получении записей', error);
+            return res.status(500).send('Ошибка при получении записей');
+        }
+        else{
+            text = results[0];
+            return res.json({success: true, text: results});
         }
     })
-
-})
-
-
+});
 //СЛУШАТЬ
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);

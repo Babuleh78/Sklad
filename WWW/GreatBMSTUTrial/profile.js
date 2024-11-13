@@ -45,7 +45,7 @@ if (idTokenReg || idTokenLog) {
     nicknamej.textContent = username;
    
     if (idTokenReg) { //Называл себя бы максимально скромно - гений, запустил бы пафосную смену поколение, Prodigy, Chemical Brothers, Дядя Fatboy и Slim, пришла Эра 2R2R-а Сим-Селявим!
-        let count = -1;
+        
 
         const addUserReg = async (username, count) => {
             try {

@@ -60,7 +60,6 @@ const fetchData = async () => {
           throw new Error('Сеть ответила с ошибкой: ' + response.status);
       }
       const data = await response.json(); 
-      console.log('Полученные данные:', data); 
       for (let i = 0; i < count; i++) {
         const Element = data[i];
      
@@ -104,6 +103,7 @@ const fetchData = async () => {
               const visitorCount = document.getElementById(uniqueVisitorCountId);
               const infospan = document.getElementById(uniqueInfoId);
               const userName = document.getElementById("name").textContent;
+              console.log(userName);
               const placeId = parseInt(ZButton.id[ZButton.id.length - 1]) + 1;
               try {
                   const visitData = await checkVisit(userName, placeId);
@@ -117,37 +117,12 @@ const fetchData = async () => {
               }
             infospan.textContent = placeinfo; 
       
-            ZButton.addEventListener("click", function() {
-              
-              
+            ZButton.addEventListener("click", async function() {
               if(isVisit == 0){
                   isVisit = 1;  
-                  fetch('http://localhost:3000/visit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username: userName, placeId: placeId })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Ошибка уже хз какая, давай там сам думай');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                      console.log("Успешно");
-                      console.log(data);
-                      visitorCount.textContent = data.count;
-                      
-                  } else {
-                      console.error(data.message); 
-                  }
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);              
-                });
+                  await setVisit(userName, placeId);
+                  await addNote(userName, placeId);
+                 
               }
                 
           });
@@ -158,6 +133,19 @@ const fetchData = async () => {
       console.error('Ошибка при получении данных:', error);
   }
 };
+async function addNote(username, placeId) {
+    const response = await fetch('http://localhost:3000/addNote', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, placeId })
+    });
+    if (!response.ok) {
+        throw new Error('Ошибка при проверке посещения');
+    }
+    return await response.json();
+}
 async function checkVisit(username, placeId) {
   const response = await fetch('http://localhost:3000/check_visit', {
       method: 'POST',
@@ -170,7 +158,24 @@ async function checkVisit(username, placeId) {
       throw new Error('Ошибка при проверке посещения');
   }
 
-  return response.json();
+  return await response.json();
+}
+
+async function setVisit(username, placeId) {
+  const response = await fetch('http://localhost:3000/visit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({username: username, placeId: placeId})
+
+  });
+  if (!response.ok) {
+    throw new Error('Ошибка setVisit');
+  }
+
+    return response.json();
+  
 }
 
 async function getVisitCount(placeId) {
@@ -180,6 +185,6 @@ async function getVisitCount(placeId) {
   }
   const data = await response.json();
   console.log(data);
-  return data.count;
+  return await data.count;
 }
 fetchData();
