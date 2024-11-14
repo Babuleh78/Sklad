@@ -11,10 +11,10 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
     appId: "1:1085351862604:web:c28fbd08e96b9026006fe9",
     measurementId: "G-TRCG7E5HPC"
 };
-//Да, мне лень делать отдельную сущность для изображений, связывать ее с пользователем и тд, сами этим занимайтесь. Кто занимайтесь то? Ты один в комнате
+//Да, мне лень делать отдельную сущность для изображений, связывать ее с пользователем и тд, сами этим занимайтесь. 
 let avatar_mas = ["url('avatars/BAZA.jpeg')", "url('avatars/BEGEMOT85.jpg')","url('avatars/FUCK.png')", "url('avatars/ZVEZDA.png')", "url('avatars/PIVO.png')", 
     "url('avatars/SLON.png')", "url('avatars/OCHKI.jpg')", "url('avatars/KPTCH.jpg')"
-]
+];
 let username = "ОШИБКА";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); 

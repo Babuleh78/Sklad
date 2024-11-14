@@ -2,50 +2,57 @@
 const TextContainer = document.getElementById('entries');
 const PhotoContainer = document.getElementById('photo');
 const journalForm = document.getElementById('journal_form');
-
+const namej = document.getElementById('namej');
+let avatar_mas = ["avatars/BAZA.jpeg", "avatars/BEGEMOT85.jpg","avatars/FUCK.png", "avatars/ZVEZDA.png", "avatars/PIVO.png", 
+    "avatars/SLON.png", "avatars/OCHKI.jpg", "avatars/KPTCH.jpg"
+];
 async function updateDisplay() {
-    // Очищаем контейнеры
     TextContainer.innerHTML = '';
     PhotoContainer.innerHTML = ''; 
-    const notes = await get_notes();
-    if (notes === -1) {
+    const all = await get_all();//noteid, text, user_avatar, user_nick
+    console.log(all);
+    console.log(all.length);
+    if (all === -1) {
         TextContainer.innerHTML = '<p>Ошибка при получении записей</p>'; 
         return; 
     }
-    if (notes.length === 0) {
+    if (all.length === 0) {
         TextContainer.innerHTML = '<p>Нет записей</p>'; 
     } else {
-        notes.forEach((entry) => {
+        for(let i = 0; i<all.length; i++){
+            const Element = all[i];
+            
             const entryContainer = document.createElement('div');
             entryContainer.className = "entry_container";
             const TextElement = document.createElement('p');
             TextElement.className = "journal_element";
-            TextElement.textContent = entry.text; 
+            TextElement.textContent = Element.text;
             const PhotoElement = document.createElement('img');
             PhotoElement.className = "avatar_journal";
-            PhotoElement.src = "avatars/BAZA.jpeg"; 
+            const avid = Element.user_avatar;
+            PhotoElement.src = avatar_mas[avid];
             entryContainer.appendChild(PhotoElement);
             entryContainer.appendChild(TextElement);
             TextContainer.appendChild(entryContainer); 
-        });
+        }
     }
 }
-
-async function get_notes() {
+async function get_all() {
     try {
         const response = await fetch(`http://localhost:3000/getNote`);
         if (!response.ok) {
             throw new Error(`Ошибка: ${response.status}`);
         }
         const data = await response.json();
-        return data.text;
+        return data.all;
     } catch (error) {
         console.error(error.message);
         return -1; 
     }
 }
-updateDisplay();
 
+updateDisplay();
+//Теперь чтоб могли вращать 
 
 let isMouseDown = false;
 let startY;

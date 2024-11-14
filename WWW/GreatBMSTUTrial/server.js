@@ -251,15 +251,15 @@ app.post('/addNote', async (req, res) => {
 });
 //ПОЛУЧИТЬ ЗАПИСИ
 app.get('/getNote', (req, res)=>{
-    const query1 = 'SELECT text FROM notes';
+    const query1 = 'SELECT * FROM notes';
+    
     connection.query(query1, null, (error, results)=>{
         if (error) {
             console.error('Ошибка при получении записей', error);
-            return res.status(500).send('Ошибка при получении записей');
+            return res.json({success: false, all: -1});
         }
         else{
-            text = results[0];
-            return res.json({success: true, text: results});
+            return res.json({success: true, all: results});
         }
     })
 });
