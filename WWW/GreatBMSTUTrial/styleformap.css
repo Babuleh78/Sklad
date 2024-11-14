@@ -2,6 +2,7 @@
   height: 100vh;
   width: 100vw;
   background-color: #333;
+  
 }
 [class*="copyrights-pane"]{
   display: none !important;
@@ -10,18 +11,18 @@
   border: 1px solid #3498db;
   background: none;
   padding: 10px 20px;
-  font-size: 20px; /* Исходный размер текста */
+  font-size: 20px; 
   font-family: "Montserrat", sans-serif;
   cursor: pointer;
   color: #3498db;
-  transition: font-size 0.3s; /* Плавный переход для изменения размера текста */
+  transition: font-size 0.3s; 
   position: relative;
   margin-bottom: 1px;
   z-index: 200;
   margin-left: 25px;
-  width: 250px; /* Фиксированная ширина кнопки */
-  height: 50px; /* Фиксированная высота кнопки */
-  overflow: hidden; /* Скрываем переполнение */
+  width: 250px; 
+  height: 50px; 
+  overflow: hidden; 
 }
 .ZButton_text{
   position: relative;
@@ -69,4 +70,8 @@
 }
 .difficult{
   text-align: center;
+}
+.map{
+  overflow-x: hidden;      
+  overflow-y: hidden;  
 }

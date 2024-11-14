@@ -10,8 +10,6 @@ async function updateDisplay() {
     TextContainer.innerHTML = '';
     PhotoContainer.innerHTML = ''; 
     const all = await get_all();//noteid, text, user_avatar, user_nick
-    console.log(all);
-    console.log(all.length);
     if (all === -1) {
         TextContainer.innerHTML = '<p>Ошибка при получении записей</p>'; 
         return; 
