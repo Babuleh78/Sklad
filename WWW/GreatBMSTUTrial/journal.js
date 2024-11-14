@@ -1,10 +1,11 @@
-let notes = [];
+
 const Container = document.getElementById('entries');
-const addBtn = document.getElementById('addEntryButton');
+
 
 async function updateDisplay() {
+    console.log("вызвали апдейт");
     Container.innerHTML = '';
-    const notes = await get_notes(); // Сохраняем результат в переменную notes
+    const notes = await get_notes(); 
     console.log(notes);
 
     if (notes === -1) {
@@ -37,5 +38,4 @@ async function get_notes() {
         return -1; 
     }
 }
-
 updateDisplay();

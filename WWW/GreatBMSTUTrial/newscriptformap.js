@@ -3,7 +3,6 @@ const key = 'F3Eh4Wsa3QzZb0pMVkSZ';
 const map = L.map('map').setView([55.75476845750829,37.621749677246086], 11); //starting position
 let visitors = 0;
 
-
 const myballoonTemplate = `
     <div class="balloon" id="balloon">
         <div class="balloon_info"> 
@@ -68,6 +67,7 @@ const fetchData = async () => {
         const coor_y = Element.coor_y;  
         const uniqueId = `popup-${i}`;
         const uniqueZButtonId = `ZButton-${i}`;
+        const uniqueZButtonTextId = `ZButtonText-${i}`;
         const uniqueVisitorCountId = `visitorCount-${i}`;
         const uniqueInfoId = `info-${i}`;
       
@@ -90,7 +90,7 @@ const fetchData = async () => {
                   </div>
               </div>
               <button id="${uniqueZButtonId}" class="ZButton">
-                  <div class="ZButton_text">ЛИКВИДИРОВАТЬ</div>
+                  <div id = "${uniqueZButtonTextId}" class="ZButton_text">ЛИКВИДИРОВАТЬ</div>
               </button>
           </div>
       `;
@@ -108,7 +108,15 @@ const fetchData = async () => {
               try {
                   const visitData = await checkVisit(userName, placeId);
                   isVisit = visitData.success ? visitData.is_visit : 0;
-      
+                  console.log(isVisit);
+                  if(isVisit !== 0){
+                    const hse_text = document.getElementById(uniqueZButtonTextId);
+                    hse_text.textContent = "ЛИКВИДИРОВАНА";
+                    hse_text.style.color = "black"; 
+                    hse_text.style.fontSize = "24px"; 
+                    hse_text.style.textDecoration = "line-through";
+                    ZButton.style.background = "red";
+                  }
                   counthse = await getVisitCount(placeId);
                   visitorCount.textContent = counthse;
                   console.log(counthse);
@@ -118,12 +126,18 @@ const fetchData = async () => {
             infospan.textContent = placeinfo; 
       
             ZButton.addEventListener("click", async function() {
-              if(isVisit == 0){
+              if(isVisit === 0){
                   isVisit = 1;  
                   await setVisit(userName, placeId);
                   await addNote(userName, placeId);
-                 
-              }
+                  visitorCount.textContent = Number(visitorCount.textContent) +1;
+                  const hse_text = document.getElementById(uniqueZButtonTextId);
+                  hse_text.textContent = "ЛИКВИДИРОВАНА";
+                  hse_text.style.color = "black"; 
+                  hse_text.style.fontSize = "24px"; 
+                  hse_text.style.textDecoration = "line-through";
+                  ZButton.style.background = "red";
+              } 
                 
           });
         });
@@ -187,4 +201,6 @@ async function getVisitCount(placeId) {
   console.log(data);
   return await data.count;
 }
+
+
 fetchData();
