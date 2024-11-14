@@ -6,7 +6,7 @@
     left:20px;
     top: 0;
     margin-left: 120px;
-    width: 300px;
+    width: 350px;
     margin-top: 100px;
     background-color: rgba(0, 0, 0, 0); 
     box-sizing: border-box; 
@@ -25,13 +25,37 @@
     display: none;
 }
 .journal_form {
-    width: 200px;
-    height: 30px;
-    background-color: green; 
-    padding: 20px;
+    width: 250px;
+    height: 300px;
+    padding: 25px;
     border-radius: 28px;
     text-align: center;
+    background-color: gold;
     justify-content: center;
+    overflow-x: hidden;      
+    overflow-y: hidden;  
+}
+
+
+.journal_element {
+    width: 200px; /* Ограничиваем ширину */
+    background-color: green; /* Зеленый фон */
+    text-align: center; /* Центрируем текст */
+    padding: 10px; /* Добавляем отступы для лучшего внешнего вида */
+    box-sizing: border-box; /* Учитываем отступы в ширине */
+    word-break: normal; /* Переносит слова только по пробелам */
+}
+
+.entry_container {
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 10px; 
+}
+
+.avatar_journal {
+    width: 50px; 
+    height: 50px; 
+    margin-right: 10px;
 }
 .avatar{
     position: relative; 

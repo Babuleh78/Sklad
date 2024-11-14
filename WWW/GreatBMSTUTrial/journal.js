@@ -1,25 +1,32 @@
 
-const Container = document.getElementById('entries');
-
+const TextContainer = document.getElementById('entries');
+const PhotoContainer = document.getElementById('photo');
+const journalForm = document.getElementById('journal_form');
 
 async function updateDisplay() {
-    console.log("вызвали апдейт");
-    Container.innerHTML = '';
-    const notes = await get_notes(); 
-    console.log(notes);
-
+    // Очищаем контейнеры
+    TextContainer.innerHTML = '';
+    PhotoContainer.innerHTML = ''; 
+    const notes = await get_notes();
     if (notes === -1) {
-        Container.innerHTML = '<p>Ошибка при получении записей</p>'; 
+        TextContainer.innerHTML = '<p>Ошибка при получении записей</p>'; 
         return; 
     }
-
     if (notes.length === 0) {
-        Container.innerHTML = '<p>Нет записей</p>'; 
+        TextContainer.innerHTML = '<p>Нет записей</p>'; 
     } else {
         notes.forEach((entry) => {
-            const Element = document.createElement('p');
-            Element.textContent = entry.text; 
-            Container.appendChild(Element);
+            const entryContainer = document.createElement('div');
+            entryContainer.className = "entry_container";
+            const TextElement = document.createElement('p');
+            TextElement.className = "journal_element";
+            TextElement.textContent = entry.text; 
+            const PhotoElement = document.createElement('img');
+            PhotoElement.className = "avatar_journal";
+            PhotoElement.src = "avatars/BAZA.jpeg"; 
+            entryContainer.appendChild(PhotoElement);
+            entryContainer.appendChild(TextElement);
+            TextContainer.appendChild(entryContainer); 
         });
     }
 }
@@ -31,7 +38,6 @@ async function get_notes() {
             throw new Error(`Ошибка: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data);
         return data.text;
     } catch (error) {
         console.error(error.message);
@@ -39,3 +45,33 @@ async function get_notes() {
     }
 }
 updateDisplay();
+
+
+let isMouseDown = false;
+let startY;
+let scrollTop;
+journalForm.addEventListener('mousedown', (e) => {
+    isMouseDown = true;
+    e.preventDefault(); 
+    startY = e.pageY - journalForm.offsetTop;
+    scrollTop = journalForm.scrollTop;
+});
+journalForm.addEventListener('mouseleave', (e) => {
+    
+        e.preventDefault(); 
+        isMouseDown = false;
+});
+
+journalForm.addEventListener('mouseup', (e) => {
+    
+        e.preventDefault(); 
+        isMouseDown = false;
+});
+//Не ну сам бы я до этого не додумался
+journalForm.addEventListener('mousemove', (e) => {
+    if (!isMouseDown) return; 
+        e.preventDefault(); 
+        const y = e.pageY - journalForm.offsetTop;
+        const walk = (y - startY) * 1; 
+        journalForm.scrollTop = scrollTop - walk; 
+});
