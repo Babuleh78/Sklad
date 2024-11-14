@@ -6,10 +6,10 @@ const namej = document.getElementById('namej');
 let avatar_mas = ["avatars/BAZA.jpeg", "avatars/BEGEMOT85.jpg","avatars/FUCK.png", "avatars/ZVEZDA.png", "avatars/PIVO.png", 
     "avatars/SLON.png", "avatars/OCHKI.jpg", "avatars/KPTCH.jpg"
 ];
-async function updateDisplay() {
+async function updateDisplayJ() {
     TextContainer.innerHTML = '';
     PhotoContainer.innerHTML = ''; 
-    const all = await get_all();//noteid, text, user_avatar, user_nick
+    const all = await get_all_j();//noteid, text, user_avatar, user_nick
     if (all === -1) {
         TextContainer.innerHTML = '<p>Ошибка при получении записей</p>'; 
         return; 
@@ -35,7 +35,7 @@ async function updateDisplay() {
         }
     }
 }
-async function get_all() {
+async function get_all_j() {
     try {
         const response = await fetch(`http://localhost:3000/getNote`);
         if (!response.ok) {
@@ -49,7 +49,7 @@ async function get_all() {
     }
 }
 
-updateDisplay();
+updateDisplayJ();
 //Теперь чтоб могли вращать 
 
 let isMouseDown = false;

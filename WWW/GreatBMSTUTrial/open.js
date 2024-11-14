@@ -23,7 +23,7 @@ userBtn.onclick = function() {
 
 journalBtn.onclick = function() {
     
-    updateDisplay();    
+    updateDisplayJ();    
     if (modalJournal.style.display === "block") {
         modalJournal.style.display = "none";
     } else {

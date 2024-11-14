@@ -252,7 +252,19 @@ app.post('/addNote', async (req, res) => {
 //ПОЛУЧИТЬ ЗАПИСИ
 app.get('/getNote', (req, res)=>{
     const query1 = 'SELECT * FROM notes';
-    
+    connection.query(query1, null, (error, results)=>{
+        if (error) {
+            console.error('Ошибка при получении записей', error);
+            return res.json({success: false, all: -1});
+        }
+        else{
+            return res.json({success: true, all: results});
+        }
+    })
+});
+//ПОЛУЧИТЬ ДОСТИЖЕНИЙ
+app.get('/getAch', (req, res)=>{
+    const query1 = 'SELECT * FROM achivements';
     connection.query(query1, null, (error, results)=>{
         if (error) {
             console.error('Ошибка при получении записей', error);
