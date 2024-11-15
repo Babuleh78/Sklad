@@ -25,6 +25,7 @@ async function updateDisplayJ() {
             const TextElement = document.createElement('p');
             TextElement.className = "journal_element";
             TextElement.textContent = Element.text;
+            TextElement.style.color = "red";
             const PhotoElement = document.createElement('img');
             PhotoElement.className = "avatar_journal";
             const avid = Element.user_avatar;
@@ -48,6 +49,7 @@ async function get_all_j() {
         return -1; 
     }
 }
+
 
 updateDisplayJ();
 //Теперь чтоб могли вращать 

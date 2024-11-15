@@ -232,18 +232,26 @@ app.post('/SetAvatar', (req, res)=>{
 //ДОБАВИТЬ ЗАПИСЬ О ПОСЕЩЕНИИ
 app.post('/addNote', async (req, res) => {
     const { username, placeId } = req.body;
-    const query1 = 'SELECT note FROM place WHERE idplace = ?;';
+    const query0 = 'SELECT picid FROM user WHERE usertoken = ?';
     try {
-        const [results] = await connection.promise().query(query1, [placeId]);
-        if (results.length === 0) {
+        const [userResults] = await connection.promise().query(query0, [username]);
+        
+        if (userResults.length === 0) {
+            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+        }
+        const picid = userResults[0].picid;
+        const query1 = 'SELECT note FROM place WHERE idplace = ?;';
+        const [placeResults] = await connection.promise().query(query1, [placeId]);
+
+        if (placeResults.length === 0) {
             return res.status(404).json({ success: false, message: 'Запись не найдена' });
         }
-
-        const info = results[0].note;
-        const str = `${username} ЛИКВИДИРОВАЛ ${info}`;
-        const query2 = 'INSERT INTO notes (text) VALUES (?);';
-        await connection.promise().query(query2, [str]);
-        return res.json({ success: true, note: str });
+        const info = placeResults[0].note;
+        const UPusername = username.toUpperCase();
+        const str = `${UPusername} ЛИКВИДИРОВАЛ ${info}`;
+        const query2 = 'INSERT INTO notes (text, user_avatar) VALUES (?, ?);';
+        await connection.promise().query(query2, [str, picid]);
+        return res.json({ success: true, note: str, avatar: picid });
     } catch (error) {
         console.error('Ошибка при обработке запроса', error);
         return res.status(500).json({ success: false, message: 'Ошибка при обработке запроса' });
