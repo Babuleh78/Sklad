@@ -262,7 +262,7 @@ app.get('/getNote', (req, res)=>{
         }
     })
 });
-//ПОЛУЧИТЬ ДОСТИЖЕНИЙ
+//ПОЛУЧИТЬ ДОСТИЖЕНИЯ
 app.get('/getAch', (req, res)=>{
     const query1 = 'SELECT * FROM achivements';
     connection.query(query1, null, (error, results)=>{
@@ -274,6 +274,21 @@ app.get('/getAch', (req, res)=>{
             return res.json({success: true, all: results});
         }
     })
+});
+//ПОЛУЧИТЬ КОЛИЧЕСТВО ЗВЕЗД
+app.get('/get_stars_count', (req, res)=>{
+    const query1 = 'SELECT stars FROM place';
+    connection.query(query1, null, (error, results)=>{
+        if (error) {
+            console.error('Ошибка при получении количества звезд у мест', error);
+            return res.json({success: false, stars: -1});
+        }
+        else{
+            return res.json({success: true, stars: results});
+        }
+    })
+
+
 });
 //СЛУШАТЬ
 app.listen(PORT, () => {

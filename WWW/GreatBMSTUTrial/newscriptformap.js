@@ -2,7 +2,21 @@
 const key = 'F3Eh4Wsa3QzZb0pMVkSZ';
 const map = L.map('map').setView([55.75476845750829,37.621749677246086], 11); //starting position
 let visitors = 0;
-
+let stars_mas = [];
+async function get_stars_count() {
+  try{
+    const response = await fetch(`http://localhost:3000/get_stars_count`);
+    if(!response.ok){
+      throw new Error(`Ошибка: ${response.status}`);
+    }
+    const data = await response.json();
+    return await data.stars;
+  } catch (error) {
+    console.error("Error fetching data:", error.message); 
+  }
+  }(async () => {
+    stars_mas = await get_stars_count();
+  })();
 const myballoonTemplate = `
     <div class="balloon" id="balloon">
         <div class="balloon_info"> 
@@ -35,7 +49,6 @@ async function get_hse_count() {
         throw new Error(`Ошибка Хуяшибка: ${response.status}`);
     }
     const data = await response.json();
-    console.log(data);
     count = data.hse_count;
     return count;
 } catch (error) {
@@ -70,7 +83,7 @@ const fetchData = async () => {
         const uniqueZButtonTextId = `ZButtonText-${i}`;
         const uniqueVisitorCountId = `visitorCount-${i}`;
         const uniqueInfoId = `info-${i}`;
-      
+        const starCount = stars_mas[i].stars;
         const balloonHTML = `
           <div class="balloon" id="${uniqueId}">
               <div class="balloon_info"> 
@@ -82,11 +95,7 @@ const fetchData = async () => {
               <div class="difficult">
                   <div class="star-box">
                       Сложность
-                      <i class="fas fa-star checked"></i>
-                      <i class="fas fa-star checked"></i>
-                      <i class="fas fa-star checked"></i>
-                      <i class="fas fa-star"></i>
-                      <i class="fas fa-star"></i>
+                      ${getStarsHTML(starCount)}
                   </div>
               </div>
               <button id="${uniqueZButtonId}" class="ZButton">
@@ -103,12 +112,10 @@ const fetchData = async () => {
               const visitorCount = document.getElementById(uniqueVisitorCountId);
               const infospan = document.getElementById(uniqueInfoId);
               const userName = document.getElementById("name").textContent;
-              console.log(userName);
               const placeId = parseInt(ZButton.id[ZButton.id.length - 1]) + 1;
               try {
                   const visitData = await checkVisit(userName, placeId);
                   isVisit = visitData.success ? visitData.is_visit : 0;
-                  console.log(isVisit);
                   if(isVisit !== 0){
                     const hse_text = document.getElementById(uniqueZButtonTextId);
                     hse_text.textContent = "ЛИКВИДИРОВАНА";
@@ -119,7 +126,6 @@ const fetchData = async () => {
                   }
                   counthse = await getVisitCount(placeId);
                   visitorCount.textContent = counthse;
-                  console.log(counthse);
               } catch (error) {
                   console.error('Ошибка:', error);
               }
@@ -147,6 +153,22 @@ const fetchData = async () => {
       console.error('Ошибка при получении данных:', error);
   }
 };
+
+function getStarsHTML(count) {
+  let starsHTML = '';
+  for (let i = 0; i < 5; i++) {
+      if (i < count) {
+          starsHTML += '<i class="fas fa-star checked"></i>';
+      } else {
+          starsHTML += '<i class="fas fa-star"></i>';
+      }
+  }
+  return starsHTML;
+}
+
+
+
+
 async function addNote(username, placeId) {
     const response = await fetch('http://localhost:3000/addNote', {
         method: 'POST',
@@ -198,9 +220,9 @@ async function getVisitCount(placeId) {
       throw new Error(`Ошибка: ${response.status}`);
   }
   const data = await response.json();
-  console.log(data);
   return await data.count;
 }
+
 
 
 fetchData();
