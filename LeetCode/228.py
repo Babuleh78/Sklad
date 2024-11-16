@@ -2,7 +2,6 @@ class Solution:
     def summaryRanges(self, nums: list[int]) -> list[str]:
         if not nums:
             return []
-
         s = []
         first = nums[0]
         second = first
