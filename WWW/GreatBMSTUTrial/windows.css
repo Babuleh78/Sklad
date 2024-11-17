@@ -105,17 +105,45 @@
     position: relative;
     bottom: 20px;
 }
-.ach_element {
+.ach_title_element {
+    position: relative;
+    left: 85px;
+    bottom: 128px;
     width: 200px; 
+    font-size: 24px;
     background-color: green; 
     text-align: center; 
     padding: 10px; 
     box-sizing: border-box; 
     word-break: normal; 
 }
+.ach_text_element{
+    position: relative;
+    left: 70px;
+    width: 200px; 
+    bottom: 20px;
+    background-color: brown;
+    text-align: center; 
+    box-sizing: border-box; 
+    word-break: normal; 
+}
 .ach_image {
-    width: 50px; 
-    height: 50px; 
+    width: 75px; 
+    height: 75px; 
     margin-right: 10px;
     border-radius: 50%;
+}
+.entry_container_ach{
+    background-color: blue;
+    height: 125px;
+    border-radius: 15%;
+}
+.ach_form_scroll{
+    width: 250px;
+    height: 300px;
+    padding: 25px;
+    border-radius: 28px;
+    background-color: gold;
+    overflow-x: hidden;      
+    overflow-y: hidden;  
 }

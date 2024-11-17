@@ -84,7 +84,7 @@ journalForm.addEventListener('mousedown', (e) => {
     scrollTop = journalForm.scrollTop;
 });
 journalForm.addEventListener('mouseleave', (e) => {
-    
+       
         e.preventDefault(); 
         isMouseDown = false;
 });

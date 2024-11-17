@@ -1,5 +1,5 @@
 const TextContainerAch = document.getElementById("ach_form");
-const AchForm = document.getElementById('ach_form');
+const AchForm = document.getElementById('ach_form_scroll');
 
 async function updateDisplayAch() {
     TextContainerAch.innerHTML = '';
@@ -15,15 +15,19 @@ async function updateDisplayAch() {
         for(let i = 0; i<all.length; i++){
             const Element = all[i];
             const entryContainer = document.createElement('div');
-            entryContainer.className = "entry_container";
+            entryContainer.className = "entry_container_ach";
             const TextElement = document.createElement('p');
-            TextElement.className = "ach_element";
+            TextElement.className = "ach_text_element";
             TextElement.textContent = Element.text;
             const PhotoElement = document.createElement('img');
             PhotoElement.className = "ach_image";
-            PhotoElement.src = Element.url;
-            entryContainer.appendChild(TextElement);
+            PhotoElement.src = Element.url; 
+            const TitleElement = document.createElement('p');
+            TitleElement.textContent = Element.title;
+            TitleElement.className = "ach_title_element";
             entryContainer.appendChild(PhotoElement);
+            entryContainer.appendChild(TextElement);
+            entryContainer.appendChild(TitleElement);
             TextContainerAch.appendChild(entryContainer); 
         }
     }
@@ -44,30 +48,32 @@ async function get_all_ach() {
 
 updateDisplayAch(); 
 
-// let isMouseDown = false;
-// let startY;
-// let scrollTop;
-// journalForm.addEventListener('mousedown', (e) => {
-//     isMouseDown = true;
-//     e.preventDefault(); 
-//     startY = e.pageY - journalForm.offsetTop;
-//     scrollTop = journalForm.scrollTop;
-// });
-// journalForm.addEventListener('mouseleave', (e) => {
-    
-//         e.preventDefault(); 
-//         isMouseDown = false;
-// });
+let isMouseDownA = false;
+let startYA;
+let scrollTopA;
+AchForm.addEventListener('mousedown', (e) => {
+    console.log("down");
+    isMouseDownA = true;
+    e.preventDefault(); 
+    startYA = e.pageY - AchForm.offsetTop;
+    scrollTopA = AchForm.scrollTopA;
+});
+AchForm.addEventListener('mouseleave', (e) => {
+    console.log("leave");
+        e.preventDefault(); 
+        isMouseDownA = false;
+});
 
-// journalForm.addEventListener('mouseup', (e) => {
-    
-//         e.preventDefault(); 
-//         isMouseDown = false;
-// });
-// journalForm.addEventListener('mousemove', (e) => {
-//     if (!isMouseDown) return; 
-//         e.preventDefault(); 
-//         const y = e.pageY - journalForm.offsetTop;
-//         const walk = (y - startY) * 1; 
-//         journalForm.scrollTop = scrollTop - walk; 
-// });
+AchForm.addEventListener('mouseup', (e) => {
+    console.log("up");
+        e.preventDefault(); 
+        isMouseDownA = false;
+});
+AchForm.addEventListener('mousemove', (e) => {
+    console.log("move");
+    if (!isMouseDownA) return; 
+        e.preventDefault(); 
+        const y = e.pageY - AchForm.offsetTopA;
+        const walk = (y - startYA) * 1; 
+        AchForm.scrollTopA = scrollTopA - walk; 
+});
