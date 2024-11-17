@@ -124,13 +124,13 @@
     box-sizing: border-box; 
     word-break: normal; 
     text-align: center; 
-    top: 0; 
+    top: -10px;
     left: 85px;
 }
 
 .ach_text_element {
     position: absolute;
-    width: 130px; 
+    width: 150px; 
     top: 50px;
     left: 85px;
     background-color: brown;
