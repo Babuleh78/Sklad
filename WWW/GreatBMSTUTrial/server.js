@@ -376,7 +376,6 @@ app.listen(PORT, () => {
 //ПРОВЕРКА АЧИВКИ НА БАСМАННУЮ
 app.post('/set_ach', (req, res)=>{
     const {uid, id} = req.body;
-    console.log("Покорми кота!");
     const query = `UPDATE open_ach SET is_open = 1 WHERE (user_id = ?) and (ach_id = ?);`;
     connection.query(query, [uid, id], (error, results)=>{
         if(error){
