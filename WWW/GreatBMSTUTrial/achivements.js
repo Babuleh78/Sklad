@@ -1,10 +1,14 @@
 const TextContainerAch = document.getElementById("ach_form");
 const AchForm = document.getElementById('ach_form_scroll');
-
+let DRAWCHECK = false;
 const nicknameach = document.getElementById("name");
 let user_id = -10;
 async function DrawDisplayAch() {
-  console.log(nicknameach.textContent);
+  if(DRAWCHECK){
+    return;
+  }
+  DRAWCHECK = true;
+  console.log("Рисуем");
   if(user_id === -10){
     user_id = await getId(nicknameach.textContent);
   } else if(user_id === -1){
@@ -22,7 +26,7 @@ async function DrawDisplayAch() {
         for(let i = 0; i<all.length; i++){
             const Element = all[i];
             const entryContainer = document.createElement('div');
-            entryContainer.id = "entry_" + i+1  ; 
+            entryContainer.id = "entry_" + (i+1 ) ; 
             entryContainer.className = "entry_container_ach_unactive";
             const TextElement = document.createElement('p');
             TextElement.className = "ach_text_element";
@@ -40,6 +44,11 @@ async function DrawDisplayAch() {
             TextContainerAch.appendChild(entryContainer); 
         }
     }
+}
+async function updateDisplayAch(i) {
+  const ach = document.getElementById("entry_"+i);
+  ach.className = "entry_container_ach";
+  console.log("Обновили");
 }
 async function get_all_ach() {
     try {

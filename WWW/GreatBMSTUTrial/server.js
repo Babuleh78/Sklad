@@ -374,7 +374,16 @@ app.listen(PORT, () => {
 
 //ВСЕ, ЧТО СВЯЗАНО С ПРОВЕРКОЙ ДОСТИЖЕНИЙ
 //ПРОВЕРКА АЧИВКИ НА БАСМАННУЮ
-app.get('/check_basm', (req, res)=>{
-    const {userName} = req.query;
-    
-})
+app.post('/set_ach', (req, res)=>{
+    const {uid, id} = req.body;
+    console.log("Покорми кота!");
+    const query = `UPDATE open_ach SET is_open = 1 WHERE (user_id = ?) and (ach_id = ?);`;
+    connection.query(query, [uid, id], (error, results)=>{
+        if(error){
+            console.error('Ошибка при поставлении достижения', error);
+            return res.json({success: false});
+        } else{
+            return res.json({success: true});
+        }
+    });
+});

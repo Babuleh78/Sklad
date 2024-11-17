@@ -60,7 +60,6 @@ if (idTokenReg || idTokenLog) {
                     throw new Error('Ошибка при добавлении пользователя');
                 }
                 const data = await response.text();
-                console.log(data);
                 stars.textContent = 0;
             } catch (error) {
                 

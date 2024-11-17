@@ -112,6 +112,8 @@ const fetchData = async () => {
               const visitorCount = document.getElementById(uniqueVisitorCountId);
               const infospan = document.getElementById(uniqueInfoId);
               const userName = document.getElementById("name").textContent;
+              const uid = await getId(userName);
+              
               const placeId = parseInt(ZButton.id[ZButton.id.length - 1]) + 1;
               try {
                   const visitData = await checkVisit(userName, placeId);
@@ -124,6 +126,7 @@ const fetchData = async () => {
                     hse_text.style.fontSize = "24px"; 
                     hse_text.style.textDecoration = "line-through";
                     ZButton.style.background = "red";
+                   
                   }
                   counthse = await getVisitCount(placeId);
                   visitorCount.textContent = counthse;
@@ -135,8 +138,10 @@ const fetchData = async () => {
             ZButton.addEventListener("click", async function() {
               if(isVisit === 0){
                   isVisit = 1;  
+
                   await setVisit(userName, placeId);
                   await addNote(userName, placeId);
+                  console.log(uid);
                   visitorCount.textContent = Number(visitorCount.textContent) +1;
                   const hse_text = document.getElementById(uniqueZButtonTextId);
                   hse_text.textContent = "ЛИКВИДИРОВАНА";
@@ -144,6 +149,12 @@ const fetchData = async () => {
                   hse_text.style.fontSize = "24px"; 
                   hse_text.style.textDecoration = "line-through";
                   ZButton.style.background = "red";
+                  console.log(ZButton.id);
+                  if(ZButton.id == "ZButton-6"){
+                      await set_ach(uid, 1);//Первое достижение
+                      await DrawDisplayAch();
+                      await updateDisplayAch(1);
+                  }
               } 
                 
           });
@@ -180,6 +191,19 @@ async function addNote(username, placeId) {
         throw new Error('Ошибка при проверке посещения');
     }
     return await response.json();
+}
+async function set_ach(uid, id) {
+  const response = await fetch('http://localhost:3000/set_ach', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ uid, id })
+  });
+  if (!response.ok) {
+      throw new Error('Ошибка при постановке ачивки');
+  }
+  return await response.json();
 }
 async function checkVisit(username, placeId) {
   const response = await fetch('http://localhost:3000/check_visit', {
