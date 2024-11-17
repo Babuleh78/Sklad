@@ -20,7 +20,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); 
 const currentUser = auth.currentUser;
 const nickname = document.getElementById("name");
-
 const nicknamej = document.getElementById("namej");
 const stars = document.getElementById("stars");
 const avatar = document.getElementById("avatar");
@@ -110,6 +109,7 @@ if (idTokenReg || idTokenLog) {
         
     }
 }
+
 pick_avatar.style.display = "none"
 avatar.onclick = function(){
     if (pick_avatar.style.display === "block") {

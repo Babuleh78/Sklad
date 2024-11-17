@@ -1,10 +1,12 @@
 const TextContainerAch = document.getElementById("ach_form");
 const AchForm = document.getElementById('ach_form_scroll');
 
+const nicknameach = document.getElementById("name");
+console.log(nicknameach.textContent);
 async function updateDisplayAch() {
+  console.log(nicknameach.textContent);
     TextContainerAch.innerHTML = '';
     const all = await get_all_ach(); //id_ach, url, title, text
-    
     if (all === -1) {
         TextContainer.innerHTML = '<p>Ошибка при получении записей</p>'; 
         return; 
@@ -25,6 +27,7 @@ async function updateDisplayAch() {
             const TitleElement = document.createElement('p');
             TitleElement.textContent = Element.title;
             TitleElement.className = "ach_title_element";
+           
             entryContainer.appendChild(PhotoElement);
             entryContainer.appendChild(TextElement);
             entryContainer.appendChild(TitleElement);
@@ -45,8 +48,9 @@ async function get_all_ach() {
         return -1; 
     }
 }
-
+if(nicknameach.textContent!=='-'){
 updateDisplayAch(); 
+}
 
 let isMouseDownA = false;
 let startYA;

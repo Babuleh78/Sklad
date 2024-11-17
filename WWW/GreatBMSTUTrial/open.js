@@ -43,6 +43,8 @@ achBtn.onclick = function(){
     if (modalach.style.display === "block") {
         modalach.style.display = "none";
     } else {
+            updateDisplayAch(); 
+              
         closeAll();
         openModal(modalach);
     }
