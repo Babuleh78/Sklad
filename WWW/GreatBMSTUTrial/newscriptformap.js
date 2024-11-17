@@ -118,6 +118,7 @@ const fetchData = async () => {
                   isVisit = visitData.success ? visitData.is_visit : 0;
                   if(isVisit !== 0){
                     const hse_text = document.getElementById(uniqueZButtonTextId);
+                    stars.textContent = Number(stars.textContent)+1;
                     hse_text.textContent = "ЛИКВИДИРОВАНА";
                     hse_text.style.color = "black"; 
                     hse_text.style.fontSize = "24px"; 

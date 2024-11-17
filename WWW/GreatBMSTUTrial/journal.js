@@ -9,6 +9,8 @@ let avatar_mas = ["avatars/BAZA.jpeg", "avatars/BEGEMOT85.jpg","avatars/FUCK.png
 async function updateDisplayJ() {
     TextContainer.innerHTML = '';
     PhotoContainer.innerHTML = ''; 
+    
+    check_journal_count();
     const all = await get_all_j();//noteid, text, user_avatar, user_nick
     if (all === -1) {
         TextContainer.innerHTML = '<p>Ошибка при получении записей</p>'; 
@@ -17,7 +19,7 @@ async function updateDisplayJ() {
     if (all.length === 0) {
         TextContainer.innerHTML = '<p>Нет записей</p>'; 
     } else {
-        for(let i = 0; i<all.length; i++){
+        for(let i = all.length-1; i>=0; i--){
             const Element = all[i];
             
             const entryContainer = document.createElement('div');
@@ -49,7 +51,25 @@ async function get_all_j() {
         return -1; 
     }
 }
+async function check_journal_count() {
+    try {
+        const response = await fetch('http://localhost:3000/check_journal_count', {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.status}`);
+        }
+        return;
 
+    } catch (error) {
+        console.error(error.message);
+        return; 
+    }
+}
 
 updateDisplayJ();
 //Теперь чтоб могли вращать 

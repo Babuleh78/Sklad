@@ -143,6 +143,7 @@ app.post('/visit', async (req, res) => {
     }
 });
 
+//ДАВНО ПОРА БЫЛО
 function query(sql, params) {
     return new Promise((resolve, reject) => {
         connection.query(sql, params, (error, results) => {
@@ -256,6 +257,41 @@ app.post('/addNote', async (req, res) => {
         console.error('Ошибка при обработке запроса', error);
         return res.status(500).json({ success: false, message: 'Ошибка при обработке запроса' });
     }
+});
+//ЕСЛИ БОЛЬШЕ 7-ми записей, удаляем. Вообще, как-то тяжко получилось
+app.post('/check_journal_count', async (req, res) => {
+    const query1 = 'SELECT COUNT(noteid) AS note_count FROM notes'; 
+    connection.query(query1, null, (error, results) => {
+        if (error) {
+            console.error('Ошибка при проверки количества (КАК)', error);
+            return res.status(500).send('Ошибка при проверке количества');
+        } else {
+            const count_note = results[0].note_count; 
+            if (count_note >= 7) {
+                const query2 = `SELECT noteid FROM notes ORDER BY noteid LIMIT 1`;
+                connection.query(query2, (error, results) => {
+                  if (error) {
+                    console.error('Ошибка при получении noteid', error);
+                    return res.status(500).send('Ошибка при получении noteid');
+                  } else {
+                    const noteid = results[0].noteid;
+                    const query3 = `DELETE FROM notes WHERE noteid = ?`;
+                    connection.query(query3, noteid, (error, results) => {
+                      if (error) {
+                        console.error('Ошибка при удалении', error);
+                        return res.status(500).send('Ошибка при удалении');
+                      } else {
+                        return res.json({ success: true });
+                      }
+                    });
+                  }
+            
+                });
+            } else {
+                return res.json({ success: false, message: 'Количество записей меньше или равно 7' }); 
+            }
+        }
+    });
 });
 //ПОЛУЧИТЬ ЗАПИСИ
 app.get('/getNote', (req, res)=>{
