@@ -105,39 +105,47 @@
     position: relative;
     bottom: 20px;
 }
-.ach_title_element {
+.entry_container_ach {
     position: relative;
-    left: 85px;
-    bottom: 128px;
-    width: 200px; 
+    margin-top: 30px;
+    background-color: blue;
+    height: 110px;
+    overflow: hidden; /* Позволяет предотвратить выезд элементов за пределы контейнера */
+    display: flex; /* Используем flexbox для выравнивания */
+    align-items: center; /* Вертикальное выравнивание элементов */
+    padding: 10px; /* Добавление отступов внутри контейнера */
+}
+
+.ach_title_element {
+    width: 150px; 
     font-size: 24px;
+    position: absolute;
     background-color: green; 
-    text-align: center; 
-    padding: 10px; 
     box-sizing: border-box; 
     word-break: normal; 
+    text-align: center; 
+    top: 0; 
+    left: 85px;
 }
-.ach_text_element{
-    position: relative;
-    left: 70px;
-    width: 200px; 
-    bottom: 20px;
+
+.ach_text_element {
+    position: absolute;
+    width: 130px; 
+    top: 50px;
+    left: 85px;
     background-color: brown;
     text-align: center; 
     box-sizing: border-box; 
     word-break: normal; 
 }
+
 .ach_image {
     width: 75px; 
     height: 75px; 
     margin-right: 10px;
     border-radius: 50%;
 }
-.entry_container_ach{
-    background-color: blue;
-    height: 125px;
-    border-radius: 15%;
-}
+
 .ach_form_scroll{
     width: 250px;
     height: 300px;

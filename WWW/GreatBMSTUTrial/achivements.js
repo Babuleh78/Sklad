@@ -51,29 +51,30 @@ updateDisplayAch();
 let isMouseDownA = false;
 let startYA;
 let scrollTopA;
+
 AchForm.addEventListener('mousedown', (e) => {
-    console.log("down");
-    isMouseDownA = true;
-    e.preventDefault(); 
-    startYA = e.pageY - AchForm.offsetTop;
-    scrollTopA = AchForm.scrollTopA;
+  isMouseDownA = true;
+  e.preventDefault(); 
+  startYA = e.pageY - AchForm.offsetTop;
+  scrollTopA = AchForm.scrollTop;
 });
+
 AchForm.addEventListener('mouseleave', (e) => {
-    console.log("leave");
-        e.preventDefault(); 
-        isMouseDownA = false;
+  e.preventDefault(); 
+  isMouseDownA = false;
 });
 
 AchForm.addEventListener('mouseup', (e) => {
-    console.log("up");
-        e.preventDefault(); 
-        isMouseDownA = false;
+  e.preventDefault(); 
+  isMouseDownA = false;
 });
+
 AchForm.addEventListener('mousemove', (e) => {
-    console.log("move");
-    if (!isMouseDownA) return; 
-        e.preventDefault(); 
-        const y = e.pageY - AchForm.offsetTopA;
-        const walk = (y - startYA) * 1; 
-        AchForm.scrollTopA = scrollTopA - walk; 
+  if (!isMouseDownA) return; 
+  e.preventDefault(); 
+  const y = e.pageY - AchForm.offsetTop;
+  if (y !== startYA) { // оптимизация: выполнять вычисления, если y изменился
+    const walk = (y - startYA) * 1; 
+    AchForm.scrollTop = scrollTopA - walk;
+  }
 });
