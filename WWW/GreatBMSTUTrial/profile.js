@@ -44,7 +44,8 @@ if (idTokenReg || idTokenLog) {
     
     if (idTokenReg) { //Называл себя бы максимально скромно - гений, запустил бы пафосную смену поколение, Prodigy, Chemical Brothers, Дядя Fatboy и Slim, пришла Эра 2R2R-а Сим-Селявим!
         
-
+        count = await get_hse_count();
+        console.log(count);
         const addUserReg = async (username, count) => {
             try {
                 const response = await fetch('http://localhost:3000/addUserReg', {
@@ -60,14 +61,14 @@ if (idTokenReg || idTokenLog) {
                 }
                 const data = await response.text();
                 console.log(data);
-                stars.textContent = count;
+                stars.textContent = 0;
             } catch (error) {
                 
                 console.error('Ошибка:', error);
             }
         };
         (async () => {
-            await addUserReg(username, 0); 
+            await addUserReg(username, count); 
             
         })();
     } else{
