@@ -348,6 +348,20 @@ app.get('/get_stars_count', (req, res)=>{
 
 
 });
+//ПРИДЕТСЯ ВСЕ-ТАКИ СДЕЛАТЬ ЭТУ ФУНКЦИЮ. ПОЛУЧИТЬ ID ИЗ ИМЕНИ
+app.get('/get_id_from_name', (req,res)=>{
+    const {userName} = req.query;
+    const query = `SELECT iduser from USER WHERE usertoken = ?`;
+    connection.query(query, [userName], (error, results)=>{
+        if(error){
+            console.error('Ошибка при переводе id в имя', error);
+            return res.json({success: false, id: -1});
+        } else{
+            const id = results[0].iduser;
+            return res.json({success: true, id: id});
+        }
+    });
+});
 //СЛУШАТЬ
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
@@ -356,3 +370,9 @@ app.listen(PORT, () => {
         console.log("Подключение к базе данных успешно!");
     });
 });
+
+//ВСЕ, ЧТО СВЯЗАНО С ПРОВЕРКОЙ ДОСТИЖЕНИЙ
+app.get('/check_basm', (req, res)=>{
+    const {userName} = req.query;
+    return;
+})

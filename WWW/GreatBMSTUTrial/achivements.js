@@ -2,9 +2,14 @@ const TextContainerAch = document.getElementById("ach_form");
 const AchForm = document.getElementById('ach_form_scroll');
 
 const nicknameach = document.getElementById("name");
-console.log(nicknameach.textContent);
-async function updateDisplayAch() {
+let user_id = -10;
+async function DrawDisplayAch() {
   console.log(nicknameach.textContent);
+  if(user_id === -10){
+    user_id = await getId(nicknameach.textContent);
+  } else if(user_id === -1){
+    console.log("Полная пизда");
+  }
     TextContainerAch.innerHTML = '';
     const all = await get_all_ach(); //id_ach, url, title, text
     if (all === -1) {
@@ -17,7 +22,8 @@ async function updateDisplayAch() {
         for(let i = 0; i<all.length; i++){
             const Element = all[i];
             const entryContainer = document.createElement('div');
-            entryContainer.className = "entry_container_ach";
+            entryContainer.id = "entry_" + i+1  ; 
+            entryContainer.className = "entry_container_ach_unactive";
             const TextElement = document.createElement('p');
             TextElement.className = "ach_text_element";
             TextElement.textContent = Element.text;
@@ -48,9 +54,23 @@ async function get_all_ach() {
         return -1; 
     }
 }
-if(nicknameach.textContent!=='-'){
-updateDisplayAch(); 
+
+function set_ach_comp(id) {
+    const current_entry = document.getElementById("entry_" + (id+1));
+    current_entry.classNmae = "entry_container_ach";
 }
+
+
+async function getId(userName) {
+  const response = await fetch(`http://localhost:3000/get_id_from_name?userName=${encodeURIComponent(userName)}`);
+  if (!response.ok) {
+      throw new Error(`Ошибка: ${response.status}`);
+  }
+  const data = await response.json();
+  return await data.id;
+}
+
+
 
 let isMouseDownA = false;
 let startYA;

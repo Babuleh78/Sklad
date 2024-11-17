@@ -168,8 +168,6 @@ function getStarsHTML(count) {
 }
 
 
-
-
 async function addNote(username, placeId) {
     const response = await fetch('http://localhost:3000/addNote', {
         method: 'POST',

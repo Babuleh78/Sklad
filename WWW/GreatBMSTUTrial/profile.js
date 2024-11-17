@@ -36,13 +36,12 @@ if (idTokenReg || idTokenLog) {
         payload = idTokenLog.split('.')[1];
     }
     const decodedPayload = JSON.parse(decodeURIComponent(escape(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))));
-    const userId = decodedPayload.user_id; 
     const email = decodedPayload.email;
     const parts = email.split('@');
     username = parts[0];
     nickname.textContent = username;
     nicknamej.textContent = username;
-   
+    
     if (idTokenReg) { //Называл себя бы максимально скромно - гений, запустил бы пафосную смену поколение, Prodigy, Chemical Brothers, Дядя Fatboy и Slim, пришла Эра 2R2R-а Сим-Селявим!
         
 

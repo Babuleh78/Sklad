@@ -110,11 +110,24 @@
     margin-top: 30px;
     background-color: blue;
     height: 110px;
-    overflow: hidden; /* Позволяет предотвратить выезд элементов за пределы контейнера */
-    display: flex; /* Используем flexbox для выравнивания */
-    align-items: center; /* Вертикальное выравнивание элементов */
-    padding: 10px; /* Добавление отступов внутри контейнера */
+    overflow: hidden; 
+    display: flex; 
+    align-items: center; 
+    padding: 10px; 
 }
+.entry_container_ach_unactive {
+    position: relative;
+    margin-top: 30px;
+    /* background-color: rgba(15, 10, 222, 0.2);  */
+    background-color: gray;
+    opacity: 0.8;
+    height: 110px;
+    overflow: hidden; 
+    display: flex; 
+    align-items: center; 
+    padding: 10px; 
+}
+
 
 .ach_title_element {
     width: 150px; 
