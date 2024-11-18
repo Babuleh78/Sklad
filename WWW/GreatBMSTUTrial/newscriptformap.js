@@ -138,18 +138,18 @@ const fetchData = async () => {
             ZButton.addEventListener("click", async function() {
               if(isVisit === 0){
                   isVisit = 1;  
-                  if(Number(visitorCount.textContent) === 0){
-                    await set_ach(uid, 2);
-                    await updateDisplayAch(2);
-                  }
-                  if(Number(visitorCount.textContent) >= 5){//нет
-                    await set_ach(uid, 3);
-                    await updateDisplayAch(3);
-                  }
-                  if(Number(visitorCount.textContent) >= 25){
-                    await set_ach(uid, 6);
-                    await updateDisplayAch(6);
-                  }
+                  // if(Number(visitorCount.textContent) === 0){
+                  //   await set_ach(uid, 2);
+                  //   await updateDisplayAch(2);
+                  // }
+                  // if(Number(visitorCount.textContent) >= 5){//нет
+                  //   await set_ach(uid, 3);
+                  //   await updateDisplayAch(3);
+                  // }
+                  // if(Number(visitorCount.textContent) >= 25){
+                  //   await set_ach(uid, 6);
+                  //   await updateDisplayAch(6);
+                  // }  
                   await setVisit(userName, placeId);
                   await addNote(userName, placeId);
                   console.log(uid);

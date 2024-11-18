@@ -1,6 +1,6 @@
 const buttons = document.querySelectorAll('.image-button');
 const container = document.getElementById("container");
-var taps = 16;
+var taps = 0;
 buttons.forEach(button => {
     button.addEventListener('click', () => {
         if (button.classList.contains('active')) {

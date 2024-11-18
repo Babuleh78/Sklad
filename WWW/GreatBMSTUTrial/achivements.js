@@ -8,7 +8,6 @@ async function DrawDisplayAch() {
     return;
   }
   DRAWCHECK = true;
-  console.log("Рисуем");
   if(user_id === -10){
     user_id = await getId(nicknameach.textContent);
   } else if(user_id === -1){
@@ -16,6 +15,7 @@ async function DrawDisplayAch() {
   }
     TextContainerAch.innerHTML = '';
     const all = await get_all_ach(); //id_ach, url, title, text
+    const all_open = await get_all_ach_open();
     if (all === -1) {
         TextContainer.innerHTML = '<p>Ошибка при получении записей</p>'; 
         return; 
@@ -27,7 +27,11 @@ async function DrawDisplayAch() {
             const Element = all[i];
             const entryContainer = document.createElement('div');
             entryContainer.id = "entry_" + (i+1 ) ; 
-            entryContainer.className = "entry_container_ach_unactive";
+            if(all_open[i].is_open){
+              entryContainer.className = "entry_container_ach";
+            } else{
+              entryContainer.className = "entry_container_ach_unactive";
+            }
             const TextElement = document.createElement('p');
             TextElement.className = "ach_text_element";
             TextElement.textContent = Element.text;
@@ -63,7 +67,19 @@ async function get_all_ach() {
         return -1; 
     }
 }
-
+async function get_all_ach_open() {
+  try {
+    const response = await fetch(`http://localhost:3000/get_ach_open`);
+    if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.ach_mas;
+} catch (error) {
+    console.error(error.message);
+    return -1; 
+}
+}
 function set_ach_comp(id) {
     const current_entry = document.getElementById("entry_" + (id+1));
     current_entry.classNmae = "entry_container_ach";

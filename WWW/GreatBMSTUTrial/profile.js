@@ -43,9 +43,8 @@ if (idTokenReg || idTokenLog) {
     nicknamej.textContent = username;
     
     if (idTokenReg) { //Называл себя бы максимально скромно - гений, запустил бы пафосную смену поколение, Prodigy, Chemical Brothers, Дядя Fatboy и Slim, пришла Эра 2R2R-а Сим-Селявим!
-        
+        console.log("Рег?");
         count = await get_hse_count();
-        console.log(count);
         const addUserReg = async (username, count) => {
             try {
                 const response = await fetch('http://localhost:3000/addUserReg', {
@@ -59,7 +58,6 @@ if (idTokenReg || idTokenLog) {
                 if (!response.ok) {
                     throw new Error('Ошибка при добавлении пользователя');
                 }
-                const data = await response.text();
                 stars.textContent = 0;
             } catch (error) {
                 
@@ -70,7 +68,7 @@ if (idTokenReg || idTokenLog) {
             await addUserReg(username, count); 
             
         })();
-    } else{
+    } 
         async function get_hse_count_for_user(username) {
             try {
                 const response = await fetch(`http://localhost:3000/get_hse_count_for_user?userName=${encodeURIComponent(username)}`);
@@ -78,8 +76,6 @@ if (idTokenReg || idTokenLog) {
                     throw new Error(`Ошибка: ${response.status}`);
                 }
                 const data = await response.json();
-                
-                console.log(data.hse_count_user);
                 count = data.hse_count_user; 
                 stars.textContent = count;
                 return count; 
@@ -88,6 +84,7 @@ if (idTokenReg || idTokenLog) {
                 return -1; 
             }
         }
+        console.log(username);
         await get_hse_count_for_user(username); 
         async function get_user_avatar(username) {
             try {
@@ -106,7 +103,7 @@ if (idTokenReg || idTokenLog) {
         const av = await get_user_avatar(username); 
         avatar.style.backgroundImage = avatar_mas[av];
         
-    }
+    
 }
 
 pick_avatar.style.display = "none"

@@ -120,11 +120,13 @@ app.post('/visit', async (req, res) => {
         }
         const idUser = userResults.iduser;
         await query('UPDATE place SET visit_count = visit_count + 1 WHERE idplace = ?', [placeId]);
+        const starsResults = await query('SELECT stars FROM place WHERE idplace = ?', [placeId]);
+        const star = Number(starsResults[0].stars);
         const [visitResults] = await query('SELECT is_visit FROM visits WHERE user_id = ? AND place_id = ?', [idUser , placeId]);
         const isVisit = visitResults.is_visit;
         if (!isVisit) {
             await query('UPDATE visits SET is_visit = 1 WHERE user_id = ? AND place_id = ?', [idUser , placeId]);
-            await query('UPDATE user SET stars = stars + 1 WHERE iduser = ?', [idUser ]);
+            await query('UPDATE user SET stars = stars + ? WHERE iduser = ?', [star, idUser ]);
             const results = await query('SELECT visit_count FROM place WHERE idplace = ?', [placeId]);
 
             if (results.length > 0) {
@@ -321,19 +323,6 @@ app.get('/getNote', (req, res)=>{
         }
     })
 });
-//ПОЛУЧИТЬ ДОСТИЖЕНИЯ
-app.get('/getAch', (req, res)=>{
-    const query1 = 'SELECT * FROM achivements';
-    connection.query(query1, null, (error, results)=>{
-        if (error) {
-            console.error('Ошибка при получении записей', error);
-            return res.json({success: false, all: -1});
-        }
-        else{
-            return res.json({success: true, all: results});
-        }
-    })
-});
 //ПОЛУЧИТЬ КОЛИЧЕСТВО ЗВЕЗД
 app.get('/get_stars_count', (req, res)=>{
     const query1 = 'SELECT stars FROM place';
@@ -373,6 +362,34 @@ app.listen(PORT, () => {
 });
 
 //ВСЕ, ЧТО СВЯЗАНО С ПРОВЕРКОЙ ДОСТИЖЕНИЙ
+//ПОЛУЧИТЬ ДОСТИЖЕНИЯ
+app.get('/getAch', (req, res)=>{
+    const query1 = 'SELECT * FROM achivements';
+    connection.query(query1, null, (error, results)=>{
+        if (error) {
+            console.error('Ошибка при получении записей', error);
+            return res.json({success: false, all: -1});
+        }
+        else{
+            return res.json({success: true, all: results});
+        }
+    })
+});
+//ПОЛУЧИТЬ ВСЕ ДОСТИЖЕНИЯ (ОТКРЫТЫ ИЛИ НЕТ)
+
+app.get('/get_ach_open', (req, res)=>{
+    const query = `SELECT is_open FROM open_ach`;
+    connection.query(query, null, (error, results)=>{
+        if(error){
+            console.error('Ошибка при получении достижений', error);
+            return res.json({success: false});
+        } else{
+            const ach_mas = results;
+            return res.json({success: true, ach_mas:ach_mas});
+        }
+    });
+
+});
 //ПРОВЕРКА АЧИВКИ НА БАСМАННУЮ
 app.post('/set_ach', (req, res)=>{
     const {uid, id} = req.body;
