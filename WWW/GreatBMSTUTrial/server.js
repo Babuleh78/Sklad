@@ -58,6 +58,7 @@ app.post('/check_visit', (req, res) => {
         if (results.length > 0) {
             const userId = results[0].iduser; 
             const query1 = 'SELECT is_visit FROM visits WHERE place_id = ? AND user_id = ?'; 
+            console.log("Проверяем для", userId, placeId);
             connection.query(query1, [placeId, userId], (error, results) => {
                 if (error) {
                     console.error("Ошибка при выполнении запроса", error);
@@ -119,6 +120,7 @@ app.post('/visit', async (req, res) => {
             return res.json({ success: false, message: 'Пользователь не найден' });
         }
         const idUser = userResults.iduser;
+       
         await query('UPDATE place SET visit_count = visit_count + 1 WHERE idplace = ?', [placeId]);
         const starsResults = await query('SELECT stars FROM place WHERE idplace = ?', [placeId]);
         const star = Number(starsResults[0].stars);
@@ -126,6 +128,7 @@ app.post('/visit', async (req, res) => {
         const isVisit = visitResults.is_visit;
         if (!isVisit) {
             await query('UPDATE visits SET is_visit = 1 WHERE user_id = ? AND place_id = ?', [idUser , placeId]);
+            console.log("Обновляем", idUser, placeId);
             await query('UPDATE user SET stars = stars + ? WHERE iduser = ?', [star, idUser ]);
             const results = await query('SELECT visit_count FROM place WHERE idplace = ?', [placeId]);
 
@@ -390,7 +393,7 @@ app.get('/get_ach_open', (req, res)=>{
     });
 
 });
-//ПРОВЕРКА АЧИВКИ НА БАСМАННУЮ
+//ПРОСТАНОВКА АЧИВОК
 app.post('/set_ach', (req, res)=>{
     const {uid, id} = req.body;
     const query = `UPDATE open_ach SET is_open = 1 WHERE (user_id = ?) and (ach_id = ?);`;
@@ -402,4 +405,22 @@ app.post('/set_ach', (req, res)=>{
             return res.json({success: true});
         }
     });
+});
+
+//ПОЛУЧИТЬ КОЛИЧЕСТВО
+
+app.get('/get_count_for_ach', (req, res)=>{
+    const {id} = req.query;
+    const query = `SELECT SUM(is_visit) AS total_visits FROM visits WHERE user_id = ?`;
+    connection.query(query, [id], (error, results)=>{
+        if(error){
+            console.error('Ошибка при получении количества достижений', error);
+            return res.json({success: false});
+        } else{
+            const count = results[0].total_visits;
+            return res.json({success: true, count: count});
+        }
+    });
+
+
 });

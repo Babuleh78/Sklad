@@ -105,7 +105,7 @@ const fetchData = async () => {
       `;
         const marker = L.marker([coor_x, coor_y]) //изменили
             .addTo(map)
-            .bindPopup(balloonHTML); // Добавление всплывающего окна
+            .bindPopup(balloonHTML);
       
             marker.on('popupopen', async function() {
               const ZButton = document.getElementById(uniqueZButtonId);
@@ -137,22 +137,24 @@ const fetchData = async () => {
       
             ZButton.addEventListener("click", async function() {
               if(isVisit === 0){
-                  isVisit = 1;  
-                  // if(Number(visitorCount.textContent) === 0){
-                  //   await set_ach(uid, 2);
-                  //   await updateDisplayAch(2);
-                  // }
-                  // if(Number(visitorCount.textContent) >= 5){//нет
-                  //   await set_ach(uid, 3);
-                  //   await updateDisplayAch(3);
-                  // }
-                  // if(Number(visitorCount.textContent) >= 25){
-                  //   await set_ach(uid, 6);
-                  //   await updateDisplayAch(6);
-                  // }  
+                  isVisit = 1; 
+                  const count_ach = await get_count_for_ach(uid);
+                  if(Number(stars.textContent) === 0){ //Достижение Первые шаги
+                    await set_ach(uid, 2);
+                    console.log("Первые шаги");
+                    await updateDisplayAch(2);
+                  }
+                  if(count_ach >= 5){//Достижение В яблочко
+                    await set_ach(uid, 3);
+                    await updateDisplayAch(3);
+                  }
+                  
+                  if(ZButton.id == "ZButton-6"){//Достижение Наш район
+                    await set_ach(uid, 1); 
+                    await updateDisplayAch(1);
+                }
                   await setVisit(userName, placeId);
                   await addNote(userName, placeId);
-                  console.log(uid);
                   visitorCount.textContent = Number(visitorCount.textContent) +1;
                   const hse_text = document.getElementById(uniqueZButtonTextId);
                   hse_text.textContent = "ЛИКВИДИРОВАНА";
@@ -160,11 +162,28 @@ const fetchData = async () => {
                   hse_text.style.fontSize = "24px"; 
                   hse_text.style.textDecoration = "line-through";
                   ZButton.style.background = "red";
-                  console.log(ZButton.id);
-                  if(ZButton.id == "ZButton-6"){
-                      await set_ach(uid, 1);//Первое достижение
-                      await updateDisplayAch(1);
-                  }
+                  
+                    async function get_hse_count_for_user(userName) {
+                    try {
+                        const response = await fetch(`http://localhost:3000/get_hse_count_for_user?userName=${encodeURIComponent(userName)}`);
+                        if (!response.ok) {
+                            throw new Error(`Ошибка: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        count = data.hse_count_user; 
+                        stars.textContent = count;
+                        return count; 
+                    } catch (error) {
+                        console.error(error.message);
+                        return -1; 
+                    }
+                }
+                
+                  await get_hse_count_for_user(userName); 
+                  if(Number(visitorCount.textContent) >= 25){
+                    await set_ach(uid, 6);
+                    await updateDisplayAch(6);
+                  }  
               } 
                 
           });
@@ -187,6 +206,7 @@ function getStarsHTML(count) {
   }
   return starsHTML;
 }
+
 
 
 async function addNote(username, placeId) {
@@ -256,6 +276,14 @@ async function getVisitCount(placeId) {
   return await data.count;
 }
 
+async function get_count_for_ach(userId) {
+  const response = await fetch(`http://localhost:3000/get_count_for_ach?id=${encodeURIComponent(userId)}`);
+  if (!response.ok) {
+      throw new Error(`Ошибка: ${response.status}`);
+  }
+  const data = await response.json();
+  return await data.count;
+}
 
 
 fetchData();

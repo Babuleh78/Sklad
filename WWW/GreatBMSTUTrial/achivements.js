@@ -51,8 +51,10 @@ async function DrawDisplayAch() {
 }
 async function updateDisplayAch(i) {
   const ach = document.getElementById("entry_"+i);
-  ach.className = "entry_container_ach";
-  console.log("Обновили");
+  if(ach!==null){
+    ach.className = "entry_container_ach";
+    console.log("Обновили");
+  }
 }
 async function get_all_ach() {
     try {
@@ -122,7 +124,7 @@ AchForm.addEventListener('mousemove', (e) => {
   if (!isMouseDownA) return; 
   e.preventDefault(); 
   const y = e.pageY - AchForm.offsetTop;
-  if (y !== startYA) { // оптимизация: выполнять вычисления, если y изменился
+  if (y !== startYA) {
     const walk = (y - startYA) * 1; 
     AchForm.scrollTop = scrollTopA - walk;
   }

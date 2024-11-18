@@ -84,7 +84,6 @@ if (idTokenReg || idTokenLog) {
                 return -1; 
             }
         }
-        console.log(username);
         await get_hse_count_for_user(username); 
         async function get_user_avatar(username) {
             try {
