@@ -3,7 +3,7 @@ const TextContainer = document.getElementById('entries');
 const PhotoContainer = document.getElementById('photo');
 const journalForm = document.getElementById('journal_form');
 const namej = document.getElementById('namej');
-let avatar_mas = ["avatars/BAZA.jpeg", "avatars/BEGEMOT85.jpg","avatars/FUCK.png", "avatars/ZVEZDA.png", "avatars/PIVO.png", 
+let avatar_mas = ["avatars/BAZA.jpeg", "avatars/BEGEMOT85.jpg","avatars/pain.jpg", "avatars/ZVEZDA.png", "avatars/PIVO.png", 
     "avatars/SLON.png", "avatars/OCHKI.jpg", "avatars/KPTCH.jpg"
 ];
 async function updateDisplayJ() {
@@ -27,7 +27,6 @@ async function updateDisplayJ() {
             const TextElement = document.createElement('p');
             TextElement.className = "journal_element";
             TextElement.textContent = Element.text;
-            TextElement.style.color = "red";
             const PhotoElement = document.createElement('img');
             PhotoElement.className = "avatar_journal";
             const avid = Element.user_avatar;

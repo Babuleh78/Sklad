@@ -31,21 +31,26 @@
     padding: 25px;
     border-radius: 28px;
     text-align: center;
-    background-color: gold;
-    justify-content: center;
-    overflow-x: hidden;      
-    overflow-y: hidden;  
+    background-color: #FFD700; /* Золотистый цвет */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Тень для формы */
+    overflow: hidden; /* Убираем прокрутку */
+    transition: transform 0.3s; /* Плавный переход при наведении */
 }
+
 
 
 .journal_element {
     width: 200px; 
-    background-color: green; 
+    background-color: white; /* Зеленый цвет */
+    color: blue; /* Цвет текста */
     text-align: center; 
     padding: 10px; 
     box-sizing: border-box; 
     word-break: normal; 
+    border-radius: 10px; 
 }
+
+
 
 .entry_container {
     display: flex; 
@@ -57,6 +62,9 @@
     width: 50px; 
     height: 50px; 
     margin-right: 10px;
+    border-radius: 50%; /* Круглая аватарка */
+    border: 2px solid white; /* Белая граница вокруг аватарки */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для аватарки */
 }
 .avatar{
     position: relative; 
@@ -167,4 +175,31 @@
     background-color: gold;
     overflow-x: hidden;      
     overflow-y: hidden;  
+}
+.cool_btn {
+    background-color: aqua; /* Основной цвет фона */
+    color: white; /* Цвет текста */
+    border: none; /* Убираем стандартные границы */
+    border-radius: 5px; /* Закругленные углы */
+    padding: 10px 20px; /* Отступы внутри кнопки */
+    font-size: 16px; /* Размер шрифта */
+    cursor: pointer; /* Указатель при наведении */
+    transition: background-color 0.3s, transform 0.2s; /* Плавные переходы */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Тень для кнопки */
+    margin-top: 30px;
+}
+
+.cool_btn:hover {
+    background-color: #45a049; /* Цвет фона при наведении */
+    transform: translateY(-2px); /* Легкий подъем кнопки */
+}
+
+.cool_btn:active {
+    transform: translateY(1px); /* Эффект нажатия */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Уменьшение тени при нажатии */
+}
+
+.cool_btn:focus {
+    outline: none; /* Убираем обводку при фокусе */
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.5); /* Обводка при фокусе */
 }
