@@ -23,7 +23,6 @@ try:
      print("Успешно подключились")
 except Exception as ex:
      print("Ну че опять", ex)
-
 async def get_top_items():
     try:
         with connection.cursor() as cursor:
@@ -43,7 +42,7 @@ async def ach_users(nickname):
             cursor.execute(query, (nickname,))
             result = cursor.fetchall()
             if not result:
-                return []
+                return ["Пользователь не найден!"]
             
             id = result[0][0]
             print(id)
@@ -81,11 +80,17 @@ async def process_callback_button(message: types.Message):
     
     final_message = "\n".join(ans_messages)
     await message.answer(final_message)
-@user_router.message(or_f(Command('top'), (F.text.lower().contains("топ"))))
-async def process_callback_button(message: types.Message):
-    data = await ach_users("Админ")
-    print(data)
-    await message.answer(data[0])
+@user_router.message(or_f(Command('user'), (F.text.lower().contains("польз"))))
+async def cmd_user(message: types.Message):
+    await message.answer("Введите ник пользователя, о котором хотите узнать в формате ИНФ-Пользователь" )
+    
+@user_router.message(F.text.lower().contains("инф-"))
+async def info_panel(message: types.Message):
+    nickname = message.text.split('-')[1]
+    data = await ach_users(nickname)
+    ans_message = "Достижения " + nickname + ":" + "\n"
+    result_string = '\n'.join(map(str, data))
+    await message.answer(ans_message+result_string)
 @user_router.message(F.text.lower().contains("ш"))
 async def info_panel(message: types.Message):
     await message.answer("ЧЕГО ЧЕГО НАХУЙ, ЭТО ЧЕ, ШАШУРА?")
