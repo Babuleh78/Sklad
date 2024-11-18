@@ -116,66 +116,86 @@
 .entry_container_ach {
     position: relative;
     margin-top: 30px;
-    background-color: blue;
+    background-color: #007BFF; /* Яркий синий цвет */
     height: 110px;
     overflow: hidden; 
     display: flex; 
     align-items: center; 
     padding: 10px; 
+    border-radius: 10px; /* Закругленные углы */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тень для контейнера */
+    transition: transform 0.3s; /* Плавный переход при наведении */
 }
+
+.entry_container_ach:hover {
+    transform: translateY(-2px); /* Легкий подъем при наведении */
+}
+
 .entry_container_ach_unactive {
     position: relative;
     margin-top: 30px;
-    /* background-color: rgba(15, 10, 222, 0.2);  */
-    background-color: gray;
-    opacity: 0.8;
+    background-color: rgba(128, 128, 128, 0.8); /* Полупрозрачный серый цвет */
     height: 110px;
     overflow: hidden; 
     display: flex; 
     align-items: center; 
     padding: 10px; 
+    border-radius: 10px; /* Закругленные углы */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тень для контейнера */
 }
-
 
 .ach_title_element {
     width: 150px; 
-    font-size: 24px;
+    font-size: 22px;
     position: absolute;
-    background-color: green; 
+    background-color: #28A745; /* Зеленый цвет */
+    color: white; /* Цвет текста */
     box-sizing: border-box; 
     word-break: normal; 
     text-align: center; 
     top: -10px;
-    left: 85px;
+    left: 168px; /* Центрирование */
+    transform: translateX(-50%); /* Центрирование */
+    padding: 5px; /* Отступы */
+    border-radius: 5px; /* Закругленные углы */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для заголовка */
 }
 
 .ach_text_element {
     position: absolute;
     width: 150px; 
     top: 50px;
-    left: 85px;
-    background-color: brown;
+    left: 168px; /* Центрирование */
+    transform: translateX(-50%); /* Центрирование */
+    background-color: #8B4513; /* Коричневый цвет */
+    color: white; /* Цвет текста */
     text-align: center; 
     box-sizing: border-box; 
-    word-break: normal; 
+    padding: 5px; /* Отступы */
+    border-radius: 5px; /* Закругленные углы */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для текста */
 }
 
 .ach_image {
     width: 75px; 
     height: 75px; 
     margin-right: 10px;
-    border-radius: 50%;
+    border-radius: 50%; /* Круглая аватарка */
+    border: 2px solid white; /* Белая граница вокруг аватарки */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для аватарки */
 }
 
-.ach_form_scroll{
+.ach_form_scroll {
     width: 250px;
     height: 300px;
     padding: 25px;
     border-radius: 28px;
-    background-color: gold;
-    overflow-x: hidden;      
-    overflow-y: hidden;  
+    background-color: #FFD700; /* Золотистый цвет */
+    overflow: hidden;      
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Тень для формы */
+    transition: transform 0.3s; /* Плавный переход при наведении */
 }
+
 .cool_btn {
     background-color: aqua; /* Основной цвет фона */
     color: white; /* Цвет текста */
