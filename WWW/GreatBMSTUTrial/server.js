@@ -58,8 +58,7 @@ app.post('/check_visit', (req, res) => {
         if (results.length > 0) {
             const userId = results[0].iduser; 
             const query1 = 'SELECT is_visit FROM visits WHERE place_id = ? AND user_id = ?'; 
-            console.log("Проверяем для", userId, placeId);
-            connection.query(query1, [placeId, userId], (error, results) => {
+                connection.query(query1, [placeId, userId], (error, results) => {
                 if (error) {
                     console.error("Ошибка при выполнении запроса", error);
                     return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });

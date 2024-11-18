@@ -12,7 +12,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase
     measurementId: "G-TRCG7E5HPC"
 };
 //Да, мне лень делать отдельную сущность для изображений, связывать ее с пользователем и тд, сами этим занимайтесь. 
-let avatar_mas = ["url('avatars/BAZA.jpeg')", "url('avatars/BEGEMOT85.jpg')","url('avatars/FUCK.png')", "url('avatars/ZVEZDA.png')", "url('avatars/PIVO.png')", 
+let avatar_mas = ["url('avatars/BAZA.jpeg')", "url('avatars/BEGEMOT85.jpg')","url('avatars/pain.jpg')", "url('avatars/ZVEZDA.png')", "url('avatars/PIVO.png')", 
     "url('avatars/SLON.png')", "url('avatars/OCHKI.jpg')", "url('avatars/KPTCH.jpg')"
 ];
 let username = "ОШИБКА";

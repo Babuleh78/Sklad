@@ -20,7 +20,7 @@ av2.onclick = function(){
 }
 av3.onclick = function(){
     userName  = document.getElementById("name").textContent;
-    avatar.style.backgroundImage = "url('avatars/FUCK.png')";
+    avatar.style.backgroundImage = "url('avatars/pain.jpg')";
     fetchfunc(userName, 2);
 }
 av4.onclick = function(){

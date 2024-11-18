@@ -114,7 +114,7 @@ const fetchData = async () => {
               const userName = document.getElementById("name").textContent;
               const uid = await getId(userName);
               
-              const placeId = parseInt(ZButton.id[ZButton.id.length - 1]) + 1;
+              const placeId = Number(ZButton.id.split('-')[1])+1;
               try {
                   const visitData = await checkVisit(userName, placeId);
                   isVisit = visitData.success ? visitData.is_visit : 0;
