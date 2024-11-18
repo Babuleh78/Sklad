@@ -71,6 +71,7 @@ const fetchData = async () => {
       if (!response.ok) {
           throw new Error('Сеть ответила с ошибкой: ' + response.status);
       }
+      
       const data = await response.json(); 
       for (let i = 0; i < count; i++) {
         const Element = data[i];
@@ -120,7 +121,6 @@ const fetchData = async () => {
                   isVisit = visitData.success ? visitData.is_visit : 0;
                   if(isVisit !== 0){
                     const hse_text = document.getElementById(uniqueZButtonTextId);
-                    stars.textContent = Number(stars.textContent)+1;
                     hse_text.textContent = "ЛИКВИДИРОВАНА";
                     hse_text.style.color = "black"; 
                     hse_text.style.fontSize = "24px"; 
@@ -138,15 +138,21 @@ const fetchData = async () => {
             ZButton.addEventListener("click", async function() {
               if(isVisit === 0){
                   isVisit = 1; 
-                  const count_ach = await get_count_for_ach(uid);
+                  const count_ach = await (get_count_for_ach(uid))+1;
+                  
                   if(Number(stars.textContent) === 0){ //Достижение Первые шаги
+                   
                     await set_ach(uid, 2);
-                    console.log("Первые шаги");
                     await updateDisplayAch(2);
                   }
                   if(count_ach >= 5){//Достижение В яблочко
                     await set_ach(uid, 3);
                     await updateDisplayAch(3);
+                  }
+                  if(count_ach >= 10){//Достижение Подержи мое пиво
+                    await set_ach(uid, 4);
+                    
+                    await updateDisplayAch(4);
                   }
                   
                   if(ZButton.id == "ZButton-6"){//Достижение Наш район
@@ -178,9 +184,9 @@ const fetchData = async () => {
                         return -1; 
                     }
                 }
-                
+                 
                   await get_hse_count_for_user(userName); 
-                  if(Number(visitorCount.textContent) >= 25){
+                  if(Number(stars.textContent) >= 25){//Достижение звездный лорд
                     await set_ach(uid, 6);
                     await updateDisplayAch(6);
                   }  

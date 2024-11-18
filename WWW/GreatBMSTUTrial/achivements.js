@@ -51,9 +51,18 @@ async function DrawDisplayAch() {
 }
 async function updateDisplayAch(i) {
   const ach = document.getElementById("entry_"+i);
-  if(ach!==null){
+  
+  console.log(ach);
+  if(ach!== null && ach.className!== "entry_container_ach"){
+    
+    console.log("зашли в апдейт", i);
     ach.className = "entry_container_ach";
-    console.log("Обновили");
+    let notification= document.getElementById("notification"+i);
+    console.log(notification);
+    notification.style.display = 'flex'; 
+    setTimeout(() => {
+          notification.style.display = 'none';
+    }, 3000);
   }
 }
 async function get_all_ach() {

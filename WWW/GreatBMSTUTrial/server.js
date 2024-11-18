@@ -92,7 +92,7 @@ app.get('/get_hse_count', (req, res) => {
         }
     });
 });
-//ПОСЕТИТЬ КОЛИЧЕСТВО ДЛЯ КОНКРЕТНОГО ПОЛЬЗОВАТЕЛЯ
+//ПОСЕТИТЬ КОЛИЧЕСТВО ДЛЯ КОНКРЕТНОГО ПОЛЬЗОВАТЕЛЯ 
     app.get('/get_hse_count_for_user', (req, res) => {
         const { userName } = req.query;
         
@@ -127,7 +127,6 @@ app.post('/visit', async (req, res) => {
         const isVisit = visitResults.is_visit;
         if (!isVisit) {
             await query('UPDATE visits SET is_visit = 1 WHERE user_id = ? AND place_id = ?', [idUser , placeId]);
-            console.log("Обновляем", idUser, placeId);
             await query('UPDATE user SET stars = stars + ? WHERE iduser = ?', [star, idUser ]);
             const results = await query('SELECT visit_count FROM place WHERE idplace = ?', [placeId]);
 
@@ -416,7 +415,7 @@ app.get('/get_count_for_ach', (req, res)=>{
             console.error('Ошибка при получении количества достижений', error);
             return res.json({success: false});
         } else{
-            const count = results[0].total_visits;
+            const count = Number(results[0].total_visits);
             return res.json({success: true, count: count});
         }
     });
