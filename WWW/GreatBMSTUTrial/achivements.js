@@ -52,10 +52,8 @@ async function DrawDisplayAch() {
 async function updateDisplayAch(i) {
   const ach = document.getElementById("entry_"+i);
   
-  console.log(ach);
   if(ach!== null && ach.className!== "entry_container_ach"){
     
-    console.log("зашли в апдейт", i);
     ach.className = "entry_container_ach";
     let notification= document.getElementById("notification"+i);
     console.log(notification);
