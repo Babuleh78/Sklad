@@ -2,6 +2,7 @@ import pymysql
 import os
 import base64
 from aiogram import F, types, Router, Bot
+from aiogram.types import InputFile  
 from aiogram.filters import CommandStart, Command, or_f
 from klava import reply, inline
 from klava.reply import get_keyboard
@@ -108,19 +109,19 @@ async def info_panel(message: types.Message):
     result_string = '\n'.join(map(str, data))
     await message.answer(ans_message+result_string)
 
-@user_router.message(F.text.lower().contains("админ"))
+@user_router.message(F.text.lower().contains("а"))
 async def info_panel(message: types.Message):
     await message.answer("Будем считать, что ты админ")
-    data = await get_image()
+    data = await get_image()  
     name, url = data
-    image_data = base64.b64decode(url)
-    with open("decoded_image.png", "wb") as image_file:
+    header, base64_data = url.split(',', 1)
+    image_data = base64.b64decode(base64_data)
+    output_file_path = f"{name}.jpg"
+    with open(output_file_path, 'wb') as image_file:
         image_file.write(image_data)
-    CHAT_ID = message.chat.id
-    with open("decoded_image.png", "rb") as image_file:
-        await bot.send_photo(chat_id=CHAT_ID, photo=image_file)
-    await message.answer(f"Пользователь {name}")
 
+    
+    await message.answer_photo(photo = "https://cdn1.ozone.ru/s3/multimedia-1-j/7033464451.jpg", caption= f"Пользователь {name}" )
 @user_router.message(F.text.lower().contains("ш"))
 async def info_panel(message: types.Message):
     await message.answer("ЧЕГО ЧЕГО НАХУЙ, ЭТО ЧЕ, ШАШУРА?")
