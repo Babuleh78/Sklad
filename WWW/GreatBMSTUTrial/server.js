@@ -7,7 +7,7 @@ const cors = require('cors');
 const { getDataFromDB } = require('./readfromsql');
 const { error } = require('console');
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -420,5 +420,27 @@ app.get('/get_count_for_ach', (req, res)=>{
         }
     });
 
+
+});
+
+
+//ОТПРАВКА ИЗОБРАЖЕНИЙ И МЕЙБИ МОДЕРАЦИЯ?
+
+app.post('/set_image', (req, res)=>{
+    const{user_id, imageURL} = req.body;
+    const query =`INSERT INTO images (user_id, image64) VALUES (?, ?)`;
+    const maxSize = 5 * 1024 * 1024; 
+    if (Buffer.byteLength(imageURL, 'base64') > maxSize) {
+        return res.status(400).json({ success: false, message: 'Изображение слишком большое' });
+    }
+    connection.query(query, [user_id, imageURL], (error, results)=>{
+        if(error){
+            console.error('Ошибка при добавлении фотографии', error);
+            return res.json({success: false});
+        } else{
+            return res.json({success: true});
+        }
+
+    });
 
 });
