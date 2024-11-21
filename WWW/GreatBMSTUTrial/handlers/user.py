@@ -1,5 +1,6 @@
 import pymysql
 import os
+import base64
 from aiogram import F, types, Router, Bot
 from aiogram.filters import CommandStart, Command, or_f
 from klava import reply, inline
@@ -23,7 +24,7 @@ try:
      print("Успешно подключились")
 except Exception as ex:
      print("Ну че опять", ex)
-async def get_top_items():
+async def get_top():
     try:
         with connection.cursor() as cursor:
             query = "SELECT * FROM user ORDER BY stars DESC"
@@ -37,7 +38,6 @@ async def get_top_items():
 async def ach_users(nickname):
     try:
         with connection.cursor() as cursor:
-            print("тут")
             query = "SELECT iduser FROM user WHERE usertoken = %s"
             cursor.execute(query, (nickname,))
             result = cursor.fetchall()
@@ -45,7 +45,6 @@ async def ach_users(nickname):
                 return ["Пользователь не найден!"]
             
             id = result[0][0]
-            print(id)
             query1 = "SELECT ach_id, is_open FROM open_ach WHERE user_id = %s"
             cursor.execute(query1, (id,))
             ach_mas = cursor.fetchall()
@@ -67,10 +66,27 @@ async def ach_users(nickname):
     except Exception as e:
         print("Ошибка выполнения SQL-запроса:", e)
         return []  
+async def get_image():
+    try:
+        with connection.cursor() as cursor:
+            print("Зашли")
+            query = "SELECT* FROM images ORDER BY image_id limit 1"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            
+            
+            if not result:
+                return ["Изображение не найдено!"]
+            id, name, url = result[0]
+            data = [name, url]
+            return data
+    except Exception as e:
+        print("Ошибка выполнения SQL-запроса:", e)
+        return []  
 @user_router.message(or_f(Command('top'), (F.text.lower().contains("топ"))))
 async def process_callback_button(message: types.Message):
     await message.answer("Топ 5 лучших участников")
-    top_items = await get_top_items()
+    top_items = await get_top()
     ans_messages = []
     for i in range(min(len(top_items), 5)):
         data = top_items[i]  
@@ -91,6 +107,20 @@ async def info_panel(message: types.Message):
     ans_message = "Достижения " + nickname + ":" + "\n"
     result_string = '\n'.join(map(str, data))
     await message.answer(ans_message+result_string)
+
+@user_router.message(F.text.lower().contains("админ"))
+async def info_panel(message: types.Message):
+    await message.answer("Будем считать, что ты админ")
+    data = await get_image()
+    name, url = data
+    image_data = base64.b64decode(url)
+    with open("decoded_image.png", "wb") as image_file:
+        image_file.write(image_data)
+    CHAT_ID = message.chat.id
+    with open("decoded_image.png", "rb") as image_file:
+        await bot.send_photo(chat_id=CHAT_ID, photo=image_file)
+    await message.answer(f"Пользователь {name}")
+
 @user_router.message(F.text.lower().contains("ш"))
 async def info_panel(message: types.Message):
     await message.answer("ЧЕГО ЧЕГО НАХУЙ, ЭТО ЧЕ, ШАШУРА?")

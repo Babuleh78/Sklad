@@ -7,7 +7,7 @@ document.getElementById('myFile').addEventListener('change', function(event) {
         reader.onload = async function(e) {
             const base64String = e.target.result; 
             console.log(base64String); 
-            await set_image(0, base64String);
+            await set_image("Шашуро", base64String);
         };
         
         reader.readAsDataURL(file); 

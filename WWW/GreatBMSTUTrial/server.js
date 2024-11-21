@@ -427,8 +427,8 @@ app.get('/get_count_for_ach', (req, res)=>{
 //ОТПРАВКА ИЗОБРАЖЕНИЙ И МЕЙБИ МОДЕРАЦИЯ?
 
 app.post('/set_image', (req, res)=>{
-    const{user_id, imageURL} = req.body;
-    const query =`INSERT INTO images (user_id, image64) VALUES (?, ?)`;
+    const{user_name, imageURL} = req.body;
+    const query =`INSERT INTO images (user_name, image64) VALUES (?, ?)`;
     const maxSize = 5 * 1024 * 1024; 
     if (Buffer.byteLength(imageURL, 'base64') > maxSize) {
         return res.status(400).json({ success: false, message: 'Изображение слишком большое' });
@@ -441,6 +441,25 @@ app.post('/set_image', (req, res)=>{
             return res.json({success: true});
         }
 
+    });
+
+});
+
+app.get('/send_image', (req, res)=>{
+    const {name} = req.query;
+    const string = f`Пользователь ${name} отправил вам изображение, он прошел проверку?`;
+    const query = `SELECT image64 FROM images ORDER BY image_id limit 1`;
+    connection.query(query, null, (error, results)=>{
+        if(error){
+            console.error('Ошибка при отправке', error);
+            return res.json({success: false});
+        } else{
+            if (results.length === 0) {
+                return res.json({ success: true, string: "Вы проверили все имеющиеся изображения" });
+            }
+            const img = results[0].image64;
+            return res.json({success: true, imageURL: img, string: string});
+        }
     });
 
 });
