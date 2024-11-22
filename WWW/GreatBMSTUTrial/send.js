@@ -2,7 +2,7 @@
 document.getElementById('myFile').addEventListener('change',async function(event) {
     console.log(document.getElementById('myFile'));
     const file = event.target.files[0]; 
-    console.log("Отправляем");
+    console.log(file);
     if (file) {
         const reader = new FileReader(); 
 
@@ -38,13 +38,13 @@ document.getElementById('myFile').addEventListener('change',async function(event
     }
 });
 
-async function set_image(user_id, imageURL) {
+async function set_image(user_name, imageURL, user_id, place_id) {
     const response = await fetch('http://localhost:3000/set_image', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ user_id, imageURL })
+        body: JSON.stringify({ user_name, imageURL, user_id, place_id })
     });
     if (!response.ok) {
         throw new Error('Ошибка при фотке');

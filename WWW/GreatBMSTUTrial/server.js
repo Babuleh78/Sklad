@@ -427,13 +427,13 @@ app.get('/get_count_for_ach', (req, res)=>{
 //ОТПРАВКА ИЗОБРАЖЕНИЙ И МЕЙБИ МОДЕРАЦИЯ?
 
 app.post('/set_image', (req, res)=>{
-    const{user_name, imageURL} = req.body;
-    const query =`INSERT INTO images (user_name, image64) VALUES (?, ?)`;
+    const{user_name, imageURL, user_id, place_id} = req.body;
+    const query =`INSERT INTO images (user_name, image64, user_id, place_id) VALUES (?, ?, ?, ?)`;
     const maxSize = 5 * 1024 * 1024; 
     if (Buffer.byteLength(imageURL, 'base64') > maxSize) {
         return res.status(400).json({ success: false, message: 'Изображение слишком большое' });
     }
-    connection.query(query, [user_id, imageURL], (error, results)=>{
+    connection.query(query, [user_name, imageURL, user_id, place_id], (error, results)=>{
         if(error){
             console.error('Ошибка при добавлении фотографии', error);
             return res.json({success: false});
