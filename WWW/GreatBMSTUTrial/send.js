@@ -1,13 +1,34 @@
-
-document.getElementById('myFile').addEventListener('change', function(event) {
+document.getElementById('myFile').addEventListener('change',async function(event) {
     const file = event.target.files[0]; 
     if (file) {
         const reader = new FileReader(); 
 
-        reader.onload = async function(e) {
-            const base64String = e.target.result; 
-            console.log(base64String); 
-            await set_image("Шашуро", base64String);
+        reader.onload = async  function(e) {
+            const img = new Image();
+            img.src = e.target.result;
+
+            img.onload = async function() {
+                // Создаем canvas
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // Устанавливаем размер canvas чтобы уменьшить вес изображения
+                const MAX_WIDTH = 800; // Максимальная ширина изображения
+                const scaleFactor = Math.min(MAX_WIDTH / img.width, 1); // Сохраняем пропорции
+                const newWidth = img.width * scaleFactor;
+                const newHeight = img.height * scaleFactor;
+
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+
+                // Рисуем изображение на canvas
+                ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+               
+                const base64String = canvas.toDataURL('image/jpeg', 0.01); 
+                console.log(base64String);
+                //await set_image("Шашуро", base64String);
+            };
         };
         
         reader.readAsDataURL(file); 

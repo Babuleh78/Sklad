@@ -1,7 +1,8 @@
 import pymysql
 from PIL import Image
-import io
+from io import BytesIO
 import os
+import io
 import base64
 from aiogram import F, types, Router, Bot
 from aiogram.types import InputFile  
@@ -111,24 +112,21 @@ async def info_panel(message: types.Message):
     result_string = '\n'.join(map(str, data))
     await message.answer(ans_message+result_string)
 
+def base64_to_image(base64_str):
+    header, base64_data = base64_str.split(',', 1) 
+    image_data = base64.b64decode(base64_data)
+    image = Image.open(io.BytesIO(image_data))
+    return image
+
 @user_router.message(F.text.lower().contains("а"))
 async def info_panel(message: types.Message):
     await message.answer("Будем считать, что ты админ")
-    # data = await get_image()  
-    # name, url = data
-    # header, base64_data = url.split(',', 1)
-    # image_data = base64.b64decode(base64_data)
-    # image = Image.open(io.BytesIO(image_data))
-    # output_file_path = f"{name}.jpg"
-    # image.save(output_file_path, format="JPEG", quality=95)  # Вы можете изменить значение качества
-   
-    # await message.answer_photo(photo = "https://cdn1.ozone.ru/s3/multimedia-1-j/7033464451.jpg", caption= f"Пользователь {name}" )
-    file_path = "avatars/pain.jpg"
-    await message.reply_photo(
-        photo = types.FSInputFile(
-            path = file_path
-        )
-    )
+    name, base64_str = await get_image()
+    header, base64_data = base64_str.split(',', 1)
+    decode = base64.b64decode(base64_data)
+    img = Image.open(io.BytesIO(decode))
+    img.show()
+
 @user_router.message(F.text.lower().contains("ш"))
 async def info_panel(message: types.Message):
     await message.answer("ЧЕГО ЧЕГО НАХУЙ, ЭТО ЧЕ, ШАШУРА?")
