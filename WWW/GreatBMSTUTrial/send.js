@@ -1,5 +1,8 @@
+
 document.getElementById('myFile').addEventListener('change',async function(event) {
+    console.log(document.getElementById('myFile'));
     const file = event.target.files[0]; 
+    console.log("Отправляем");
     if (file) {
         const reader = new FileReader(); 
 
@@ -27,7 +30,7 @@ document.getElementById('myFile').addEventListener('change',async function(event
                
                 const base64String = canvas.toDataURL('image/jpeg', 0.1); //похуй, сжимаем
                 console.log(base64String);
-                //await set_image("Шашуро", base64String);
+                await set_image("Шашуро", base64String);
             };
         };
         

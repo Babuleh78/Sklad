@@ -84,6 +84,7 @@ const fetchData = async () => {
         const uniqueZButtonTextId = `ZButtonText-${i}`;
         const uniqueVisitorCountId = `visitorCount-${i}`;
         const uniqueInfoId = `info-${i}`;
+        const uniqueZagrId = `zagr-${i}`;
         const starCount = stars_mas[i].stars;
         const balloonHTML = `
           <div class="balloon" id="${uniqueId}">
@@ -102,6 +103,14 @@ const fetchData = async () => {
               <button id="${uniqueZButtonId}" class="ZButton">
                   <div id = "${uniqueZButtonTextId}" class="ZButton_text">ЛИКВИДИРОВАТЬ</div>
               </button>
+              <div id="${uniqueZagrId}" style =" display: none ">
+                <div>
+                <input id = "myFile" name="myFile" type="file" accept="image/*">
+              </div>
+          <script src = "send.js"> </script>
+          
+    
+          </div>
           </div>
       `;
         const marker = L.marker([coor_x, coor_y]) //изменили
@@ -120,6 +129,8 @@ const fetchData = async () => {
                   const visitData = await checkVisit(userName, placeId);
                   isVisit = visitData.success ? visitData.is_visit : 0;
                   if(isVisit !== 0){
+
+                    
                     const hse_text = document.getElementById(uniqueZButtonTextId);
                     hse_text.textContent = "ЛИКВИДИРОВАНА";
                     hse_text.style.color = "black"; 
@@ -137,6 +148,47 @@ const fetchData = async () => {
       
             ZButton.addEventListener("click", async function() {
               if(isVisit === 0){
+                  const window = document.getElementById(uniqueZagrId);
+                  window.style.display = "flex";
+                  document.getElementById('myFile').addEventListener('change',async function(event) {
+                    console.log(document.getElementById('myFile'));
+                    const file = event.target.files[0]; 
+                    console.log("Отправляем");
+                    if (file) {
+                        const reader = new FileReader(); 
+                
+                        reader.onload = async  function(e) {
+                            const img = new Image();
+                            img.src = e.target.result;
+                
+                            img.onload = async function() {
+                                // Создаем canvas
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                
+                                // Устанавливаем размер canvas чтобы уменьшить вес изображения
+                                const MAX_WIDTH = 800; // Максимальная ширина изображения
+                                const scaleFactor = Math.min(MAX_WIDTH / img.width, 1); // Сохраняем пропорции
+                                const newWidth = img.width * scaleFactor;
+                                const newHeight = img.height * scaleFactor;
+                
+                                canvas.width = newWidth;
+                                canvas.height = newHeight;
+                
+                                // Рисуем изображение на canvas
+                                ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                
+                               
+                                const base64String = canvas.toDataURL('image/jpeg', 0.1); //похуй, сжимаем
+                                console.log(base64String);
+                                await set_image("Шашуро", base64String);
+                            };
+                        };
+                        
+                        reader.readAsDataURL(file); 
+                    }
+                });
+                
                   isVisit = 1; 
                   const count_ach = await (get_count_for_ach(uid))+1;
                   
