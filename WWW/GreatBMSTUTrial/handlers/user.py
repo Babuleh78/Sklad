@@ -1,6 +1,6 @@
 import pymysql
 from PIL import Image
-from io import BytesIO
+import tempfile
 import os
 import io
 import base64
@@ -126,6 +126,12 @@ async def info_panel(message: types.Message):
     decode = base64.b64decode(base64_data)
     img = Image.open(io.BytesIO(decode))
     img.show()
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp_file:
+        img.save(tmp_file, format='PNG')
+        tmp_file.seek(0) 
+        photo = types.FSInputFile(tmp_file.name)
+    # Отправляем изображение
+    await message.answer_photo(photo=photo)
 
 @user_router.message(F.text.lower().contains("ш"))
 async def info_panel(message: types.Message):

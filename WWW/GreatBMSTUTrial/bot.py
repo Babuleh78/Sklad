@@ -9,7 +9,7 @@ load_dotenv(find_dotenv())
 from handlers.user import user_router
 from common.bot_cmds_list import private
 
-ALLOWED_UPDATES = ['message', 'edited_message']
+ALLOWED_UPDATES = ['message', 'edited_message', 'photo']
 
 bot = Bot(token = os.getenv('TOKEN'))
 

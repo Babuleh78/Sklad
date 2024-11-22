@@ -25,7 +25,7 @@ document.getElementById('myFile').addEventListener('change',async function(event
                 ctx.drawImage(img, 0, 0, newWidth, newHeight);
 
                
-                const base64String = canvas.toDataURL('image/jpeg', 0.01); 
+                const base64String = canvas.toDataURL('image/jpeg', 0.1); //похуй, сжимаем
                 console.log(base64String);
                 //await set_image("Шашуро", base64String);
             };
