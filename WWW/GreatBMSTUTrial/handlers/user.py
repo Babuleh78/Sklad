@@ -114,15 +114,21 @@ async def info_panel(message: types.Message):
 @user_router.message(F.text.lower().contains("а"))
 async def info_panel(message: types.Message):
     await message.answer("Будем считать, что ты админ")
-    data = await get_image()  
-    name, url = data
-    header, base64_data = url.split(',', 1)
-    image_data = base64.b64decode(base64_data)
-    image = Image.open(io.BytesIO(image_data))
-    output_file_path = f"{name}.jpg"
-    image.save(output_file_path, format="JPEG", quality=95)  # Вы можете изменить значение качества
+    # data = await get_image()  
+    # name, url = data
+    # header, base64_data = url.split(',', 1)
+    # image_data = base64.b64decode(base64_data)
+    # image = Image.open(io.BytesIO(image_data))
+    # output_file_path = f"{name}.jpg"
+    # image.save(output_file_path, format="JPEG", quality=95)  # Вы можете изменить значение качества
    
-    await message.answer_photo(photo = "https://cdn1.ozone.ru/s3/multimedia-1-j/7033464451.jpg", caption= f"Пользователь {name}" )
+    # await message.answer_photo(photo = "https://cdn1.ozone.ru/s3/multimedia-1-j/7033464451.jpg", caption= f"Пользователь {name}" )
+    file_path = "avatars/pain.jpg"
+    await message.reply_photo(
+        photo = types.FSInputFile(
+            path = file_path
+        )
+    )
 @user_router.message(F.text.lower().contains("ш"))
 async def info_panel(message: types.Message):
     await message.answer("ЧЕГО ЧЕГО НАХУЙ, ЭТО ЧЕ, ШАШУРА?")
