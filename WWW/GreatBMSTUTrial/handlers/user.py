@@ -90,21 +90,43 @@ async def get_image():
 async def good_photo():
     try:
         with connection.cursor() as cursor:
-            query = "SELECT* FROM images ORDER BY image_id limit 1"
+            query = "SELECT * FROM images ORDER BY image_id LIMIT 1"
             cursor.execute(query)
             result = cursor.fetchone() 
             if not result:
-                return
+                return None 
+
             id, name, url, uid, pid = result
             query1 = "UPDATE visits SET is_visit = %s WHERE user_id = %s AND place_id = %s"
             cursor.execute(query1, (1, uid, pid))  
-            connection.commit()  
-            return
+            query2 = "DELETE FROM images WHERE image_id = %s"
+            cursor.execute(query2, (id,))
+            query3 = "SELECT * FROM user WHERE usertoken = %s"
+            cursor.execute(query3, (name,))
+            user_result = cursor.fetchone()
+            connection.commit()
+            return user_result  
     except Exception as e:
         print("Ошибка выполнения SQL-запроса:", e)
-        return
-
-
+        return None  
+async def bad_photo():
+    try:
+        with connection.cursor() as cursor:
+            query = "SELECT * FROM images ORDER BY image_id LIMIT 1"
+            cursor.execute(query)
+            result = cursor.fetchone() 
+            id, name, url, uid, pid = result
+            if not result:
+                return None 
+            query2 = "DELETE FROM images WHERE image_id = %s"
+            cursor.execute(query2, (id,))
+            query3 = "SELECT telegram FROM user WHERE usertoken = %s"
+            cursor.execute(query3, (name,))
+            tg = cursor.fetchone()
+            return [f"{name}, это че за хуйня, забыл как каша дома пахнет? ", url, tg]
+    except Exception as e:
+        print("Ошибка выполнения SQL-запроса:", e)
+        return None  
 
 @user_router.message(Command('top'))
 async def process_callback_button(message: types.Message):
@@ -207,11 +229,27 @@ async def info_panel(message: types.Message):
 async def process_callback(callback_query: types.CallbackQuery):
     if callback_query.data == "yes_callback":
         await bot.answer_callback_query(callback_query.id) 
-        await good_photo()
-        await bot.send_message(callback_query.from_user.id, "Ликвидация успешна")
+        res = await good_photo()
+        id, name, hui, pizda, tg = res
+        
+        await bot.send_message(chat_id=tg, text=f"Поздравляем, {name}! Ликвидация успешна")
     elif callback_query.data == "no_callback":
-        await bot.answer_callback_query(callback_query.id)  # Подтверждаем нажатие
-        await bot.send_message(callback_query.from_user.id, "Вы выбрали: НЕТ")
+        await bot.answer_callback_query(callback_query.id)
+        res = await bad_photo()
+        mes = res[0]
+        base64_str = res[1]
+        tg = res[2][0]
+        print(tg)
+        header, base64_data = base64_str.split(',', 1)
+        decode = base64.b64decode(base64_data)
+        img = Image.open(io.BytesIO(decode))
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp_file:
+            img.save(tmp_file, format='PNG')
+            tmp_file.seek(0) 
+            photo = types.FSInputFile(tmp_file.name)
+
+        await bot.send_photo(photo = photo, chat_id= tg, caption=mes)
 
 @user_router.message(F.text.lower().contains("ш"))
 async def info_panel(message: types.Message):
