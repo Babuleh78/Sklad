@@ -110,7 +110,7 @@ app.get('/get_hse_count', (req, res) => {
             }
         });
     });
-//ПОСЕТИТЬ (КАК ЖЕ ОНО УБОГО НАПИСАНО) уже не убого, жаль, что мне лень все на такие же рельсы переводить
+//ПОСЕТИТЬ (КАК ЖЕ ОНО УБОГО НАПИСАНО) уже не убого, жаль, что мне лень все на такие же рельсы переводить ДЛЯ ПОСЕЩЕНИЯ
 app.post('/visit', async (req, res) => {
     const { username, placeId } = req.body;
     try {
@@ -140,6 +140,27 @@ app.post('/visit', async (req, res) => {
         } else {
             return res.json({ success: false, message: 'Посещение не найдено' });
         }
+    } catch (error) {
+        console.error("Ошибка", error);
+        return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });
+    }
+});
+
+//МЕСТО НА ПРОВЕРКЕ
+app.post('/visit_on_check', async (req, res) => {
+    const { username, placeId } = req.body;
+    try {
+        const [userResults] = await query('SELECT iduser FROM user WHERE usertoken = ?', [username]);
+        if (userResults.length === 0) {
+            return res.json({ success: false, message: 'Пользователь не найден' });
+        }
+        const idUser = userResults.iduser;
+        await query('UPDATE visits SET is_visit = -1 WHERE (place_id = ? &&  user_id = ?)', [placeId, idUser]);
+        if(!res.ok){
+            return res.json({ success: false, message: 'Этого не может быть, промежуток должен быть' });
+        }
+        return res.json({ success: true});
+        
     } catch (error) {
         console.error("Ошибка", error);
         return res.status(500).json({ success: false, error: 'Ошибка при выполнении запроса' });

@@ -127,7 +127,7 @@ const fetchData = async () => {
               try {
                   const visitData = await checkVisit(userName, placeId);
                   isVisit = visitData.success ? visitData.is_visit : 0;
-                  if(isVisit !== 0){
+                  if(isVisit === 1){
 
                     
                     const hse_text = document.getElementById(uniqueZButtonTextId);
@@ -137,6 +137,12 @@ const fetchData = async () => {
                     hse_text.style.textDecoration = "line-through";
                     ZButton.style.background = "red";
                    
+                  } else if(isVisit === -1){//На проверке
+                    const hse_text = document.getElementById(uniqueZButtonTextId);
+                    hse_text.textContent = "Отправлено"
+                    hse_text.style.fontSize = "24px";
+                    hse_text.style.background = "blue";
+                    ZButton.style.background = "white";
                   }
                   counthse = await getVisitCount(placeId);
                   visitorCount.textContent = counthse;
@@ -146,11 +152,22 @@ const fetchData = async () => {
             infospan.textContent = placeinfo; 
       
             ZButton.addEventListener("click", async function() {
-              if(isVisit === 0){
-                  const window = document.getElementById(uniqueZagrId);
+              const window = document.getElementById(uniqueZagrId);
+              if(isVisit === 0 && window.style.display !=="flex" ){
                     window.style.display = "flex";
+                      const hse_text = document.getElementById(uniqueZButtonTextId);
+                    
                     window.addEventListener('change',async function(event) {
+                      await visit_on_check(userName, placeId)
                       const file = event.target.files[0]; 
+                      hse_text.textContent = "Отправлено"
+                      hse_text.style.fontSize = "24px";
+                      hse_text.style.background = "blue";
+                      hse_text.style.color = "white";
+                      //   const hse_text = document.getElementById(uniqueZButtonTextId);
+                //   hse_text.textContent = "ЛИКВИДИРОВАНА";
+                //   hse_text.style.color = "black"; 
+                //   hse_text.style.fontSize = "24px"; 
                       if (file) {
                           const reader = new FileReader(); 
                   
@@ -184,59 +201,59 @@ const fetchData = async () => {
                           reader.readAsDataURL(file); 
                       }
                   });  
-                  isVisit = 1; 
-                  const count_ach = await (get_count_for_ach(uid))+1;
+                //   isVisit = 1; 
+                //   const count_ach = await (get_count_for_ach(uid))+1;
                   
-                  if(Number(stars.textContent) === 0){ //Достижение Первые шаги
+                //   if(Number(stars.textContent) === 0){ //Достижение Первые шаги
                    
-                    await set_ach(uid, 2);
-                    await updateDisplayAch(2);
-                  }
-                  if(count_ach >= 5){//Достижение В яблочко
-                    await set_ach(uid, 3);
-                    await updateDisplayAch(3);
-                  }
-                  if(count_ach >= 10){//Достижение Подержи мое пиво
-                    await set_ach(uid, 4);
+                //     await set_ach(uid, 2);
+                //     await updateDisplayAch(2);
+                //   }
+                //   if(count_ach >= 5){//Достижение В яблочко
+                //     await set_ach(uid, 3);
+                //     await updateDisplayAch(3);
+                //   }
+                //   if(count_ach >= 10){//Достижение Подержи мое пиво
+                //     await set_ach(uid, 4);
                     
-                    await updateDisplayAch(4);
-                  }
+                //     await updateDisplayAch(4);
+                //   }
                   
-                  if(ZButton.id == "ZButton-6"){//Достижение Наш район
-                    await set_ach(uid, 1); 
-                    await updateDisplayAch(1);
-                }
-                  await setVisit(userName, placeId);
-                  await addNote(userName, placeId);
-                  visitorCount.textContent = Number(visitorCount.textContent) +1;
-                  const hse_text = document.getElementById(uniqueZButtonTextId);
-                  hse_text.textContent = "ЛИКВИДИРОВАНА";
-                  hse_text.style.color = "black"; 
-                  hse_text.style.fontSize = "24px"; 
-                  hse_text.style.textDecoration = "line-through";
-                  ZButton.style.background = "red";
+                //   if(ZButton.id == "ZButton-6"){//Достижение Наш район
+                //     await set_ach(uid, 1); 
+                //     await updateDisplayAch(1);
+                // }
+                //   await setVisit(userName, placeId);
+                //   await addNote(userName, placeId);
+                //   visitorCount.textContent = Number(visitorCount.textContent) +1;
+                //   const hse_text = document.getElementById(uniqueZButtonTextId);
+                //   hse_text.textContent = "ЛИКВИДИРОВАНА";
+                //   hse_text.style.color = "black"; 
+                //   hse_text.style.fontSize = "24px"; 
+                //   hse_text.style.textDecoration = "line-through";
+                //   ZButton.style.background = "red";
                   
-                    async function get_hse_count_for_user(userName) {
-                    try {
-                        const response = await fetch(`http://localhost:3000/get_hse_count_for_user?userName=${encodeURIComponent(userName)}`);
-                        if (!response.ok) {
-                            throw new Error(`Ошибка: ${response.status}`);
-                        }
-                        const data = await response.json();
-                        count = data.hse_count_user; 
-                        stars.textContent = count;
-                        return count; 
-                    } catch (error) {
-                        console.error(error.message);
-                        return -1; 
-                    }
-                }
+                //     async function get_hse_count_for_user(userName) {
+                //     try {
+                //         const response = await fetch(`http://localhost:3000/get_hse_count_for_user?userName=${encodeURIComponent(userName)}`);
+                //         if (!response.ok) {
+                //             throw new Error(`Ошибка: ${response.status}`);
+                //         }
+                //         const data = await response.json();
+                //         count = data.hse_count_user; 
+                //         stars.textContent = count;
+                //         return count; 
+                //     } catch (error) {
+                //         console.error(error.message);
+                //         return -1; 
+                //     }
+                // }
                  
-                  await get_hse_count_for_user(userName); 
-                  if(Number(stars.textContent) >= 25){//Достижение звездный лорд
-                    await set_ach(uid, 6);
-                    await updateDisplayAch(6);
-                  }  
+                //   await get_hse_count_for_user(userName); 
+                //   if(Number(stars.textContent) >= 25){//Достижение звездный лорд
+                //     await set_ach(uid, 6);
+                //     await updateDisplayAch(6);
+                //   }  
               } 
                 
           });
@@ -303,6 +320,19 @@ async function checkVisit(username, placeId) {
   return await response.json();
 }
 
+async function visit_on_check(username, placeId) {
+  const response = await fetch('http://localhost:3000/visit_on_check', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, placeId })
+  });
+  if (!response.ok) {
+      throw new Error('Ошибка при проверке посещения');
+  }
+  return await response.json();
+}
 async function setVisit(username, placeId) {
   const response = await fetch('http://localhost:3000/visit', {
       method: 'POST',
