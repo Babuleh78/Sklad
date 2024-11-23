@@ -223,3 +223,39 @@
     outline: none; /* Убираем обводку при фокусе */
     box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.5); /* Обводка при фокусе */
 }
+
+.telega {
+    display: flex;
+    position: fixed; /* Окно фиксировано относительно окна браузера */
+    z-index: 1000; /* На переднем плане */
+    left: 0;
+    top: 0;
+    width: 100%; /* Полная ширина */
+    height: 100%; /* Полная высота */
+    overflow: auto; /* Включает прокрутку, если необходимо */
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+}
+
+.telega-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% сверху и центрирование */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ширина окна */
+    max-width: 500px; /* Максимальная ширина */
+    border-radius: 5px; /* Закругленные углы */
+}
+
+.close-telega-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-telega-button:hover,
+.close-telega-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
