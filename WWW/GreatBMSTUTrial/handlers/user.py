@@ -6,7 +6,6 @@ import io
 import base64
 
 from aiogram import F, types, Router, Bot
-from aiogram.types import InputFile  
 from aiogram.filters import CommandStart, Command, or_f
 from klava import reply, inline
 from klava.reply import get_keyboard
@@ -16,7 +15,6 @@ ADMIN_ID = int(os.getenv('ADMIN'))
 IS_ADMIN = False
 IGNORE_CASE = False
 bot = Bot(token = os.getenv('TOKEN'))
-
 try:
      connection = pymysql.connect(
           host="localhost",
@@ -108,7 +106,7 @@ async def good_photo():
 
 
 
-@user_router.message(or_f(Command('top'), (F.text.lower().contains("топ"))))
+@user_router.message(Command('top'))
 async def process_callback_button(message: types.Message):
     await message.answer("Топ 5 лучших участников")
     top_items = await get_top()
@@ -121,7 +119,7 @@ async def process_callback_button(message: types.Message):
     
     final_message = "\n".join(ans_messages)
     await message.answer(final_message)
-@user_router.message(or_f(Command('user'), (F.text.lower().contains("польз"))))
+@user_router.message(Command('user'))
 async def cmd_user(message: types.Message):
     await message.answer("Введите ник пользователя, о котором хотите узнать в формате ИНФ-Пользователь" )
     
@@ -138,10 +136,44 @@ def base64_to_image(base64_str):
     image_data = base64.b64decode(base64_data)
     image = Image.open(io.BytesIO(image_data))
     return image
+def reg_user(name, id):
+    try:
+        with connection.cursor() as cursor:
+            query = "UPDATE user SET telegram = %s WHERE (usertoken = %s)"
+            cursor.execute(query, (id, name))
+            result = cursor.fetchone() 
+            connection.commit()  
+
+            if cursor.rowcount > 0:  
+                return "Вы успешно вошли!"
+            return "Ошибка: пользователь не найден или вы уже зарегистрированы"
+            
+    except Exception as e:
+        print("Ошибка выполнения SQL-запроса:", e)
+        return "ОШИБКА"
 @user_router.message(Command('start'))
 async def send_welcome(message: types.Message):
-    keyboard = get_keyboard("Вход", "Топ")
+    keyboard = get_keyboard("Вход", "Топ Пользователей", "Узнать о пользователе")
     await message.answer("Здравствуй боец, выбери, что ты хочешь сделать", reply_markup = keyboard)
+@user_router.message(F.text.lower().contains("вход"))
+async def vhod(message: types.Message): 
+    await message.answer("Введите ваше имя на сайте (какое указали при регистрации) в формате ВХ-Имя")
+@user_router.message(F.text.lower().contains("вх-"))
+async def vhod(message: types.Message): 
+    name = message.text.split('-')[1]
+
+    uid = message.from_user.id
+    print(name, uid)
+    string = reg_user(name, uid)
+    await message.answer(string)
+async def vhod(message: types.Message): 
+    await message.answer("Введите ваше имя на сайте (какое указали при регистрации) в формате ВХ-Имя")
+@user_router.message(F.text.lower().contains("топ пользователей"))
+async def vhod(message: types.Message): 
+    await message.answer("топ польхов")
+@user_router.message(F.text.lower().contains("узнать о пользователе"))
+async def vhod(message: types.Message): 
+    await message.answer("уна")
 @user_router.message(F.text.lower().contains("а"))
 async def info_panel(message: types.Message):
     print(message.from_user.id)
