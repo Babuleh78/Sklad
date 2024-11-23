@@ -15,6 +15,8 @@ bot = Bot(token = os.getenv('TOKEN'))
 
 dp = Dispatcher() 
 dp.include_router(user_router)
+async def on_startup():
+    await bot.send_message(chat_id="YOUR_CHAT_ID", text="Бот запущен!")  
 
 async def main() -> None:
     await bot.delete_webhook(drop_pending_updates=True)
@@ -22,6 +24,8 @@ async def main() -> None:
         await bot.set_my_commands(commands=private, scope=types.BotCommandScopeAllPrivateChats())
     except Exception as e:
         print(f"An error occurred: {e}")
+        
     await dp.start_polling(bot, allowed_updates= dp.resolve_used_update_types() ) #запуск бота
+    await dp.start_polling(bot)
 
 asyncio.run(main())

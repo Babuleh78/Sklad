@@ -137,7 +137,11 @@ def base64_to_image(base64_str):
     image_data = base64.b64decode(base64_data)
     image = Image.open(io.BytesIO(image_data))
     return image
-
+@user_router.message(Command('start'))
+async def send_welcome(message: types.Message):
+    
+    keyboard = get_keyboard("Вход", "Топ")
+    await message.answer("Здравствуй боец, выбери, что ты хочешь сделать", reply_markup = keyboard)
 @user_router.message(F.text.lower().contains("а"))
 async def info_panel(message: types.Message):
     print(message.from_user.id)
