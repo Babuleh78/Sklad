@@ -4,6 +4,7 @@ import tempfile
 import os
 import io
 import base64
+
 from aiogram import F, types, Router, Bot
 from aiogram.types import InputFile  
 from aiogram.filters import CommandStart, Command, or_f
@@ -139,7 +140,6 @@ def base64_to_image(base64_str):
     return image
 @user_router.message(Command('start'))
 async def send_welcome(message: types.Message):
-    
     keyboard = get_keyboard("Вход", "Топ")
     await message.answer("Здравствуй боец, выбери, что ты хочешь сделать", reply_markup = keyboard)
 @user_router.message(F.text.lower().contains("а"))

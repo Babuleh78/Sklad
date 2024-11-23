@@ -2,7 +2,7 @@ const telega = document.getElementById("telega");
 const closeModalButton = document.getElementById("closeTelega");
 const go_btn = document.getElementById("go_to_telega");
 go_btn.addEventListener("click", function(){
-    window.open("https://t.me/ForGreatBMSTUTrailBot");
+    window.open("https://t.me/ForGreatBMSTUTrailBot?start");
 });
 
 
