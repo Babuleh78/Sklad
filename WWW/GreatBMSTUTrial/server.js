@@ -125,9 +125,10 @@ app.post('/visit', async (req, res) => {
         const star = Number(starsResults[0].stars);
         const [visitResults] = await query('SELECT is_visit FROM visits WHERE user_id = ? AND place_id = ?', [idUser , placeId]);
         const isVisit = visitResults.is_visit;
-        if (!isVisit) {
+        if (isVisit == 78) {
             await query('UPDATE visits SET is_visit = 1 WHERE user_id = ? AND place_id = ?', [idUser , placeId]);
             await query('UPDATE user SET stars = stars + ? WHERE iduser = ?', [star, idUser ]);
+            
             const results = await query('SELECT visit_count FROM place WHERE idplace = ?', [placeId]);
 
             if (results.length > 0) {
