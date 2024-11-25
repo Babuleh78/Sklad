@@ -485,3 +485,19 @@ app.get('/send_image', (req, res)=>{
     });
 
 });
+
+app.get('/get_telega', (req, res)=>{
+    const {name} = req.query;
+    const query = `SELECT telegram FROM user WHERE usertoken = ?`;
+    connection.query(query, null, (error, results)=>{
+        if(error){
+            console.error('Ошибка при получении тг', error);
+            return res.json({success: false});
+        } else{
+            const tg = results[0].telegram;
+            return res.json({success: true, imageURL: img, tg: tg});
+        }
+
+    });
+
+});

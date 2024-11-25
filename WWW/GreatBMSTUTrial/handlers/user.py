@@ -267,4 +267,4 @@ async def process_callback(callback_query: types.CallbackQuery):
         if(not(tg is None)):
             await bot.send_photo(photo = photo, chat_id= tg, caption=mes)
         else:
-            await bot.send_photo(chat_id= ADMIN_ID, caption="У дурика нет ТГ, еще и фотки херовые присылает, может его того?")
+            await bot.send_message(chat_id= ADMIN_ID, text="У дурика нет ТГ, еще и фотки херовые присылает, может его того?")
