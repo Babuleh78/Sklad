@@ -117,12 +117,17 @@ async def bad_photo():
             id, name, url, uid, pid = result
             if not result:
                 return None 
+            query1 = "UPDATE visits SET is_visit = %s WHERE user_id = %s AND place_id = %s"
+            cursor.execute(query1, (0, uid, pid))  
             query2 = "DELETE FROM images WHERE image_id = %s"
             cursor.execute(query2, (id,))
             query3 = "SELECT telegram FROM user WHERE usertoken = %s"
             cursor.execute(query3, (name,))
             tg = cursor.fetchone()
+            connection.commit()
+            
             return [f"{name}, это че за хуйня, забыл как каша дома пахнет? ", url, tg]
+          
     except Exception as e:
         print("Ошибка выполнения SQL-запроса:", e)
         return None  
@@ -162,7 +167,6 @@ def reg_user(name, id):
         with connection.cursor() as cursor:
             query = "UPDATE user SET telegram = %s WHERE (usertoken = %s)"
             cursor.execute(query, (id, name))
-            result = cursor.fetchone() 
             connection.commit()  
 
             if cursor.rowcount > 0:  
@@ -195,50 +199,63 @@ async def vhod(message: types.Message):
 @user_router.message(F.text.lower().contains("узнать о пользователе"))
 async def vhod(message: types.Message): 
     await message.answer("уна")
-@user_router.message(F.text.lower().contains("а"))
-async def info_panel(message: types.Message):
+@user_router.message(F.text.lower().contains("28 ноября"))
+async def admin_panel(message: types.Message):
     print(message.from_user.id)
     if message.from_user.id == ADMIN_ID:
-        await message.answer("Будем считать, что ты админ")
+            
+            keyboard = get_keyboard("ПРОВЕРКА ФОТОГРАФИЙ","ПОПРОСИТЬ МИЛОСТЫНИ")
+            await message.answer( text = "Я у аппарата, начнем работу", reply_markup=keyboard)
         
-        name, base64_str, pid = await get_image()
-        str_message = f'Пользователь {name} прислал вам изображение, он хочет ликвидировать место {pid}. Одобряем?'
-        
-        header, base64_data = base64_str.split(',', 1)
-        decode = base64.b64decode(base64_data)
-        img = Image.open(io.BytesIO(decode))
-
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp_file:
-            img.save(tmp_file, format='PNG')
-            tmp_file.seek(0) 
-            photo = types.FSInputFile(tmp_file.name)
-
-        buttons = {
-            "ДА": "yes_callback", 
-            "НЕТ": "no_callback",   
-        }
-        keyboard = get_callback_btns(btns=buttons)
-        await message.answer_photo(photo=photo, caption=str_message, reply_markup=keyboard)
-
-        os.remove(tmp_file.name)
     else:
-        await message.answer("Соси хуй")
+        await message.answer("Пасхалко найдено")
+@user_router.message(F.text.lower().contains("проверка фотографий"))
+async def moneytalks(message: types.Message):
+        if message.from_user.id == ADMIN_ID:
+            try:
+                name, base64_str, pid = await get_image()
+
+                str_message = f'Пользователь {name} прислал вам изображение, он хочет ликвидировать место {pid}. Одобряем?'
+                
+                header, base64_data = base64_str.split(',', 1)
+                decode = base64.b64decode(base64_data)
+                img = Image.open(io.BytesIO(decode))
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp_file:
+                    img.save(tmp_file, format='PNG')
+                    tmp_file.seek(0) 
+                    photo = types.FSInputFile(tmp_file.name)
+
+                buttons = {
+                    "ДА": "yes_callback", 
+                    "НЕТ": "no_callback",   
+                }
+                keyboard = get_callback_btns(btns=buttons)
+                await bot.send_photo(chat_id= ADMIN_ID, photo=photo, caption=str_message, reply_markup=keyboard)
+                
+                os.remove(tmp_file.name)
+            except Exception as e:
+                print(e)
+                await message.answer("Больше нет фотографий для проверки!")
 
 @user_router.callback_query(lambda c: c.data in ["yes_callback", "no_callback"])
 async def process_callback(callback_query: types.CallbackQuery):
     if callback_query.data == "yes_callback":
         await bot.answer_callback_query(callback_query.id) 
         res = await good_photo()
-        id, name, hui, pizda, tg = res
         
-        await bot.send_message(chat_id=tg, text=f"Поздравляем, {name}! Ликвидация успешна")
+        id, name, h, p, tg = res
+        if not(tg is None):
+            await bot.send_message(chat_id=tg, text=f"Поздравляем, {name}! Ликвидация успешна")
+        else:
+            await bot.send_message(chat_id=ADMIN_ID, text=f"У дурика {name}! нет телеги")
     elif callback_query.data == "no_callback":
         await bot.answer_callback_query(callback_query.id)
         res = await bad_photo()
         mes = res[0]
         base64_str = res[1]
         tg = res[2][0]
-        print(tg)
+        
         header, base64_data = base64_str.split(',', 1)
         decode = base64.b64decode(base64_data)
         img = Image.open(io.BytesIO(decode))
@@ -247,9 +264,7 @@ async def process_callback(callback_query: types.CallbackQuery):
             img.save(tmp_file, format='PNG')
             tmp_file.seek(0) 
             photo = types.FSInputFile(tmp_file.name)
-
-        await bot.send_photo(photo = photo, chat_id= tg, caption=mes)
-
-@user_router.message(F.text.lower().contains("ш"))
-async def info_panel(message: types.Message):
-    await message.answer("ЧЕГО ЧЕГО НАХУЙ, ЭТО ЧЕ, ШАШУРА?")
+        if(not(tg is None)):
+            await bot.send_photo(photo = photo, chat_id= tg, caption=mes)
+        else:
+            await bot.send_photo(chat_id= ADMIN_ID, caption="У дурика нет ТГ, еще и фотки херовые присылает, может его того?")
