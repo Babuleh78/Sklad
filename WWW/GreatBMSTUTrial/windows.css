@@ -146,14 +146,14 @@
 
 .ach_title_element {
     width: 150px; 
-    font-size: 22px;
+    font-size: 20px;
     position: absolute;
     background-color: #28A745; /* Зеленый цвет */
     color: white; /* Цвет текста */
     box-sizing: border-box; 
     word-break: normal; 
     text-align: center; 
-    top: -10px;
+    top: -15px;
     left: 168px; /* Центрирование */
     transform: translateX(-50%); /* Центрирование */
     padding: 5px; /* Отступы */
@@ -238,12 +238,13 @@
 
 .telega-content {
     background-color: #fefefe;
-    margin: 15% auto; /* 15% сверху и центрирование */
+    margin:  auto; 
     padding: 20px;
     border: 1px solid #888;
     width: 80%; /* Ширина окна */
-    max-width: 500px; /* Максимальная ширина */
-    border-radius: 5px; /* Закругленные углы */
+    
+    max-width: 300px; /* Максимальная ширина */
+    border-radius: 15px; /* Закругленные углы */
 }
 
 .close-telega-button {
@@ -258,4 +259,16 @@
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+.go_to_telega{
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex; 
+    left: 33%;
+    background-image: url('tg.jpg');
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;    
 }

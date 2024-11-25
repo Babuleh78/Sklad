@@ -6,12 +6,10 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 load_dotenv(find_dotenv())
 
-from handlers.user import user_router
+from handlers.user import user_router, bot
 from common.bot_cmds_list import private
 
 ALLOWED_UPDATES = ['message', 'edited_message', 'photo']
-
-bot = Bot(token = os.getenv('TOKEN'))
 
 dp = Dispatcher() 
 dp.include_router(user_router)

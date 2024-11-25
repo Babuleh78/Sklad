@@ -211,7 +211,10 @@ const fetchData = async () => {
               if(isVisit === 0 && window.style.display !=="flex" ){
                     window.style.display = "flex";
                       const hse_text = document.getElementById(uniqueZButtonTextId);
-                    
+                      hse_text.textContent = "ЛИКВИДИРОВАТЬ";
+                      hse_text.style.color = "black"; 
+                      hse_text.style.fontSize = "24px"; 
+                      ZButton.style.background = "red";
                     window.addEventListener('change',async function(event) {
                       await visit_on_check(userName, placeId)
                       const file = event.target.files[0]; 

@@ -12,9 +12,11 @@ from klava.reply import get_keyboard
 from klava.inline import get_callback_btns
 user_router = Router()
 ADMIN_ID = int(os.getenv('ADMIN'))
+print(ADMIN_ID)
 IS_ADMIN = False
 IGNORE_CASE = False
 bot = Bot(token = os.getenv('TOKEN'))
+
 try:
      connection = pymysql.connect(
           host="localhost",
