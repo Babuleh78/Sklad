@@ -24,6 +24,23 @@
   height: 50px; 
   overflow: hidden; 
 }
+.ZButtonCheck{
+  border: 1px solid #3498db;
+  background: springgreen;
+  padding: 10px 20px;
+  font-size: 20px; 
+  font-family: "Montserrat", sans-serif;
+  cursor: pointer;
+  color: blue;
+  transition: font-size 0.3s; 
+  position: relative;
+  margin-bottom: 1px;
+  z-index: 200;
+  margin-left: 25px;
+  width: 250px; 
+  height: 50px; 
+  overflow: hidden; 
+}
 .ZButton_text{
   position: relative;
   z-index: 200;

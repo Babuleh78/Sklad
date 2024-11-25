@@ -44,7 +44,7 @@ if (idTokenReg || idTokenLog) {
     nicknamej.textContent = username;
     
     if (idTokenReg) { //Называл себя бы максимально скромно - гений, запустил бы пафосную смену поколение, Prodigy, Chemical Brothers, Дядя Fatboy и Slim, пришла Эра 2R2R-а Сим-Селявим!
-        console.log("Рег?");
+     
         count = await get_hse_count();
         const addUserReg = async (username, count) => {
             try {
@@ -93,7 +93,6 @@ if (idTokenReg || idTokenLog) {
                     throw new Error(`Ошибка: ${response.status}`);
                 }
                 const data = await response.json();
-                console.log(data);
                 return data.avatar;
             } catch (error) {
                 console.error(error.message);

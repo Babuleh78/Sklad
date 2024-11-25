@@ -31,6 +31,5 @@ async function get_telega(name) {
     return await data.tg;
   }
 function open_telega(){
-    console.log("opentelega");
     telega.style.display = "flex";
 }

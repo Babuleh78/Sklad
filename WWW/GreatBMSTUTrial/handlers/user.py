@@ -4,7 +4,7 @@ import tempfile
 import os
 import io
 import base64
-
+import time
 from aiogram import F, types, Router, Bot
 from aiogram.filters import CommandStart, Command, or_f
 from klava import reply, inline
@@ -12,24 +12,24 @@ from klava.reply import get_keyboard
 from klava.inline import get_callback_btns
 user_router = Router()
 ADMIN_ID = int(os.getenv('ADMIN'))
-print(ADMIN_ID)
 IS_ADMIN = False
 IGNORE_CASE = False
 bot = Bot(token = os.getenv('TOKEN'))
-
-try:
-     connection = pymysql.connect(
-          host="localhost",
-          port = 8888,
-          user = "root",
-          password= "root",
-          database= "project",
-    
-
-     )
-     print("Успешно подключились")
-except Exception as ex:
-     print("Ну че опять", ex)
+connection = None
+async def do_connect():
+    global connection
+    try:
+        connection = pymysql.connect(
+            host="localhost",
+            port=8888,
+            user="root",
+            password="root",
+            database="project",
+        )
+        print("Успешно подключились")
+    except Exception as ex:
+        print("Не удалось подключиться", ex)
+        connection = None
 async def get_top():
     try:
         with connection.cursor() as cursor:
@@ -64,7 +64,6 @@ async def ach_users(nickname):
                     querycicle = "SELECT title FROM achivements WHERE idach = %s"
                     cursor.execute(querycicle, (aid,))
                     title_result = cursor.fetchall()
-                    print(title_result[0][0])
                     achievements.append(title_result[0][0])
 
             return achievements  
@@ -190,7 +189,6 @@ async def vhod(message: types.Message):
     name = message.text.split('-')[1]
 
     uid = message.from_user.id
-    print(name, uid)
     string = reg_user(name, uid)
     await message.answer(string)
 async def vhod(message: types.Message): 
@@ -203,18 +201,28 @@ async def vhod(message: types.Message):
     await message.answer("уна")
 @user_router.message(F.text.lower().contains("28 ноября"))
 async def admin_panel(message: types.Message):
-    print(message.from_user.id)
     if message.from_user.id == ADMIN_ID:
             
-            keyboard = get_keyboard("ПРОВЕРКА ФОТОГРАФИЙ","ПОПРОСИТЬ МИЛОСТЫНИ")
+            keyboard = get_keyboard("ПРОВЕРКА ФОТОГРАФИЙ","ПОПРОСИТЬ МИЛОСТЫНИ", "ОБНОВИТЬ СОЕДИНЕНИЕ")
             await message.answer( text = "Я у аппарата, начнем работу", reply_markup=keyboard)
         
     else:
         await message.answer("Пасхалко найдено")
+@user_router.message(F.text.lower().contains("обновить соединение"))
+async def update(message: types.Message):
+    global connection  
+    if message.from_user.id == ADMIN_ID:
+        if connection:
+            connection.close()  
+            await do_connect()  
+        else:
+            await do_connect()  
+         
 @user_router.message(F.text.lower().contains("проверка фотографий"))
 async def moneytalks(message: types.Message):
         if message.from_user.id == ADMIN_ID:
             try:
+                
                 name, base64_str, pid = await get_image()
 
                 str_message = f'Пользователь {name} прислал вам изображение, он хочет ликвидировать место {pid}. Одобряем?'

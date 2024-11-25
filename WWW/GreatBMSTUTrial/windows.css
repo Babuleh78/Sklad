@@ -59,12 +59,15 @@
 }
 
 .avatar_journal {
-    width: 50px; 
-    height: 50px; 
+    position: relative; 
+    width: 70px;
+    height: 70px;
     margin-right: 10px;
-    border-radius: 50%; /* Круглая аватарка */
-    border: 2px solid white; /* Белая граница вокруг аватарки */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для аватарки */
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+   
+  
 }
 .avatar{
     position: relative; 

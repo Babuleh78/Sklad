@@ -205,7 +205,6 @@ app.post('/addUserReg', (req, res) => {
             const achQuery = 'INSERT INTO open_ach (user_id, ach_id, is_open) VALUES (?, ?, ?)';
             const visitPromises = [];
             const achPromises = [];
-            console.log(count);
             for (let i = 1; i <= count; i++) {
                 visitPromises.push(new Promise((resolve, reject) => {
                     connection.query(visitQuery, [userId, i, 0], (error, results) => {

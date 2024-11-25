@@ -7,7 +7,6 @@ async function DrawDisplayAch() {
   if(DRAWCHECK){
     return;
   }
-  console.log("рисуем");
   DRAWCHECK = true;
   if(user_id === -10){
     user_id = await getId(nicknameach.textContent);
@@ -53,7 +52,6 @@ async function DrawDisplayAch() {
 async function updateDisplayAch(i) {
   const ach = document.getElementById("entry_"+i);
   if(ach!== null && ach.className!== "entry_container_ach"){
-    console.log("Обновляем")
     ach.className = "entry_container_ach";
     let notification= document.getElementById("notification"+i);
     console.log(notification);

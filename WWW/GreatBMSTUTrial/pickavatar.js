@@ -49,7 +49,6 @@ av8.onclick = function(){
     fetchfunc(userName, 7);
 }
 fetchfunc = function(userName, picId){
-    console.log("Пытаемся");
     fetch('http://localhost:3000/SetAvatar', {
         method: 'POST',
         headers: {

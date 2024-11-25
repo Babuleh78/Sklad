@@ -140,15 +140,12 @@ const fetchData = async () => {
                   } else if(isVisit === -1){//На проверке
                     const hse_text = document.getElementById(uniqueZButtonTextId);
                     hse_text.textContent = "Отправлено"
-                    hse_text.style.fontSize = "24px";
-                    hse_text.style.background = "blue";
-                    ZButton.style.background = "white";
+              
+                    ZButton.className = "ZButtonCheck";
                   } else if(isVisit === 78){//Прошло проверку, необходимо внести всю информацию на сервер
                          isVisit = 1; 
                           const count_ach = await (get_count_for_ach(uid))+1;
-                          console.log(stars.textContent);
                           if(Number(stars.textContent) === 0){ //Достижение Первые шаги
-                            console.log("Первые шаги")
                             await set_ach(uid, 2);
                             await updateDisplayAch(2);
                           }
@@ -185,7 +182,6 @@ const fetchData = async () => {
                                 const data = await response.json();
                                 count = data.hse_count_user; 
                                 stars.textContent = count;
-                                console.log(count);
                                 return count; 
                             } catch (error) {
                                 console.error(error.message);
@@ -218,10 +214,12 @@ const fetchData = async () => {
                     window.addEventListener('change',async function(event) {
                       await visit_on_check(userName, placeId)
                       const file = event.target.files[0]; 
-                      hse_text.textContent = "Отправлено"
-                      hse_text.style.fontSize = "24px";
-                      hse_text.style.background = "blue";
-                      hse_text.style.color = "white";
+                      hse_text.textContent = "Отправлено";
+                      hse_text.style.color = "blue";
+                      hse_text.style.fontSize = "20px";
+                      ZButton.style.color = "blue";
+                      ZButton.style.background ="springgreen";
+                      ZButton.className = "ZButtonCheck";
                       if (file) {
                           const reader = new FileReader(); 
                   
