@@ -73,7 +73,6 @@ async def ach_users(nickname):
 async def get_image():
     try:
         with connection.cursor() as cursor:
-            print("Зашли")
             query = "SELECT* FROM images ORDER BY image_id limit 1"
             cursor.execute(query)
             result = cursor.fetchall()
@@ -98,7 +97,7 @@ async def good_photo():
 
             id, name, url, uid, pid = result
             query1 = "UPDATE visits SET is_visit = %s WHERE user_id = %s AND place_id = %s"
-            cursor.execute(query1, (1, uid, pid))  
+            cursor.execute(query1, (78, uid, pid))  
             query2 = "DELETE FROM images WHERE image_id = %s"
             cursor.execute(query2, (id,))
             query3 = "SELECT * FROM user WHERE usertoken = %s"
