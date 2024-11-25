@@ -133,7 +133,7 @@ async def bad_photo():
         print("Ошибка выполнения SQL-запроса:", e)
         return None  
 
-@user_router.message(Command('top'))
+@user_router.message(or_f(Command('top')),F.text.lower().contains("топ пользователей"))
 async def process_callback_button(message: types.Message):
     await message.answer("Топ 5 лучших участников")
     top_items = await get_top()
@@ -146,7 +146,7 @@ async def process_callback_button(message: types.Message):
     
     final_message = "\n".join(ans_messages)
     await message.answer(final_message)
-@user_router.message(Command('user'))
+@user_router.message(or_f(Command('user')), F.text.lower().contains("узнать о пользователе"))
 async def cmd_user(message: types.Message):
     await message.answer("Введите ник пользователя, о котором хотите узнать в формате ИНФ-Пользователь" )
     
@@ -180,25 +180,17 @@ def reg_user(name, id):
 @user_router.message(Command('start'))
 async def send_welcome(message: types.Message):
     keyboard = get_keyboard("Вход", "Топ Пользователей", "Узнать о пользователе")
-    await message.answer("Здравствуй боец, выбери, что ты хочешь сделать", reply_markup = keyboard)
-@user_router.message(F.text.lower().contains("вход"))
+    await message.answer("Здравствуй боец, выбери, что ты хочешь сделать или воспользуйся командами", reply_markup = keyboard)
+@user_router.message(or_f(Command('login'), F.text.lower().contains("вход")))
 async def vhod(message: types.Message): 
     await message.answer("Введите ваше имя на сайте (какое указали при регистрации) в формате ВХ-Имя")
 @user_router.message(F.text.lower().contains("вх-"))
 async def vhod(message: types.Message): 
     name = message.text.split('-')[1]
-
     uid = message.from_user.id
     string = reg_user(name, uid)
     await message.answer(string)
-async def vhod(message: types.Message): 
-    await message.answer("Введите ваше имя на сайте (какое указали при регистрации) в формате ВХ-Имя")
-@user_router.message(F.text.lower().contains("топ пользователей"))
-async def vhod(message: types.Message): 
-    await message.answer("топ польхов")
-@user_router.message(F.text.lower().contains("узнать о пользователе"))
-async def vhod(message: types.Message): 
-    await message.answer("уна")
+
 @user_router.message(F.text.lower().contains("28 ноября"))
 async def admin_panel(message: types.Message):
     if message.from_user.id == ADMIN_ID:
@@ -250,6 +242,7 @@ async def moneytalks(message: types.Message):
 
 @user_router.callback_query(lambda c: c.data in ["yes_callback", "no_callback"])
 async def process_callback(callback_query: types.CallbackQuery):
+    await bot.delete_message(callback_query.from_user.id, callback_query.message.message_id) 
     if callback_query.data == "yes_callback":
         await bot.answer_callback_query(callback_query.id) 
         res = await good_photo()
