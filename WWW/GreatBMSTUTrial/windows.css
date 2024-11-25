@@ -225,7 +225,7 @@
 }
 
 .telega {
-    display: flex;
+    display: none;
     position: fixed; /* Окно фиксировано относительно окна браузера */
     z-index: 1000; /* На переднем плане */
     left: 0;

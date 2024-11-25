@@ -401,8 +401,9 @@ app.get('/getAch', (req, res)=>{
 //ПОЛУЧИТЬ ВСЕ ДОСТИЖЕНИЯ (ОТКРЫТЫ ИЛИ НЕТ)
 
 app.get('/get_ach_open', (req, res)=>{
-    const query = `SELECT is_open FROM open_ach`;
-    connection.query(query, null, (error, results)=>{
+    const {id} = req.query;
+    const query = `SELECT is_open FROM open_ach WHERE user_id = ?`;
+    connection.query(query, id, (error, results)=>{
         if(error){
             console.error('Ошибка при получении достижений', error);
             return res.json({success: false});
@@ -489,7 +490,7 @@ app.get('/send_image', (req, res)=>{
 app.get('/get_telega', (req, res)=>{
     const {name} = req.query;
     const query = `SELECT telegram FROM user WHERE usertoken = ?`;
-    connection.query(query, null, (error, results)=>{
+    connection.query(query, name, (error, results)=>{
         if(error){
             console.error('Ошибка при получении тг', error);
             return res.json({success: false});

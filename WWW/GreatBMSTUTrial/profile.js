@@ -39,6 +39,7 @@ if (idTokenReg || idTokenLog) {
     const email = decodedPayload.email;
     const parts = email.split('@');
     username = parts[0];
+    await open_telega(username);
     nickname.textContent = username;
     nicknamej.textContent = username;
     

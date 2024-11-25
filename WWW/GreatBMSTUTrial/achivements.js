@@ -7,6 +7,7 @@ async function DrawDisplayAch() {
   if(DRAWCHECK){
     return;
   }
+  console.log("рисуем");
   DRAWCHECK = true;
   if(user_id === -10){
     user_id = await getId(nicknameach.textContent);
@@ -15,7 +16,7 @@ async function DrawDisplayAch() {
   }
     TextContainerAch.innerHTML = '';
     const all = await get_all_ach(); //id_ach, url, title, text
-    const all_open = await get_all_ach_open();
+    const all_open = await get_all_ach_open(user_id);
     if (all === -1) {
         TextContainer.innerHTML = '<p>Ошибка при получении записей</p>'; 
         return; 
@@ -51,9 +52,8 @@ async function DrawDisplayAch() {
 }
 async function updateDisplayAch(i) {
   const ach = document.getElementById("entry_"+i);
-  
   if(ach!== null && ach.className!== "entry_container_ach"){
-    
+    console.log("Обновляем")
     ach.className = "entry_container_ach";
     let notification= document.getElementById("notification"+i);
     console.log(notification);
@@ -76,11 +76,12 @@ async function get_all_ach() {
         return -1; 
     }
 }
-async function get_all_ach_open() {
+async function get_all_ach_open(id) {
   try {
-    const response = await fetch(`http://localhost:3000/get_ach_open`);
+    const response = await fetch(`http://localhost:3000/get_ach_open?id=${encodeURIComponent(id)}`);
     if (!response.ok) {
         throw new Error(`Ошибка: ${response.status}`);
+        
     }
     const data = await response.json();
     return data.ach_mas;
