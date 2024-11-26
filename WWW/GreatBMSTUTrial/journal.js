@@ -6,6 +6,7 @@ const namej = document.getElementById('namej');
 let avatar_mas = ["avatars/BAZA.jpeg", "avatars/BEGEMOT85.jpg","avatars/pain.jpg", "avatars/ZVEZDA.png", "avatars/PIVO.png", 
     "avatars/SLON.png", "avatars/OCHKI.jpg", "avatars/KPTCH.jpg"
 ];
+
 async function updateDisplayJ() {
     TextContainer.innerHTML = '';
     PhotoContainer.innerHTML = ''; 
