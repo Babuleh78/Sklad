@@ -1,68 +1,67 @@
-    const express = require('express');
-    const path = require('path');
-    const mysql = require('mysql2'); // Не забудьте подключить mysql2
-    const app = express();
-    const PORT = 3000; 
-    const cors = require('cors');
-    const { error } = require('console');const corsOptions = {
-        origin: ['https://babuflex.ru'], // Разрешенные источники
-        methods: ['GET', 'POST'], // Разрешенные методы
-    };
-    const getDataFromDB = () => {
-        return new Promise((resolve, reject) => {
-            connection.query('SELECT * FROM user', (error, results) => {
-                if (error) {
-                    return reject(error);
-                }
-                resolve(results);
+        const express = require('express');
+        const path = require('path');
+        const request = require('request');
+        const mysql = require('mysql2'); // Не забудьте подключить mysql2
+        const app = express();
+        const PORT = 3000; 
+        const cors = require('cors');
+        const { error } = require('console');const corsOptions = {
+            origin: ['https://babuflex.ru'], // Разрешенные источники
+            methods: ['GET', 'POST'], // Разрешенные методы
+        };
+        
+        const getDataFromDB = () => {
+            return new Promise((resolve, reject) => {
+                connection.query('SELECT * FROM user', (error, results) => {
+                    if (error) {
+                        return reject(error);
+                    }
+                    resolve(results);
+                });
             });
-        });
-    };
-    app.use(cors(corsOptions));
-    app.use(express.json({ limit: '10mb' }));
+        };
+        app.use(cors(corsOptions));
+        app.use(express.json({ limit: '10mb' }));
 
-    const connection = mysql.createConnection({
-        host: '141.8.192.138',
-        user: 'a1057017_babuleh',
-        password: 'LopastiNeGluposti',
-        database: 'a1057017_babuleh'
-    });
-    connection.connect((err) => {
-        if (err) {
-            console.error('Ошибка подключения: ' + err.stack);
-            return;
-        }    connection.query("SHOW GLOBAL VARIABLES LIKE 'PORT';", (error, results) => {
-            if (error) {
-                console.error('Ошибка при выполнении запроса: ' + error.stack);
+        const connection = mysql.createConnection({
+            host: '141.8.192.138',
+            user: 'a1057017_babuleh',
+            password: 'LopastiNeGluposti',
+            database: 'a1057017_babuleh'
+        });
+        
+        connection.connect((err) => {
+            if (err) {
+                console.error('Ошибка подключения: ' + err.stack);
                 return;
             }
         });
-    });
-    //СЧИТЫВАНИЕ ДАННЫХ
-    app.get('/RID', async (req, res) => {
-        console.log('Получен запрос на /RID'); // Добавьте это
-        try {
-            const data = await getDataFromDB(); 
-            res.json(data); 
-        } catch (error) {
-            console.error('Ошибка:', error);
-            res.status(500).json({ error: 'Ошибка при получении данных' });
-        } 
-    });
-    async function fetchData() {
-        try {
-            const response = await fetch(`http://141.8.192.138:${PORT}/RID`); 
-            if (!response.ok) {
-                throw new Error('Сеть ответила с ошибкой: ' + response.status);
-            }
-            
-            const data = await response.json(); 
-            console.log(data);
-        } catch (error) {
-            console.error('Произошла ошибка:', error);
+        
+        //СЧИТЫВАНИЕ ДАННЫХ
+        app.get('/RID', async (req, res) => {
+            console.log('Получен запрос на /RID'); 
+            try {
+                const data = await getDataFromDB(); 
+                res.json(data); 
+            } catch (error) {
+                console.error('Ошибка:', error);
+                res.status(500).json({ error: 'Ошибка при получении данных' });
+            } 
+        });
+        
+        // Измененная функция fetchData с использованием request
+        function fetchData() {
+            request('http://141.8.192.138:3000/RID', { json: true }, (error, response, body) => {
+                if (error) {
+                    return console.error('Произошла ошибка:', error);
+                }
+                if (response.statusCode !== 200) {
+                    return console.error('Сеть ответила с ошибкой: ' + response.statusCode);
+                }
+                console.log(body);
+            });
         }
-    }
-    fetchData(); 
+        
 //ПОЛУЧИТЬ СКОЛЬКО ПОСЕТИЛИ КАЖДОЕ МЕСТО ДЛЯ ЗАГРУЗКИ КАРТЫ
 app.get('/get_visit_count', (req, res) => {
     const { placeId } = req.query;
@@ -540,5 +539,8 @@ app.listen(PORT, () => {
     connection.connect(function(err) {
         if (err) throw err;
         console.log("Подключение к базе данных успешно!");
+        
+        fetchData();
+
     });
 });
