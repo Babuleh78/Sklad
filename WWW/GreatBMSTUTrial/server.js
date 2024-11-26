@@ -9,7 +9,7 @@ const { error } = require('console');
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 const connection = mysql.createConnection({
-    host: 'localhost',
+    host: '109.252.15.235',
     user: 'root',
     password: 'root',
     database: 'project',
