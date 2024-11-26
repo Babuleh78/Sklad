@@ -23,7 +23,7 @@ window.addEventListener("click", function(event) {
 });
 
 async function get_telega(name) {
-    const response = await fetch(`http://localhost:3000/get_telega?name=${encodeURIComponent(name)}`);
+    const response = await fetch(`https://109.252.15.235:3000/get_telega?name=${encodeURIComponent(name)}`);
     if (!response.ok) {
         throw new Error(`Ошибка: ${response.status}`);
     }

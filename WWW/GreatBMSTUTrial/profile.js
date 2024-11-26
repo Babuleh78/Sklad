@@ -48,7 +48,7 @@ if (idTokenReg || idTokenLog) {
         count = await get_hse_count();
         const addUserReg = async (username, count) => {
             try {
-                const response = await fetch('http://localhost:3000/addUserReg', {
+                const response = await fetch('https://109.252.15.235:3000/addUserReg', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -72,7 +72,7 @@ if (idTokenReg || idTokenLog) {
     } 
         async function get_hse_count_for_user(username) {
             try {
-                const response = await fetch(`http://localhost:3000/get_hse_count_for_user?userName=${encodeURIComponent(username)}`);
+                const response = await fetch(`https://109.252.15.235:3000/get_hse_count_for_user?userName=${encodeURIComponent(username)}`);
                 if (!response.ok) {
                     throw new Error(`Ошибка: ${response.status}`);
                 }
@@ -88,7 +88,7 @@ if (idTokenReg || idTokenLog) {
         await get_hse_count_for_user(username); 
         async function get_user_avatar(username) {
             try {
-                const response = await fetch(`http://localhost:3000/GetAvatar?userName=${encodeURIComponent(username)}`);
+                const response = await fetch(`https://109.252.15.235:3000/GetAvatar?userName=${encodeURIComponent(username)}`);
                 if (!response.ok) {
                     throw new Error(`Ошибка: ${response.status}`);
                 }

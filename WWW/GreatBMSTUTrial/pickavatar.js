@@ -49,7 +49,7 @@ av8.onclick = function(){
     fetchfunc(userName, 7);
 }
 fetchfunc = function(userName, picId){
-    fetch('http://localhost:3000/SetAvatar', {
+    fetch('https://109.252.15.235:3000/SetAvatar', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

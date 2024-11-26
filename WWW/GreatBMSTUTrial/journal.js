@@ -39,7 +39,7 @@ async function updateDisplayJ() {
 }
 async function get_all_j() {
     try {
-        const response = await fetch(`http://localhost:3000/getNote`);
+        const response = await fetch(`https://109.252.15.235:3000/getNote`);
         if (!response.ok) {
             throw new Error(`Ошибка: ${response.status}`);
         }
@@ -52,7 +52,7 @@ async function get_all_j() {
 }
 async function check_journal_count() {
     try {
-        const response = await fetch('http://109.252.15.235/check_journal_count', {
+        const response = await fetch('https://109.252.15.235:3000/check_journal_count', {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
