@@ -5,7 +5,7 @@ let visitors = 0;
 let stars_mas = [];
 async function get_stars_count() {
   try{
-    const response = await fetch(`https://109.252.15.235:3000/get_stars_count`);
+    const response = await fetch(`http://localhost:3000/get_stars_count`);
     if(!response.ok){
       throw new Error(`Ошибка: ${response.status}`);
     }
@@ -44,7 +44,7 @@ let balloons = [myballoonTemplate, myballoonTemplate, myballoonTemplate];
 let counthse = -1;
 async function get_hse_count() {
   try {
-    const response = await fetch('https://109.252.15.235:3000/get_hse_count');
+    const response = await fetch('http://localhost:3000/get_hse_count');
     if (!response.ok) {
         throw new Error(`Ошибка Хуяшибка: ${response.status}`);
     }
@@ -71,11 +71,14 @@ const fetchData = async () => {
       if (!response.ok) {
           throw new Error('Сеть ответила с ошибкой: ' + response.status);
       }
-      
-      const data = await response.json(); 
+      const data1 = await response.json();
+      data = data1.data;
+      console.log(count);
+      console.log(data);
       for (let i = 0; i < count; i++) {
+        console.log(data[0]);
         const Element = data[i];
-     
+        console.log(Element);
         const placeinfo = Element.placeinfo;   
         const coor_x = Element.coor_x; 
         const coor_y = Element.coor_y;  
@@ -175,7 +178,7 @@ const fetchData = async () => {
                           
                             async function get_hse_count_for_user(userName) {
                             try {
-                                const response = await fetch(`https://109.252.15.235:3000/get_hse_count_for_user?userName=${encodeURIComponent(userName)}`);
+                                const response = await fetch(`http://localhost:3000/get_hse_count_for_user?userName=${encodeURIComponent(userName)}`);
                                 if (!response.ok) {
                                     throw new Error(`Ошибка: ${response.status}`);
                                 }
@@ -364,7 +367,7 @@ async function get_count_for_ach(userId) {
 
 
 async function set_image(user_name, imageURL, user_id, place_id) {
-  const response = await fetch('https://109.252.15.235:3000/set_image', {
+  const response = await fetch('https://localhost:3000/set_image', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'

@@ -1,14 +1,12 @@
-        const express = require('express');
-        const path = require('path');
-        const mysql = require('mysql2'); // Не забудьте подключить mysql2
-        const app = express();
-        const PORT = 3000; 
-        const cors = require('cors');
-const { error } = require('console');
-        
+const express = require('express');
+const path = require('path');
+const mysql = require('mysql2'); 
+const cors = require('cors'); 
+const app = express();
+const PORT = 3000; 
         const getDataFromDB = () => {
             return new Promise((resolve, reject) => {
-                connection.query('SELECT * FROM user', (error, results) => {
+                connection.query('SELECT * FROM place', (error, results) => {
                     if (error) {
                         return reject(error);
                     }
@@ -16,6 +14,13 @@ const { error } = require('console');
                 });
             });
         };
+        app.use(cors({
+            origin: 'https://babuflexmap.ru', // Разрешаем доступ только с этого домена
+            methods: ['GET', 'POST', 'OPTIONS'], // Разрешаем методы
+            allowedHeaders: ['Content-Type', 'Authorization'] // Разрешаем заголовки
+        }));
+        
+        
         app.use(express.json({ limit: '10mb' }));
         const connection = mysql.createConnection({
             
@@ -37,7 +42,7 @@ const { error } = require('console');
         app.get('/RID', async (req, res) => {
             try {
                 const data = await getDataFromDB(); 
-                res.json(data); 
+                res.json({data});
             } catch (error) {
                 console.error('Ошибка:', error);
                 res.status(500).json({ error: 'Ошибка при получении данных' });
@@ -381,7 +386,7 @@ app.get('/get_stars_count', (req, res)=>{
 //ПРИДЕТСЯ ВСЕ-ТАКИ СДЕЛАТЬ ЭТУ ФУНКЦИЮ. ПОЛУЧИТЬ ID ИЗ ИМЕНИ
 app.get('/get_id_from_name', (req,res)=>{
     const {userName} = req.query;
-    const query = `SELECT iduser from USER WHERE usertoken = ?`;
+    const query = `SELECT iduser FROM user WHERE usertoken = ?`;
     connection.query(query, [userName], (error, results)=>{
         if(error){
             console.error('Ошибка при переводе id в имя', error);
