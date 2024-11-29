@@ -67,7 +67,7 @@ L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}
 
 const fetchData = async () => {
   try {
-      const response = await fetch('https://109.252.15.235:3000/RID'); 
+      const response = await fetch('http://localhost:3000/RID'); 
       if (!response.ok) {
           throw new Error('Сеть ответила с ошибкой: ' + response.status);
       }
@@ -274,7 +274,7 @@ function getStarsHTML(count) {
 
 
 async function addNote(username, placeId) {
-    const response = await fetch('https://109.252.15.235:3000/addNote', {
+    const response = await fetch('http://localhost:3000/addNote', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -287,7 +287,7 @@ async function addNote(username, placeId) {
     return await response.json();
 }
 async function set_ach(uid, id) {
-  const response = await fetch('https://109.252.15.235:3000/set_ach', {
+  const response = await fetch('http://localhost:3000/set_ach', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
@@ -300,7 +300,7 @@ async function set_ach(uid, id) {
   return await response.json();
 }
 async function checkVisit(username, placeId) {
-  const response = await fetch('https://109.252.15.235:3000/check_visit', {
+  const response = await fetch('http://localhost:3000/check_visit', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -315,7 +315,7 @@ async function checkVisit(username, placeId) {
 }
 
 async function visit_on_check(username, placeId) {
-  const response = await fetch('https://109.252.15.235:3000/visit_on_check', {
+  const response = await fetch('http://localhost:3000/visit_on_check', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -328,7 +328,7 @@ async function visit_on_check(username, placeId) {
   return await response.json();
 }
 async function setVisit(username, placeId) {
-  const response = await fetch('https://109.252.15.235:3000/visit', {
+  const response = await fetch('http://localhost:3000/visit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -354,7 +354,7 @@ async function getVisitCount(placeId) {
 }
 
 async function get_count_for_ach(userId) {
-  const response = await fetch(`https://109.252.15.235:3000/get_count_for_ach?id=${encodeURIComponent(userId)}`);
+  const response = await fetch(`http://localhost:3000/get_count_for_ach?id=${encodeURIComponent(userId)}`);
   if (!response.ok) {
       throw new Error(`Ошибка: ${response.status}`);
   }
