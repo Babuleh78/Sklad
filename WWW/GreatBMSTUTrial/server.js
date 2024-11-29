@@ -1,14 +1,9 @@
         const express = require('express');
         const path = require('path');
-        const request = require('request');
         const mysql = require('mysql2'); // Не забудьте подключить mysql2
         const app = express();
         const PORT = 3000; 
         const cors = require('cors');
-        const { error } = require('console');const corsOptions = {
-            origin: ['https://babuflex.ru'], // Разрешенные источники
-            methods: ['GET', 'POST'], // Разрешенные методы
-        };
         
         const getDataFromDB = () => {
             return new Promise((resolve, reject) => {
@@ -20,23 +15,22 @@
                 });
             });
         };
-        app.use(cors(corsOptions));
         app.use(express.json({ limit: '10mb' }));
-
         const connection = mysql.createConnection({
-            host: '141.8.192.138',
-            user: 'a1057017_babuleh',
-            password: 'LopastiNeGluposti',
-            database: 'a1057017_babuleh'
+            
+            host: 'localhost',
+            user: 'u2919365_babuleh',
+            password: 'Em3ZkCwJYvReg185',
+            database: 'u2919365_project',
+            port: 3306
         });
-        
         connection.connect((err) => {
             if (err) {
                 console.error('Ошибка подключения: ' + err.stack);
                 return;
-            }
+            }    
+            
         });
-        
         //СЧИТЫВАНИЕ ДАННЫХ
         app.get('/RID', async (req, res) => {
             console.log('Получен запрос на /RID'); 
@@ -48,20 +42,20 @@
                 res.status(500).json({ error: 'Ошибка при получении данных' });
             } 
         });
-        
-        // Измененная функция fetchData с использованием request
-        function fetchData() {
-            request('http://141.8.192.138:3000/RID', { json: true }, (error, response, body) => {
-                if (error) {
-                    return console.error('Произошла ошибка:', error);
-                }
-                if (response.statusCode !== 200) {
-                    return console.error('Сеть ответила с ошибкой: ' + response.statusCode);
-                }
-                console.log(body);
-            });
-        }
-        
+// async function fetchData() {
+//             try {
+//                 const response = await fetch(`http://141.8.192.138/RID`); 
+//                 if (!response.ok) {
+//                     throw new Error('Сеть ответила с ошибкой: ' + response.status);
+//                 }
+                
+//                 const data = await response.json(); 
+//                 console.log(data);
+//             } catch (error) {
+//                 console.error('Произошла ошибка:', error);
+//             }
+//         }
+// fetchData();
 //ПОЛУЧИТЬ СКОЛЬКО ПОСЕТИЛИ КАЖДОЕ МЕСТО ДЛЯ ЗАГРУЗКИ КАРТЫ
 app.get('/get_visit_count', (req, res) => {
     const { placeId } = req.query;
@@ -535,12 +529,12 @@ app.get('/get_telega', (req, res)=>{
 
 
 app.listen(PORT, () => {
-    console.log(`Сервер запущен`);
+    console.log(`Сервер запущен на порту ${PORT}`);
     connection.connect(function(err) {
-        if (err) throw err;
+        if (err) {
+            console.error("Ошибка подключения к базе данных:", err);
+            return;
+        }
         console.log("Подключение к базе данных успешно!");
-        
-        fetchData();
-
     });
 });
