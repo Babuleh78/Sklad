@@ -4,6 +4,7 @@
         const app = express();
         const PORT = 3000; 
         const cors = require('cors');
+const { error } = require('console');
         
         const getDataFromDB = () => {
             return new Promise((resolve, reject) => {
@@ -18,11 +19,10 @@
         app.use(express.json({ limit: '10mb' }));
         const connection = mysql.createConnection({
             
-            host: 'localhost',
+            host: 'babuflexmap.ru',
             user: 'u2919365_babuleh',
             password: 'Em3ZkCwJYvReg185',
             database: 'u2919365_project',
-            port: 3306
         });
         connection.connect((err) => {
             if (err) {
@@ -31,6 +31,7 @@
             }    
             
         });
+        
         //СЧИТЫВАНИЕ ДАННЫХ
         app.get('/RID', async (req, res) => {
             console.log('Получен запрос на /RID'); 
@@ -42,20 +43,20 @@
                 res.status(500).json({ error: 'Ошибка при получении данных' });
             } 
         });
-// async function fetchData() {
-//             try {
-//                 const response = await fetch(`http://141.8.192.138/RID`); 
-//                 if (!response.ok) {
-//                     throw new Error('Сеть ответила с ошибкой: ' + response.status);
-//                 }
+async function fetchData() {
+            try {
+                const response = await fetch(`http://localhost:3000/RID`); 
+                if (!response.ok) {
+                    throw new Error('Сеть ответила с ошибкой: ' + response.status);
+                }
                 
-//                 const data = await response.json(); 
-//                 console.log(data);
-//             } catch (error) {
-//                 console.error('Произошла ошибка:', error);
-//             }
-//         }
-// fetchData();
+                const data = await response.json(); 
+                console.log(data);
+            } catch (error) {
+                console.error('Произошла ошибка:', error);
+            }
+        }
+fetchData();
 //ПОЛУЧИТЬ СКОЛЬКО ПОСЕТИЛИ КАЖДОЕ МЕСТО ДЛЯ ЗАГРУЗКИ КАРТЫ
 app.get('/get_visit_count', (req, res) => {
     const { placeId } = req.query;
