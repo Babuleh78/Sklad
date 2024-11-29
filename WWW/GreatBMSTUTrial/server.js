@@ -25,13 +25,14 @@ const { error } = require('console');
             database: 'u2919365_project',
         });
         connection.connect((err) => {
+            console.log("Я ЖИВОЙ");
             if (err) {
                 console.error('Ошибка подключения: ' + err.stack);
                 return;
             }    
             
         });
-        
+//ПОЛУЧИТЬ СКОЛ
         //СЧИТЫВАНИЕ ДАННЫХ
         app.get('/RID', async (req, res) => {
             try {
