@@ -1,9 +1,16 @@
 const express = require('express');
+const https = require('https');
+const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2'); 
 const cors = require('cors'); 
+const { cert } = require('firebase-admin/app');
 const app = express();
 const PORT = 3000; 
+const options={
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.crt')
+};
         const getDataFromDB = () => {
             return new Promise((resolve, reject) => {
                 connection.query('SELECT * FROM place', (error, results) => {
@@ -15,7 +22,8 @@ const PORT = 3000;
             });
         };
         app.use(cors({
-            origin: 'https://babuflexmap.ru', // Разрешаем доступ только с этого домена
+            origin: ['https://babuflexmap.ru','http://babuflexmap.ru','https://192.168.1.68:3000', 'http://192.168.1.68:3000'], 
+         
             methods: ['GET', 'POST', 'OPTIONS'], // Разрешаем методы
             allowedHeaders: ['Content-Type', 'Authorization'] // Разрешаем заголовки
         }));
@@ -530,3 +538,6 @@ app.listen(PORT, '0.0.0.0', () => {
         console.log("Подключение к базе данных успешно!");
     });
 });
+// https.createServer(options, app).listen(PORT, ()=>{
+//     console.log("Запустил запустил");
+// })
