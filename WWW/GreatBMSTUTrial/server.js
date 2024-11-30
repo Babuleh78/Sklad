@@ -528,7 +528,7 @@ app.get('/get_telega', (req, res)=>{
 });
 
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Сервер запущен на порту ${PORT}`);
     connection.connect(function(err) {
         if (err) {
