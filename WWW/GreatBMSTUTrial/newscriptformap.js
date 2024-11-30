@@ -5,7 +5,7 @@ let visitors = 0;
 let stars_mas = [];
 async function get_stars_count() {
   try{
-    const response = await fetch(`http://localhost:3000/get_stars_count`);
+    const response = await fetch(`http://192.168.1.68:3000/get_stars_count`);
     if(!response.ok){
       throw new Error(`Ошибка: ${response.status}`);
     }
@@ -44,7 +44,7 @@ let balloons = [myballoonTemplate, myballoonTemplate, myballoonTemplate];
 let counthse = -1;
 async function get_hse_count() {
   try {
-    const response = await fetch('http://localhost:3000/get_hse_count');
+    const response = await fetch('http://192.168.1.68:3000/get_hse_count');
     if (!response.ok) {
         throw new Error(`Ошибка Хуяшибка: ${response.status}`);
     }
@@ -67,7 +67,7 @@ L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}
 
 const fetchData = async () => {
   try {
-      const response = await fetch('http://localhost:3000/RID'); 
+      const response = await fetch('http://192.168.1.68:3000/RID'); 
       if (!response.ok) {
           throw new Error('Сеть ответила с ошибкой: ' + response.status);
       }
@@ -178,7 +178,7 @@ const fetchData = async () => {
                           
                             async function get_hse_count_for_user(userName) {
                             try {
-                                const response = await fetch(`http://localhost:3000/get_hse_count_for_user?userName=${encodeURIComponent(userName)}`);
+                                const response = await fetch(`http://192.168.1.68:3000/get_hse_count_for_user?userName=${encodeURIComponent(userName)}`);
                                 if (!response.ok) {
                                     throw new Error(`Ошибка: ${response.status}`);
                                 }
@@ -277,7 +277,7 @@ function getStarsHTML(count) {
 
 
 async function addNote(username, placeId) {
-    const response = await fetch('http://localhost:3000/addNote', {
+    const response = await fetch('http://192.168.1.68:3000/addNote', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -290,7 +290,7 @@ async function addNote(username, placeId) {
     return await response.json();
 }
 async function set_ach(uid, id) {
-  const response = await fetch('http://localhost:3000/set_ach', {
+  const response = await fetch('http://192.168.1.68:3000/set_ach', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
@@ -303,7 +303,7 @@ async function set_ach(uid, id) {
   return await response.json();
 }
 async function checkVisit(username, placeId) {
-  const response = await fetch('http://localhost:3000/check_visit', {
+  const response = await fetch('http://192.168.1.68:3000/check_visit', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -318,7 +318,7 @@ async function checkVisit(username, placeId) {
 }
 
 async function visit_on_check(username, placeId) {
-  const response = await fetch('http://localhost:3000/visit_on_check', {
+  const response = await fetch('http://192.168.1.68:3000/visit_on_check', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -331,7 +331,7 @@ async function visit_on_check(username, placeId) {
   return await response.json();
 }
 async function setVisit(username, placeId) {
-  const response = await fetch('http://localhost:3000/visit', {
+  const response = await fetch('http://192.168.1.68:3000/visit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -348,7 +348,7 @@ async function setVisit(username, placeId) {
 }
 
 async function getVisitCount(placeId) {
-  const response = await fetch(`http://localhost:3000/get_visit_count?placeId=${encodeURIComponent(placeId)}`);
+  const response = await fetch(`http://192.168.1.68:3000/get_visit_count?placeId=${encodeURIComponent(placeId)}`);
   if (!response.ok) {
       throw new Error(`Ошибка: ${response.status}`);
   }
@@ -357,7 +357,7 @@ async function getVisitCount(placeId) {
 }
 
 async function get_count_for_ach(userId) {
-  const response = await fetch(`http://localhost:3000/get_count_for_ach?id=${encodeURIComponent(userId)}`);
+  const response = await fetch(`http://192.168.1.68:3000/get_count_for_ach?id=${encodeURIComponent(userId)}`);
   if (!response.ok) {
       throw new Error(`Ошибка: ${response.status}`);
   }
@@ -367,7 +367,7 @@ async function get_count_for_ach(userId) {
 
 
 async function set_image(user_name, imageURL, user_id, place_id) {
-  const response = await fetch('https://localhost:3000/set_image', {
+  const response = await fetch('https://192.168.1.68:3000/set_image', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'

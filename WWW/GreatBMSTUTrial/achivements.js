@@ -63,7 +63,7 @@ async function updateDisplayAch(i) {
 }
 async function get_all_ach() {
     try {
-        const response = await fetch(`http://localhost:3000/getAch`);
+        const response = await fetch(`http://192.168.1.68:3000/getAch`);
         if (!response.ok) {
             throw new Error(`Ошибка: ${response.status}`);
         }
@@ -76,7 +76,7 @@ async function get_all_ach() {
 }
 async function get_all_ach_open(id) {
   try {
-    const response = await fetch(`http://localhost:3000/get_ach_open?id=${encodeURIComponent(id)}`);
+    const response = await fetch(`http://192.168.1.68:3000/get_ach_open?id=${encodeURIComponent(id)}`);
     if (!response.ok) {
         throw new Error(`Ошибка: ${response.status}`);
         
@@ -95,7 +95,7 @@ function set_ach_comp(id) {
 
 
 async function getId(userName) {
-  const response = await fetch(`http://localhost:3000/get_id_from_name?userName=${encodeURIComponent(userName)}`);
+  const response = await fetch(`http://192.168.1.68:3000/get_id_from_name?userName=${encodeURIComponent(userName)}`);
   if (!response.ok) {
       throw new Error(`Ошибка: ${response.status}`);
   }
