@@ -1,6 +1,6 @@
 async function get_all_j() {
     try {
-        const response = await fetch(`http://192.168.1.68:3000/getNote`);
+        const response = await fetch(`https://192.168.1.68:3000/getNote`);
         if (!response.ok) {
             throw new Error(`Ошибка: ${response.status}`);
         }
