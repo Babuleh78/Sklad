@@ -7,11 +7,12 @@ const cors = require('cors');
 const { cert } = require('firebase-admin/app');
 const app = express();
 const PORT = 3000; 
+const host = "192.168.1.68";
 const options={
     key: fs.readFileSync('server.key'),
     cert: fs.readFileSync('server.crt')
 };
-        const getDataFromDB = () => {
+        const getDataFromDB = () => {//////////////////
             return new Promise((resolve, reject) => {
                 connection.query('SELECT * FROM place', (error, results) => {
                     if (error) {
@@ -47,7 +48,7 @@ const options={
         });
 //ПОЛУЧИТЬ СКОЛ
         //СЧИТЫВАНИЕ ДАННЫХ
-        app.get('/RID', async (req, res) => {
+        app.get('/RID', async (req, res) => {///////////////////
             try {
                 const data = await getDataFromDB(); 
                 res.json({data});
@@ -57,7 +58,7 @@ const options={
             } 
         });
 //ПОЛУЧИТЬ СКОЛЬКО ПОСЕТИЛИ КАЖДОЕ МЕСТО ДЛЯ ЗАГРУЗКИ КАРТЫ
-app.get('/get_visit_count', (req, res) => {
+app.get('/get_visit_count', (req, res) => {/////////////////////
     const { placeId } = req.query;
     if (!placeId) {
         return res.status(400).json({ success: false, message: 'placeId не указан' });
@@ -77,7 +78,7 @@ app.get('/get_visit_count', (req, res) => {
     });
 });
 //ПРОВЕРИТЬ БЫЛ ЛИ ПОЛЬЗОВАТЕЛЬ
-app.post('/check_visit', (req, res) => {
+app.post('/check_visit', (req, res) => {///////////
     const { username, placeId } = req.body;
 
     const query = 'SELECT iduser FROM user WHERE usertoken = ?'; 
@@ -108,7 +109,7 @@ app.post('/check_visit', (req, res) => {
     });
 });
 //ПОЛУЧИТЬ КОЛИЧЕСТВО ВСЕХ ВЫШЕК
-app.get('/get_hse_count', (req, res) => {
+app.get('/get_hse_count', (req, res) => { //////
     const query1 = 'SELECT COUNT(idplace) AS hse_count FROM place'; 
     connection.query(query1, null, (error, results) => {
         if (error) {
@@ -124,7 +125,7 @@ app.get('/get_hse_count', (req, res) => {
     });
 });
 //ПОСЕТИТЬ КОЛИЧЕСТВО ДЛЯ КОНКРЕТНОГО ПОЛЬЗОВАТЕЛЯ 
-    app.get('/get_hse_count_for_user', (req, res) => {
+    app.get('/get_hse_count_for_user', (req, res) => {//////////////
         const { userName } = req.query;
         
         const query1 = 'SELECT stars AS hse_count_user FROM user WHERE usertoken = ?'; 
@@ -142,7 +143,7 @@ app.get('/get_hse_count', (req, res) => {
         });
     });
 //ПОСЕТИТЬ (КАК ЖЕ ОНО УБОГО НАПИСАНО) уже не убого, жаль, что мне лень все на такие же рельсы переводить ДЛЯ ПОСЕЩЕНИЯ
-app.post('/visit', async (req, res) => {
+app.post('/visit', async (req, res) => {////////
     const { username, placeId } = req.body;
     try {
         const [userResults] = await query('SELECT iduser FROM user WHERE usertoken = ?', [username]);
@@ -179,7 +180,7 @@ app.post('/visit', async (req, res) => {
 });
 
 //МЕСТО НА ПРОВЕРКЕ
-app.post('/visit_on_check', async (req, res) => {
+app.post('/visit_on_check', async (req, res) => {///////
     const { username, placeId } = req.body;
     try {
         const [userResults] = await query('SELECT iduser FROM user WHERE usertoken = ?', [username]);
@@ -211,7 +212,7 @@ function query(sql, params) {
     });
 }
 //ДОБАВИТЬ ПОЛЬЗОВАТЕЛЯ
-app.post('/addUserReg', (req, res) => {
+app.post('/addUserReg', (req, res) => { /////////
     const username = req.body.username;
     const count = req.body.count;
     const checkUserQuery = 'SELECT COUNT(*) AS count FROM user WHERE usertoken = ?';
@@ -270,7 +271,7 @@ app.post('/addUserReg', (req, res) => {
     });
 });
 //ПОЛУЧИТЬ НОМЕР АВЫ
-app.get('/GetAvatar', (req, res)=>{
+app.get('/GetAvatar', (req, res)=>{////
     const {userName} = req.query;
     const query1 = 'SELECT picid FROM user WHERE usertoken = ?';
     connection.query(query1, [userName], (error, results)=>{
@@ -286,7 +287,7 @@ app.get('/GetAvatar', (req, res)=>{
     });
 });
 //ЗАПИСАТЬ НОМЕР АВЫ
-app.post('/SetAvatar', (req, res)=>{
+app.post('/SetAvatar', (req, res)=>{///////////////
     const {userName, picId} = req.body;
     const query1 = 'UPDATE user SET picid = ? WHERE (usertoken = ?);';
     connection.query(query1, [picId, userName], (error, results)=>{
@@ -301,7 +302,7 @@ app.post('/SetAvatar', (req, res)=>{
     });
 });
 //ДОБАВИТЬ ЗАПИСЬ О ПОСЕЩЕНИИ
-app.post('/addNote', async (req, res) => {
+app.post('/addNote', async (req, res) => {/////////
     const { username, placeId } = req.body;
     const query0 = 'SELECT picid FROM user WHERE usertoken = ?';
     try {
@@ -364,7 +365,7 @@ app.post('/check_journal_count', async (req, res) => {
     });
 });
 //ПОЛУЧИТЬ ЗАПИСИ
-app.get('/getNote', (req, res)=>{
+app.get('/getNote', (req, res)=>{ ///////////
     const query1 = 'SELECT * FROM notes';
     connection.query(query1, null, (error, results)=>{
         if (error) {
@@ -377,7 +378,7 @@ app.get('/getNote', (req, res)=>{
     })
 });
 //ПОЛУЧИТЬ КОЛИЧЕСТВО ЗВЕЗД
-app.get('/get_stars_count', (req, res)=>{
+app.get('/get_stars_count', (req, res)=>{//////
     const query1 = 'SELECT stars FROM place';
     connection.query(query1, null, (error, results)=>{
         if (error) {
@@ -392,7 +393,7 @@ app.get('/get_stars_count', (req, res)=>{
 
 });
 //ПРИДЕТСЯ ВСЕ-ТАКИ СДЕЛАТЬ ЭТУ ФУНКЦИЮ. ПОЛУЧИТЬ ID ИЗ ИМЕНИ
-app.get('/get_id_from_name', (req,res)=>{
+app.get('/get_id_from_name', (req,res)=>{ //////
     const {userName} = req.query;
     const query = `SELECT iduser FROM user WHERE usertoken = ?`;
     connection.query(query, [userName], (error, results)=>{
@@ -410,7 +411,7 @@ app.get('/get_id_from_name', (req,res)=>{
 
 //ВСЕ, ЧТО СВЯЗАНО С ПРОВЕРКОЙ ДОСТИЖЕНИЙ
 //ПОЛУЧИТЬ ДОСТИЖЕНИЯ
-app.get('/getAch', (req, res)=>{
+app.get('/getAch', (req, res)=>{ ////////////
     const query1 = 'SELECT * FROM achivements';
     connection.query(query1, null, (error, results)=>{
         if (error) {
@@ -424,7 +425,7 @@ app.get('/getAch', (req, res)=>{
 });
 //ПОЛУЧИТЬ ВСЕ ДОСТИЖЕНИЯ (ОТКРЫТЫ ИЛИ НЕТ)
 
-app.get('/get_ach_open', (req, res)=>{
+app.get('/get_ach_open', (req, res)=>{//////
     const {id} = req.query;
     const query = `SELECT is_open FROM open_ach WHERE user_id = ?`;
     connection.query(query, id, (error, results)=>{
@@ -439,7 +440,7 @@ app.get('/get_ach_open', (req, res)=>{
 
 });
 //ПРОСТАНОВКА АЧИВОК
-app.post('/set_ach', (req, res)=>{
+app.post('/set_ach', (req, res)=>{/////////////
     const {uid, id} = req.body;
     const query = `UPDATE open_ach SET is_open = 1 WHERE (user_id = ?) and (ach_id = ?);`;
     connection.query(query, [uid, id], (error, results)=>{
@@ -454,7 +455,7 @@ app.post('/set_ach', (req, res)=>{
 
 //ПОЛУЧИТЬ КОЛИЧЕСТВО
 
-app.get('/get_count_for_ach', (req, res)=>{
+app.get('/get_count_for_ach', (req, res)=>{/////////
     const {id} = req.query;
     const query = `SELECT SUM(is_visit) AS total_visits FROM visits WHERE user_id = ?`;
     connection.query(query, [id], (error, results)=>{
@@ -473,7 +474,7 @@ app.get('/get_count_for_ach', (req, res)=>{
 
 //ОТПРАВКА ИЗОБРАЖЕНИЙ И МЕЙБИ МОДЕРАЦИЯ?
 
-app.post('/set_image', (req, res)=>{
+app.post('/set_image', (req, res)=>{ //////
     const{user_name, imageURL, user_id, place_id} = req.body;
     const query =`INSERT INTO images (user_name, image64, user_id, place_id) VALUES (?, ?, ?, ?)`;
     const maxSize = 5 * 1024 * 1024; 
@@ -492,7 +493,7 @@ app.post('/set_image', (req, res)=>{
 
 });
 
-app.get('/send_image', (req, res)=>{
+app.get('/send_image', (req, res)=>{///////
     const {name} = req.query;
     const string = f`Пользователь ${name} отправил вам изображение, он прошел проверку?`;
     const query = `SELECT image64 FROM images ORDER BY image_id limit 1`;
@@ -511,7 +512,7 @@ app.get('/send_image', (req, res)=>{
 
 });
 
-app.get('/get_telega', (req, res)=>{
+app.get('/get_telega', (req, res)=>{///////////
     const {name} = req.query;
     const query = `SELECT telegram FROM user WHERE usertoken = ?`;
     connection.query(query, name, (error, results)=>{
@@ -528,7 +529,7 @@ app.get('/get_telega', (req, res)=>{
 });
 
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, host, () => {
     console.log(`Сервер запущен на порту ${PORT}`);
     connection.connect(function(err) {
         if (err) {
