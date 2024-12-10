@@ -20,11 +20,10 @@ async def do_connect():
     global connection
     try:
         connection = pymysql.connect(
-            host="localhost",
-            port=8888,
-            user="root",
-            password="root",
-            database="project",
+            host="babuflexmap.ru",
+            user="u2919365_babuleh",
+            password="Em3ZkCwJYvReg185",
+            database="u2919365_project",
         )
         print("Успешно подключились")
     except Exception as ex:
@@ -74,14 +73,13 @@ async def ach_users(nickname):
 async def get_image():
     try:
         with connection.cursor() as cursor:
-            query = "SELECT* FROM images ORDER BY image_id limit 1"
+            query = "SELECT * FROM images ORDER BY image_id limit 1"
             cursor.execute(query)
-            result = cursor.fetchall()
-            
-            
+            result = cursor.fetchone()
+            print(len(result))
             if not result:
                 return ["Изображение не найдено!"]
-            id, name, url, uid, pid = result[0]
+            id, name, url, uid, pid = result
             data = [name, url, pid]
             return data
     except Exception as e:
@@ -126,7 +124,6 @@ async def bad_photo():
             cursor.execute(query3, (name,))
             tg = cursor.fetchone()
             connection.commit()
-            
             return [f"{name}, это че за хуйня, забыл как каша дома пахнет? ", url, tg]
           
     except Exception as e:
@@ -205,10 +202,12 @@ async def update(message: types.Message):
     global connection  
     if message.from_user.id == ADMIN_ID:
         if connection:
+            
             connection.close()  
             await do_connect()  
         else:
             await do_connect()  
+        await   message.answer("Соединение обновлено!")
          
 @user_router.message(F.text.lower().contains("проверка фотографий"))
 async def moneytalks(message: types.Message):
@@ -216,10 +215,11 @@ async def moneytalks(message: types.Message):
             try:
                 
                 name, base64_str, pid = await get_image()
-
                 str_message = f'Пользователь {name} прислал вам изображение, он хочет ликвидировать место {pid}. Одобряем?'
-                
-                header, base64_data = base64_str.split(',', 1)
+                try:
+                    header, base64_data = base64_str.split(',', 1)
+                except:
+                    base64_data = base64_str
                 decode = base64.b64decode(base64_data)
                 img = Image.open(io.BytesIO(decode))
 
@@ -247,7 +247,7 @@ async def process_callback(callback_query: types.CallbackQuery):
         await bot.answer_callback_query(callback_query.id) 
         res = await good_photo()
         
-        id, name, h, p, tg = res
+        id, name, h, p, tg, p = res
         if not(tg is None):
             await bot.send_message(chat_id=tg, text=f"Поздравляем, {name}! Ликвидация успешна")
         else:
@@ -257,9 +257,11 @@ async def process_callback(callback_query: types.CallbackQuery):
         res = await bad_photo()
         mes = res[0]
         base64_str = res[1]
-        tg = res[2][0]
-        
-        header, base64_data = base64_str.split(',', 1)
+        tg = res[2]
+        try:
+            header, base64_data = base64_str.split(',', 1)
+        except:
+            base64_data = base64_str.split(',', 1)[0]
         decode = base64.b64decode(base64_data)
         img = Image.open(io.BytesIO(decode))
 
