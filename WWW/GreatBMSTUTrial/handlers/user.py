@@ -25,10 +25,20 @@ async def do_connect():
             password="Em3ZkCwJYvReg185",
             database="u2919365_project",
         )
-        print("Успешно подключились")
     except Exception as ex:
         print("Не удалось подключиться", ex)
         connection = None
+
+async def get_all_telega():
+    try:
+        with connection.cursor() as cursor:
+            query = "SELECT telegram FROM user"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+    except Exception as e:
+        print("Ошибка выполнения SQL-запроса:", e)
+        return []
 async def get_top():
     try:
         with connection.cursor() as cursor:
@@ -76,7 +86,8 @@ async def get_image():
             query = "SELECT * FROM images ORDER BY image_id limit 1"
             cursor.execute(query)
             result = cursor.fetchone()
-            print(len(result))
+
+
             if not result:
                 return ["Изображение не найдено!"]
             id, name, url, uid, pid = result
@@ -197,6 +208,14 @@ async def admin_panel(message: types.Message):
         
     else:
         await message.answer("Пасхалко найдено")
+@user_router.message(F.text.lower().contains("попросить милостыни"))
+async def babki(message: types.Message):
+    if message.from_user_id == ADMIN_ID:
+
+        tgshki = await get_all_telega()
+        for i in range(len(tgshki)):
+            await message.answer(chat_id = tgshki[i], text="Братва, чтобы вы могли дальше пользоваться ботом, а я мог нормально кушать, закиньте деревянных на карту")
+
 @user_router.message(F.text.lower().contains("обновить соединение"))
 async def update(message: types.Message):
     global connection  
