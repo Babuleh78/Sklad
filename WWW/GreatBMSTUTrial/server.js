@@ -1,10 +1,6 @@
 const express = require('express');
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
 const mysql = require('mysql2'); 
 const cors = require('cors'); 
-const { cert } = require('firebase-admin/app');
 const app = express();
 const PORT = 3000; 
 const host = "192.168.1.65";

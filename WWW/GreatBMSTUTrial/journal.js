@@ -40,7 +40,7 @@ async function updateDisplayJ() {
 }
 async function get_all_j() {
     try {
-        const response = await fetch(`https://192.168.1.68:3000/getNote`);
+        const response = await fetch(`http://192.168.1.65:3000/getNote`);
         if (!response.ok) {
             throw new Error(`Ошибка: ${response.status}`);
         }
@@ -53,7 +53,7 @@ async function get_all_j() {
 }
 async function check_journal_count() {
     try {
-        const response = await fetch('https://192.168.1.68:3000/check_journal_count', {
+        const response = await fetch('http://192.168.1.65:3000/check_journal_count', {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
