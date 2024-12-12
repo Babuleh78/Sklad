@@ -7,11 +7,7 @@ const cors = require('cors');
 const { cert } = require('firebase-admin/app');
 const app = express();
 const PORT = 3000; 
-const host = "192.168.1.68";
-const options={
-    key: fs.readFileSync('server.key'),
-    cert: fs.readFileSync('server.crt')
-};
+const host = "192.168.1.65";
         const getDataFromDB = () => {//////////////////
             return new Promise((resolve, reject) => {
                 connection.query('SELECT * FROM place', (error, results) => {
@@ -23,16 +19,12 @@ const options={
             });
         };
         app.use(cors({
-            origin: ['https://babuflexmap.ru','http://babuflexmap.ru','https://192.168.1.68:3000', 'http://192.168.1.68:3000'], 
-         
-            methods: ['GET', 'POST', 'OPTIONS'], // Разрешаем методы
-            allowedHeaders: ['Content-Type', 'Authorization'] // Разрешаем заголовки
+            origin: "*",
+            methods: ['GET', 'POST'],
+            allowedHeaders: "*"
         }));
-        
-        
         app.use(express.json({ limit: '10mb' }));
         const connection = mysql.createConnection({
-            
             host: 'babuflexmap.ru',
             user: 'u2919365_babuleh',
             password: 'Em3ZkCwJYvReg185',
@@ -46,6 +38,16 @@ const options={
             }    
             
         });
+app.listen(PORT, host, () => {
+    console.log(`Сервер запущен на порту ${PORT}`);
+    connection.connect(function(err) {
+        if (err) {
+            console.error("Ошибка подключения к базе данных:", err);
+            return;
+        }
+        console.log("Подключение к базе данных успешно!");
+    });
+});
 //ПОЛУЧИТЬ СКОЛ
         //СЧИТЫВАНИЕ ДАННЫХ
         app.get('/RID', async (req, res) => {///////////////////
@@ -529,16 +531,3 @@ app.get('/get_telega', (req, res)=>{///////////
 });
 
 
-app.listen(PORT, host, () => {
-    console.log(`Сервер запущен на порту ${PORT}`);
-    connection.connect(function(err) {
-        if (err) {
-            console.error("Ошибка подключения к базе данных:", err);
-            return;
-        }
-        console.log("Подключение к базе данных успешно!");
-    });
-});
-// https.createServer(options, app).listen(PORT, ()=>{
-//     console.log("Запустил запустил");
-// })
