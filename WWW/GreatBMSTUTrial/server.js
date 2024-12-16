@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const cors = require('cors'); 
 const app = express();
 const PORT = 3000; 
-const host = "192.168.1.65";
+const host = "0.0.0.0";
         const getDataFromDB = () => {//////////////////
             return new Promise((resolve, reject) => {
                 connection.query('SELECT * FROM place', (error, results) => {
@@ -44,6 +44,12 @@ app.listen(PORT, host, () => {
         console.log("Подключение к базе данных успешно!");
     });
 });
+
+
+
+
+
+
 //ПОЛУЧИТЬ СКОЛ
         //СЧИТЫВАНИЕ ДАННЫХ
         app.get('/RID', async (req, res) => {///////////////////
