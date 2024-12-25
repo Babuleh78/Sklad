@@ -9,7 +9,7 @@
       "stopAtEntry": false,
       "externalConsole": true,
       "cwd": "c:/Users/Денис/Desktop/Бауманка/Sklad/Doom",
-      "program": "c:/Users/Денис/Desktop/Бауманка/Sklad/Doom/build/Debug/outDebug",
+      "program": "c:/Users/Денис/Desktop/Бауманка/Sklad/Doom/a.exe",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
@@ -18,7 +18,9 @@
           "text": "-enable-pretty-printing",
           "ignoreFailures": true
         }
-      ]
+        
+      ],
+       "preLaunchTask": "build"
     }
   ]
 }
