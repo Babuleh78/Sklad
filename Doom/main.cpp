@@ -14,7 +14,6 @@ float PlayerA = 0.0f;
 
 int MapHeight = 16;
 int MapWidth = 16;
-
 float Pov = 3.14 / 4.0;
 float Depth = 16.0f;
 int main()
