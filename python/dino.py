@@ -35,8 +35,21 @@ def run_game():
         screen.fill(back)
         screen.blit(road, (0, 600))
 
+   
+
+        dino = Dino(30, 600, "insta", "DinoCo")
+
+        dino.update()
+        dino.draw(screen, font)
+
+        user_input = pygame.key.get_pressed()
+        if user_input[pygame.K_SPACE]:
+            if not dino.state == DinoState.JUMP:
+                dino.jump()
+
         pygame.display.flip()
         clock.tick(0)
+
 class DinoState():
     RUN  = 1
     JUMP = 2
@@ -108,6 +121,17 @@ class Dino():
             c_label_rect = c_label.get_rect()
             c_label_rect.center = (self.hitbox.x + 45, self.hitbox.y - 30)
             scr.blit(c_label, c_label_rect)
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     run_game()
