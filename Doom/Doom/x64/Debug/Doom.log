@@ -1,0 +1,5 @@
+﻿  Doom.cpp
+C:\Users\Денис\Desktop\Бауманка\Sklad\Doom\Doom.cpp(18,11): warning C4305: инициализация: усечение из "double" в "float"
+C:\Users\Денис\Desktop\Бауманка\Sklad\Doom\Doom.cpp(123,47): warning C4305: инициализация: усечение из "double" в "float"
+C:\Users\Денис\Desktop\Бауманка\Sklad\Doom\Doom.cpp(130,29): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+  Doom.vcxproj -> C:\Users\Денис\Desktop\Бауманка\Sklad\Doom\x64\Debug\Doom.exe
