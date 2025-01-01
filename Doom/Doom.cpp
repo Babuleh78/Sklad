@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <chrono>
 #include <vector>
+#include <cmath>
 int ScreenWidth = 120;
 int ScreenHeight = 40;
 
@@ -185,7 +186,7 @@ int main()
 
 
             screen[ScreenWidth * ScreenHeight - 1] = '\0';
-            WriteConsoleOutputCharacter(hConsole, screen, ScreenWidth * ScreenHeight, { 0,0 }, &dwBytesWritten);
+            //WriteConsoleOutputCharacter(hConsole, screen, ScreenWidth * ScreenHeight, { 0,0 }, &dwBytesWritten);
         }
 
 
