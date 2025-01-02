@@ -19,6 +19,14 @@ names = ["Флафи", "Фалафель", "Ведьмак", "Лютик", "Пу
 generation = 0
 
 def run_game():
+    global game_speed, score, enemies, dinosaurs, generation, score_speedup
+
+    generation += 1
+    game_speed = 2.0
+    score = 0
+    score_speedup = 0
+
+
     enemies = [Cactus(width + 300 / random.uniform(0.8, 3), height - 85),
                Cactus(width * 2 + 200 / random.uniform(0.8, 3), height - 85),
                Cactus(width * 3 + 400 / random.uniform(0.8, 3), height - 85)]
@@ -58,16 +66,9 @@ def run_game():
             
         if len(enemies) < 3:
             enemies.append(Cactus(enemies[len(enemies) - 1].hitbox.x + width / random.uniform(0.8, 3), height - 85))
-        score += 0.5 * (game_speed / 4)
-        if score > score_speedup:
-            score_speedup += 100 * (game_speed / 2)
-            game_speed += 1
-            print(f"Game speed increased - {game_speed}")
+        
 
-        score_label = score_font.render("Очки: " + str(math.floor(score)), True, (50, 50, 50))
-        score_label_rect = score_label.get_rect()
-        score_label_rect.center = (width - 100, 50)
-        screen.blit(score_label, score_label_rect)
+        
         # draw enemies
         rem_list = []
         for i, enemy in enumerate(enemies):
@@ -87,7 +88,16 @@ def run_game():
             enemies.pop(i)
 
         
+        score += 0.5 * (game_speed / 4)
+        if score > score_speedup:
+            score_speedup += 100 * (game_speed / 2)
+            game_speed += 0.1
+            print(f"Game speed increased - {game_speed}")
 
+        score_label = font.render("Очки: " + str(math.floor(score)), True, (50, 50, 50))
+        score_label_rect = score_label.get_rect()
+        score_label_rect.center = (width - 100, 50)
+        screen.blit(score_label, score_label_rect)
 
         user_input = pygame.key.get_pressed()
         if user_input[pygame.K_SPACE]:
