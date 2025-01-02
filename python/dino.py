@@ -298,7 +298,6 @@ def run_game(genomes, config):
 
 
 if __name__ == "__main__":
-    # setup config
     config_path = "./config-feedforward.txt"
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
                                 neat.DefaultStagnation, config_path)
