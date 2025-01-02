@@ -34,6 +34,7 @@ def run_game():
     road = pygame.image.load('sprites/road.png')
     font = pygame.font.SysFont("Roboto Condensed", 30)
     dino = Dino(30, 550, "insta", "Шашик")
+    dinosaurs = [dino]
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -51,8 +52,36 @@ def run_game():
             road_chunk[1][0] -= game_speed
             screen.blit(road_chunk[0], (road_chunk[1][0], road_chunk[1][1]))
 
-   
+        if len(enemies) < 3:
+            enemies.append(Cactus(enemies[len(enemies) - 1].hitbox.x + width / random.uniform(0.8, 3), height - 85))
 
+        # draw enemies
+        rem_list = []
+        for i, enemy in enumerate(enemies):
+            enemy.update()
+            enemy.draw(screen)
+
+            if not enemy.is_active:
+                rem_list.append(i)
+                continue
+
+            for j, dinosaur in enumerate(dinosaurs):
+                if dinosaur.hitbox.colliderect(enemy.hitbox):
+                    
+                    dinosaurs.pop(j)
+
+        for i in rem_list:
+            enemies.pop(i)
+
+        for i, dinosaur in enumerate(dinosaurs):
+            output = nets[i].activate((dinosaur.hitbox.y,
+                                       calc_dist((dinosaur.hitbox.x, dinosaur.hitbox.y), enemies[0].hitbox.midtop),
+                                       enemies[0].hitbox.width,
+                                       game_speed))
+
+            if output[0] > 0.5 and dinosaur.state is not DinoState.JUMP:
+                dinosaur.jump()
+                genomes[i][1].fitness -= 1  # every jump lowers the fitness (assuming it's false jump)
 
         dino.update()
         dino.draw(screen, font)
