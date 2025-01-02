@@ -22,7 +22,11 @@ def run_game():
     enemies = [Cactus(width + 300 / random.uniform(0.8, 3), height - 85),
                Cactus(width * 2 + 200 / random.uniform(0.8, 3), height - 85),
                Cactus(width * 3 + 400 / random.uniform(0.8, 3), height - 85)]
-
+    
+    road_chunks = [
+        [pygame.image.load('sprites/road.png'), [0, height - 100]],
+        [pygame.image.load('sprites/road.png'), [2404, height - 100]]
+    ]
 
     pygame.init()
     screen = pygame.display.set_mode((width, height))
@@ -37,7 +41,15 @@ def run_game():
                 sys.exit()
 
         screen.fill(back)
-        screen.blit(road, (0, 600))
+        for road_chunk in road_chunks:
+            if road_chunk[1][0] <= -2400:
+                road_chunk[1][0] = road_chunks[len(road_chunks) - 1][1][0] + 2400
+
+                road_chunks[0], road_chunks[1] = road_chunks[1], road_chunks[0]
+                break
+
+            road_chunk[1][0] -= game_speed
+            screen.blit(road_chunk[0], (road_chunk[1][0], road_chunk[1][1]))
 
    
 
@@ -74,7 +86,6 @@ class Dino():
         self.color = color
         self.load_sprites()
         self.hitbox = pygame.Rect(x, y, self.sprites["run"][0].get_width(), self.sprites["run"][0].get_height())
-        print(self.sprites["run"][0].get_width())
         self.image = self.sprites["run"][0]
 
         if name is not None:
@@ -103,19 +114,15 @@ class Dino():
         if self.run_animation_index[0] >= self.run_animation_index[1] * 2:
             self.run_animation_index[0] = 0
 
-    def jump(self):
+    def jump(self): 
         if self.state == DinoState.JUMP:
             self.hitbox.y -= self.cur_jump_power * (2 * (game_speed / 8))
             self.cur_jump_power -= 0.5 * (game_speed / 8)
 
-            if self.cur_jump_power <= -self.jump_power:
-               self.hitbox.y -= self.cur_jump_power * (2 * (game_speed / 8))
-               self.state = DinoState.RUN
-               self.cur_jump_power = self.jump_power
-            # if self.hitbox.y >= height - 170:
-            #     self.hitbox.y = height - 170
-            #     self.state = DinoState.RUN
-            #     self.cur_jump_power = self.jump_power
+            if self.hitbox.y >= height - 170:
+                self.hitbox.y = height - 170
+                self.state = DinoState.RUN
+                self.cur_jump_power = self.jump_power
         else:
             self.state = DinoState.JUMP
             self.image = pygame.image.load(f"sprites/dino/{self.color}_jump.png")
