@@ -75,10 +75,6 @@ class Dino:
             self.hitbox.y -= self.cur_jump_power * (2 * (game_speed / 8))
             self.cur_jump_power -= 0.5 * (game_speed / 8)
 
-            # if self.cur_jump_power <= -self.jump_power:
-            #    self.hitbox.y -= self.cur_jump_power * (2 * (game_speed / 8))
-            #    self.state = DinoState.RUN
-            #    self.cur_jump_power = self.jump_power
             if self.hitbox.y >= height - 170:
                 self.hitbox.y = height - 170
                 self.state = DinoState.RUN
@@ -184,7 +180,6 @@ def run_game(genomes, config):
     dname_font = pygame.font.SysFont("Roboto Condensed", 30)
     heading_font = pygame.font.SysFont("Roboto Condensed", 70)
 
-    # dinosaurs = [Dino(30, height-170, "subaru", "Howdy")]
 
     # the loop
     while True:
@@ -243,7 +238,6 @@ def run_game(genomes, config):
                 genomes[j][1].fitness += 5  # raise fitness (+5 for every enemy)
 
 
-        # controls
         for i, dinosaur in enumerate(dinosaurs):
             output = nets[i].activate((dinosaur.hitbox.y,
                                        calc_dist((dinosaur.hitbox.x, dinosaur.hitbox.y), enemies[0].hitbox.midtop),
@@ -252,16 +246,7 @@ def run_game(genomes, config):
 
             if output[0] > 0.5 and dinosaur.state is not DinoState.JUMP:
                 dinosaur.jump()
-                genomes[i][1].fitness -= 1  # every jump lowers the fitness (assuming it's false jump)
-
-        # read user input (jump test)
-        # user_input = pygame.key.get_pressed()
-        # if user_input[pygame.K_SPACE]:
-        #     for dino in dinosaurs:
-        #         if not dino.state == DinoState.JUMP:
-        #             dino.jump()
-
-        # score & game speed
+                genomes[i][1].fitness -= 1  
         score += 0.5 * (game_speed / 4)
         if score > score_speedup:
             score_speedup += 100 * (game_speed / 2)
