@@ -36,6 +36,7 @@ def run_game():
     dino = Dino(30, 550, "insta", "Шашик")
     dinosaurs = [dino]
     while True:
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -51,10 +52,22 @@ def run_game():
 
             road_chunk[1][0] -= game_speed
             screen.blit(road_chunk[0], (road_chunk[1][0], road_chunk[1][1]))
-
+        for dino in dinosaurs:
+            dino.update()
+            dino.draw(screen, font)
+            
         if len(enemies) < 3:
             enemies.append(Cactus(enemies[len(enemies) - 1].hitbox.x + width / random.uniform(0.8, 3), height - 85))
+        score += 0.5 * (game_speed / 4)
+        if score > score_speedup:
+            score_speedup += 100 * (game_speed / 2)
+            game_speed += 1
+            print(f"Game speed increased - {game_speed}")
 
+        score_label = score_font.render("Очки: " + str(math.floor(score)), True, (50, 50, 50))
+        score_label_rect = score_label.get_rect()
+        score_label_rect.center = (width - 100, 50)
+        screen.blit(score_label, score_label_rect)
         # draw enemies
         rem_list = []
         for i, enemy in enumerate(enemies):
@@ -67,24 +80,14 @@ def run_game():
 
             for j, dinosaur in enumerate(dinosaurs):
                 if dinosaur.hitbox.colliderect(enemy.hitbox):
-                    
+                    print("есть")
                     dinosaurs.pop(j)
 
         for i in rem_list:
             enemies.pop(i)
 
-        for i, dinosaur in enumerate(dinosaurs):
-            output = nets[i].activate((dinosaur.hitbox.y,
-                                       calc_dist((dinosaur.hitbox.x, dinosaur.hitbox.y), enemies[0].hitbox.midtop),
-                                       enemies[0].hitbox.width,
-                                       game_speed))
+        
 
-            if output[0] > 0.5 and dinosaur.state is not DinoState.JUMP:
-                dinosaur.jump()
-                genomes[i][1].fitness -= 1  # every jump lowers the fitness (assuming it's false jump)
-
-        dino.update()
-        dino.draw(screen, font)
 
         user_input = pygame.key.get_pressed()
         if user_input[pygame.K_SPACE]:
