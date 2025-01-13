@@ -22,7 +22,6 @@ public:
         return numbers.top();
     }
 
-
     bool isNum(string token){
         if (token.empty()) return false;
         int start = (token[0] == '-' && token.size() > 1) ? 1 : 0; 
