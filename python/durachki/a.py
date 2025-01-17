@@ -1,15 +1,12 @@
-def decrypt_message(encrypted_text):
-    decrypted_message = ""
-    for char in encrypted_text:
-        if char.isalpha():
-            if char.islower():  
-                decrypted_message += chr(ord('z') - (ord(char) - ord('a')))
-            elif char.isupper(): 
-                decrypted_message += chr(ord('Z') - (ord(char) - ord('A')))
-        else:
-            decrypted_message += char  
-
-    return decrypted_message
-
-encrypted_text = "r olev zorxv"
-print(decrypt_message(encrypted_text))
+def davinci():
+    input_data = input()
+    paintings = input_data.split(", ")
+    affordable_paintings = []
+    for painting in paintings:
+        name, price = painting.split(" - ")
+        price = int(price)
+        if price % 500 == 0:
+            affordable_paintings.append(name)
+    affordable_paintings.sort()
+    print(", ".join(affordable_paintings))
+davinci()
