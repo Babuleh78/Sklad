@@ -1,20 +1,15 @@
-def to_str(dic):
-    vals = sorted(map(int, set(dic.values())))
-    res = ''.join(dic.keys()).upper() + ''.join(vals)
-    return res
-
-def to_lst(data):
-    res1 = data[0] + str(data[1])
-    res1 = res1.replace(' ', '')
-    
-    res2 = {}
-    for var in res1:
-        if var in res2:
-            res2[var] += 1
+def decrypt_message(encrypted_text):
+    decrypted_message = ""
+    for char in encrypted_text:
+        if char.isalpha():
+            if char.islower():  
+                decrypted_message += chr(ord('z') - (ord(char) - ord('a')))
+            elif char.isupper(): 
+                decrypted_message += chr(ord('Z') - (ord(char) - ord('A')))
         else:
-            res2[var] = 1
-    
-    return to_str(res2)
+            decrypted_message += char  
 
-data = ('United States of America', 92)
-print(to_lst(data))
+    return decrypted_message
+
+encrypted_text = "r olev zorxv"
+print(decrypt_message(encrypted_text))
