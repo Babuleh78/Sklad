@@ -60,3 +60,34 @@ public:
         return Dummy;
     }
 };
+
+
+
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* dummyHead = new ListNode(0); // Создаем "пустую" голову для результирующего списка
+        ListNode* current = dummyHead; // Указатель на текущий узел
+        int carry = 0; // Перенос
+
+        while (l1 != nullptr || l2 != nullptr || carry != 0) {
+            int sum = carry; // Начинаем с переноса
+
+            if (l1 != nullptr) {
+                sum += l1->val; // Добавляем значение из первого списка
+                l1 = l1->next; // Переходим к следующему узлу
+            }
+
+            if (l2 != nullptr) {
+                sum += l2->val; // Добавляем значение из второго списка
+                l2 = l2->next; // Переходим к следующему узлу
+            }
+
+            carry = sum / 10; // Вычисляем новый перенос
+            current->next = new ListNode(sum % 10); // Создаем новый узел с остатком
+            current = current->next; // Переходим к следующему узлу
+        }
+
+        return dummyHead->next; // Возвращаем следующий узел после "пустой" головы
+    }
+};
