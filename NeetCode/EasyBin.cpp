@@ -28,3 +28,18 @@ public:
         Helper(node->right);
     }
 };
+
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if(!root) return 0;
+        return Helper(root, 0);
+    }
+    int Helper(TreeNode* node, int n){
+        if(node == nullptr) return 0;
+        
+        int l = Helper(node->left, n);
+        int r = Helper(node->right, n);
+        return max(l, r)+1;
+    }
+};
