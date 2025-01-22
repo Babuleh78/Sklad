@@ -43,3 +43,21 @@ public:
         return max(l, r)+1;
     }
 };
+
+class Solution {
+public:
+    int diameterOfBinaryTree(TreeNode* root) {
+        int res = 0;
+        helper(root, res);
+        return res;
+    }
+
+    int helper(TreeNode* node, int& res){
+        if(!node) return 0;
+        int left = helper(node->left, res);
+        int right = helper(node->right, res);
+        res = max(res, left+right);
+        return 1+max(left, right);
+    }
+};
+
