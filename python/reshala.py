@@ -22,6 +22,10 @@ class DrawingApp:
         self.canvas = tk.Canvas(master, bg="white", width=self.canvas_size, height=self.canvas_size)
         self.canvas.pack(padx=10, pady=10)
 
+        
+        self.predict = tk.Label(master=master, text="Введи число!", padx=10, pady=10)
+        self.predict.pack()
+
         self.image = Image.new("L", (self.canvas_size, self.canvas_size), 255)  # Создаем белое изображение
         self.draw = ImageDraw.Draw(self.image)
 
@@ -32,7 +36,7 @@ class DrawingApp:
 
         self.clean_button = tk.Button(master, text="Очистить", command=self.clean_canvas)
         self.clean_button.pack(pady = 5)
-        self.convert_button = tk.Button(master, text="Преобразовать в матрицу", command=self.convert_to_matrix)
+        self.convert_button = tk.Button(master, text="Что введено", command=self.convert_to_matrix)
         self.convert_button.pack(pady=5)
 
     def clean_canvas(self):
@@ -61,15 +65,8 @@ class DrawingApp:
         norm_data = 1 - (data / 255.0)
         x = np.expand_dims(norm_data, axis=0)
         res = model.predict(x)
-        print(np.argmax(res))
-        
-        plt.imshow(norm_data, cmap=plt.cm.binary)
-        plt.show()
-        # Предсказание
-        res = self.model.predict(norm_data)
         predicted_class = np.argmax(res)
-
-        print(f"Предсказанная цифра: {predicted_class}")
+        self.predict.config(text = f"Кажется, ты ввел {predicted_class}")
 
 if __name__ == "__main__":
     root = tk.Tk()
