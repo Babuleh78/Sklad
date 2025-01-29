@@ -14,7 +14,7 @@ class DrawingApp:
     def __init__(self, master, model):  
         self.master = master
         self.model = model  
-        master.title("Рисовалка")
+        master.title("Угадываение цифры")
 
         master.geometry("400x400")
 
@@ -26,7 +26,7 @@ class DrawingApp:
         self.predict = tk.Label(master=master, text="Введи число!", padx=10, pady=10)
         self.predict.pack()
 
-        self.image = Image.new("L", (self.canvas_size, self.canvas_size), 255)  # Создаем белое изображение
+        self.image = Image.new("L", (self.canvas_size, self.canvas_size), 255)  
         self.draw = ImageDraw.Draw(self.image)
 
         self.last_x, self.last_y = None, None
@@ -88,8 +88,8 @@ if __name__ == "__main__":
     model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     # Обучение модели
-    model.fit(x_train, y_train_category, batch_size=32, epochs=3, validation_split=0.2)
+    model.fit(x_train, y_train_category, batch_size=25, epochs=5, validation_split=0.2)
 
     
-    app = DrawingApp(root, model)  # Передаем модель в приложение
+    app = DrawingApp(root, model)  
     root.mainloop()
