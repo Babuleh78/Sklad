@@ -13,7 +13,7 @@ import tkinter as tk
 class DrawingApp:
     def __init__(self, master, model):  
         self.master = master
-        self.model = model  ь
+        self.model = model  
         master.title("Рисовалка")
 
         master.geometry("400x400")
@@ -37,15 +37,17 @@ class DrawingApp:
 
     def clean_canvas(self):
         self.canvas.delete("all")
+        self.image = Image.new("L", (self.canvas_size, self.canvas_size), 255)  
+        self.draw = ImageDraw.Draw(self.image)  
     def start_draw(self, event):
         self.last_x, self.last_y = event.x, event.y
 
     def draw_line(self, event):
         if self.last_x is not None and self.last_y is not None:
             
-            self.canvas.create_line(self.last_x, self.last_y, event.x, event.y, fill="black", width=2)
+            self.canvas.create_line(self.last_x, self.last_y, event.x, event.y, fill="black", width=5)
             
-            self.draw.line([self.last_x, self.last_y, event.x, event.y], fill=0, width=2)
+            self.draw.line([self.last_x, self.last_y, event.x, event.y], fill=0, width=5)
         self.last_x, self.last_y = event.x, event.y
 
     def reset(self, event):
@@ -57,8 +59,12 @@ class DrawingApp:
 
   
         norm_data = 1 - (data / 255.0)
-        norm_data = np.expand_dims(norm_data, axis=(0, -1))  
-
+        x = np.expand_dims(norm_data, axis=0)
+        res = model.predict(x)
+        print(np.argmax(res))
+        
+        plt.imshow(norm_data, cmap=plt.cm.binary)
+        plt.show()
         # Предсказание
         res = self.model.predict(norm_data)
         predicted_class = np.argmax(res)
@@ -88,6 +94,5 @@ if __name__ == "__main__":
     model.fit(x_train, y_train_category, batch_size=32, epochs=3, validation_split=0.2)
 
     
-
     app = DrawingApp(root, model)  # Передаем модель в приложение
     root.mainloop()
