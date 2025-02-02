@@ -1,51 +1,49 @@
 #include <iostream>
 #include <vector>
-#include <queue>
+#include <unordered_map>
 
 using namespace std;
 
 int main() {
-    int N, B;
-    cin >> N >> B;
-
-    vector<int> A(N);
-    for (int i = 0; i < N; i++) {
-        cin >> A[i];
-    }
-
-    int count = 0;
-
-    for (int start = 0; start < N; start++) {
-        priority_queue<int> max_heap; // Для меньшей половины
-        priority_queue<int, vector<int>, greater<int>> min_heap; // Для большей половины
-
-        for (int end = start; end < N; end++) {
-            if (max_heap.empty() || A[end] <= max_heap.top()) {
-                max_heap.push(A[end]);
-            }
-            else {
-                min_heap.push(A[end]);
-            }
-
-            if (max_heap.size() > min_heap.size() + 1) {
-                min_heap.push(max_heap.top());
-                max_heap.pop();
-            }
-            else if (min_heap.size() > max_heap.size()) {
-                max_heap.push(min_heap.top());
-                min_heap.pop();
-            }
-
-            // Проверяем только подотрезки нечетной длины
-            if ((end - start + 1) % 2 == 1) {
-                if (max_heap.top() == B) {
-                    count++;
-                }
-            }
+    int n, b;
+    cin >> n >> b;
+    vector<int> a(n);
+    int B_iter = -1;
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        if (a[i] == b) {
+            B_iter = i; //Последнее вхождение B
         }
     }
 
-    cout << count << endl;
+    unordered_map<int, int> Left_B; //разница между количеством элементов больше и меньше В
+    int bal = 0;
+    Left_B[bal] = 1; 
+    //Лево В
+    for (int i = B_iter - 1; i >= 0; i--) {
+        if (a[i] > b) {
+            bal++;
+        }
+        else if (a[i] < b) {
+            bal--;
+        }
+        Left_B[bal]++;
+    }
+
+    bal = 0;
+    int result = 0;
+    //Право В
+    for (int i = B_iter; i < n; i++) {
+        if (a[i] > b) {
+            bal++;
+        }
+        else if (a[i] < b) {
+            bal--;
+        }
+        result += Left_B[-bal]; 
+    }
+
+    cout << result << endl;
 
     return 0;
 }
