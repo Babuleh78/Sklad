@@ -1,51 +1,60 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <algorithm>
+
 using namespace std;
 
 int main() {
-    int R, C;
-    cin >> R >> C;
+    int r, c;
+    cin >> r >> c;
+    cin.ignore();
 
-    vector<string> words;
-    for (int i = 0; i < R; i++) {
-        string word;
-        cin >> word;
-        words.push_back(word);
+    vector<string> crossword(r);
+    for (int i = 0; i < r; ++i) {
+        getline(cin, crossword[i]);
     }
 
-    string min_word = "";
+    vector<string> allWords;
+    for (int i = 0; i < r; ++i) {
+        stringstream ss(crossword[i]);
+        string word;
 
-    for (const auto& word : words) {
-        if (word.length() >= 2 && word.find('#') == string::npos) {
-            if (min_word.empty() || word < min_word) {
-                min_word = word;
+        while (getline(ss, word, '#')) {
+            if (word.length() >= 2) {
+                allWords.push_back(word);
             }
         }
     }
 
-    for (int col = 0; col < C; ++col) {
-        string vertical_word;
-        for (int row = 0; row < R; ++row) {
-            if (words[row][col] == '#') {
-                if (vertical_word.length() >= 2 && min_word.empty() || vertical_word < min_word) {
-                    min_word = vertical_word;
+    for (int j = 0; j < c; ++j) {
+        string colWord;
+        for (int i = 0; i < r; ++i) {
+            char ch = crossword[i][j];
+
+            if (ch == '#') {
+                if (colWord.length() >= 2) {
+                    allWords.push_back(colWord);
                 }
-                vertical_word.clear(); 
+                colWord.clear();
             }
             else {
-                vertical_word += words[row][col];
+                colWord += ch;
             }
         }
-        if (vertical_word.length() >= 2 && vertical_word.find('#') == string::npos) {
-            if (min_word.empty() || vertical_word < min_word) {
-                min_word = vertical_word;
-            }
+
+        if (colWord.length() >= 2) {
+            allWords.push_back(colWord);
         }
     }
 
-    cout << min_word << endl;
+    sort(allWords.begin(), allWords.end());
+
+
+
+    cout << allWords[0] << endl;
+
 
     return 0;
 }
