@@ -17,7 +17,7 @@ int main() {
 
     // Проверка горизонтальных слов
     for (const auto& word : words) {
-        if (word.length() >= 2 && word.find('#') == std::string::npos) {
+        if (word.length() >= 2 && word.find('#') == string::npos) {
             if (min_word.empty() || word < min_word) {
                 min_word = word;
             }
@@ -30,7 +30,7 @@ int main() {
         for (int row = 0; row < R; ++row) {
             vertical_word += words[row][col];
         }
-        if (vertical_word.length() >= 2 && vertical_word.find('#') == std::string::npos) {
+        if (vertical_word.length() >= 2 && vertical_word.find('#') == string::npos) {
             if (min_word.empty() || vertical_word < min_word) {
                 min_word = vertical_word;
             }
