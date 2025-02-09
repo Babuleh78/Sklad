@@ -1,31 +1,35 @@
 #include <iostream>
-#include <string>
 #include <vector>
+#include <algorithm> // для std::sort
 using namespace std;
 
 int main() 
 {
-	int T;
-	cin >> T;
-	while(T>0){
-		int n;
-		cin >> n;
-		vector<int> vec(n);
-		for(int i = 0; i<n; i++){
-			cin>>vec[i];
-		}
-		int minimum = 100000;
-		for(int i = 0; i<n; i++){
-			for(int j = i+1; j<n; j++){
-				minimum = min(minimum, vec[i]^vec[j]);
-			}
-		}
+    int T;
+    cin >> T;
+    
+    while (T > 0) {
+        int n;
+        cin >> n;
+        vector<int> vec(n);
+        
+        for (int i = 0; i < n; i++) {
+            cin >> vec[i];
+        }
 
-		cout << minimum;
+        // Сначала сортируем массив
+        sort(vec.begin(), vec.end());
 
-		T--;
+        int minimum = 2147483647; 
 
-	}
+        for (int i = 0; i < n - 1; i++) {
+            minimum = min(minimum, vec[i] ^ vec[i + 1]);
+        }
 
-	return 0;
+        cout << minimum << endl;
+
+        T--;
+    }
+
+    return 0;
 }
