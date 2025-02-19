@@ -49,9 +49,9 @@ for i in range(HEIGHT_CUT):
             blue_sum += b
 
         num_pixels = len(pixels)
-        average_red = red_sum // num_pixels
-        average_green = green_sum // num_pixels
-        average_blue = blue_sum // num_pixels
+        average_red = red_sum 
+        average_green = green_sum 
+        average_blue = blue_sum 
 
         p = Pixel(average_red, average_green, average_blue)
         all_data.append(p.to_dict())  
