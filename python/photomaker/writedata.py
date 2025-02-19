@@ -9,14 +9,16 @@ class Pixel:
 
     def to_dict(self):
         return {'r': self.r, 'g': self.g, 'b': self.b}
+    def __str__(self):
+        return f"Pixel({self.r}, {self.g}, {self.b})"
 
 all_data = []
 image = Image.open("main_photo.jpg")
 
 width, height = image.size
 
-WIDTH_CUT  = 4
-HEIGHT_CUT = 4
+WIDTH_CUT  = 32
+HEIGHT_CUT = 32
 small_width = width // WIDTH_CUT
 small_height = height // HEIGHT_CUT
 
@@ -47,12 +49,12 @@ for i in range(HEIGHT_CUT):
             blue_sum += b
 
         num_pixels = len(pixels)
-        average_red = red_sum // num_pixels
-        average_green = green_sum // num_pixels
-        average_blue = blue_sum // num_pixels
-
-        p = Pixel(average_red, average_green, average_blue)
-        all_data.append(p.to_dict())  
+        average_red = red_sum 
+        average_green = green_sum 
+        average_blue = blue_sum 
+        sum = average_red+average_blue+average_green
+        
+        all_data.append(red_sum)
 
 
 with open('data.json', 'w') as f:
