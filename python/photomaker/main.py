@@ -4,51 +4,40 @@ from readdata import get_data
 
 import sys
 our_data = get_data()
-print(len(our_data))
-def find_closest(number):
-    global our_data 
-    closest = our_data[0]  
-    closest_num = 0
-    min_diff = abs(number - closest)  
 
+def find_closest(r, g, b):
+    global our_data 
+    global images
+    min_diff = abs(our_data[0][0] - r)+abs(our_data[0][1] - g)+abs(our_data[0][2] - b)
     for i in range(len(our_data)):
         value = our_data[i]
-        diff = abs(number - value)  
+        diff = abs(value[0] - r)+abs(value[1] - g)+abs(value[2] - b)
         if diff < min_diff:  
             min_diff = diff 
             closest_num = i
-
     return closest_num
 
-def choose_one(a, b, c):
-
+def choose_one(a, b, c):#r ,g , b
+    global our_data
     ab = abs(a - b)
     ac = abs(a - c)
     bc = abs(b - c)
 
     if ab <= ac and ab <= bc:
+    
         return min(a, b)  
     elif ac <= ab and ac <= bc:
+        
         return min(a, c)  
     else:
+        
         return min(b, c)  
     
 
 
 root = tk.Tk()
 root.title("Трепещи перри утконос")
-root.geometry("1400x1000")
-
-images = []
-for i in range(32):
-    image = Image.open(f"albums/{i+1}.jpg")
-    image = image.resize((32, 32))
-    
-    tk_image = ImageTk.PhotoImage(image) 
-
-    images.append(tk_image)
-     
-  
+root.geometry("1100x1100")
 
 user_image_path = 'user_photo.jpg'
 user_image = Image.open(user_image_path) # то, что скинул пользователь
@@ -59,8 +48,19 @@ WIDTH_CUT  = 32
 HEIGHT_CUT = 32
 SMALL_WIDTH = width // WIDTH_CUT
 SMALL_HEIGHT = height // HEIGHT_CUT
-#NUMPIXELS = len(user_image)//WIDTH_CUT//HEIGHT_CUT
-small_images = []
+
+images = []
+
+for i in range(128):
+    image = Image.open(f"albums/{i+1}.jpg")
+    image = image.resize((SMALL_WIDTH, SMALL_HEIGHT))
+    
+    tk_image = ImageTk.PhotoImage(image) 
+
+    images.append(tk_image)
+     
+  
+
 
 # if(WIDTH_CUT*HEIGHT_CUT!=len(our_data)):
 #     print("Ошибка с данным")
@@ -92,23 +92,18 @@ for i in range(HEIGHT_CUT):
         
         sum = red_sum+blue_sum+green_sum
         
-        closest_number_r = find_closest(red_sum)
-        closest_number_b = find_closest(blue_sum)
-        closest_number_g = find_closest(green_sum)
-        #print(closest_number_r, red_sum)
-        #our_elephant = choose_one(closest_number_r, closest_number_g, closest_number_b)
+     
+
+        closest = find_closest(r, g, b)
         
-        closest_numbers.append(closest_number_r)
 
+        closest_numbers.append(closest)
 
-print(len(closest_numbers))
-print("Изо", len(images))
 for i in range(HEIGHT_CUT):
     for j in range(WIDTH_CUT):
-        index = i * WIDTH_CUT + j  # Вычисляем индекс для closest_numbers
-        if index < len(closest_numbers):  # Проверяем, что индекс не выходит за пределы
-            print(index)
+        index = i * WIDTH_CUT + j  
+        if index < len(closest_numbers):  
             tk_image_small = images[closest_numbers[index]]
-            label = tk.Label(root, image=tk_image_small)  
-            label.place(x=j * SMALL_WIDTH, y=i * SMALL_HEIGHT) 
+            label = tk.Label(root, image=tk_image_small, bd=0, highlightthickness=0)  
+            label.place(x=j * SMALL_WIDTH, y=i * SMALL_HEIGHT)
 root.mainloop()
