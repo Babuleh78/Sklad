@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageTk
 import json
 
 class Pixel:
@@ -13,50 +13,35 @@ class Pixel:
         return f"Pixel({self.r}, {self.g}, {self.b})"
 
 all_data = []
+
 image = Image.open("main_photo.jpg")
 
 width, height = image.size
 
 WIDTH_CUT  = 32
 HEIGHT_CUT = 32
-small_width = width // WIDTH_CUT
-small_height = height // HEIGHT_CUT
+for i in range(128):
+    image = Image.open(f"albums/{i+1}.jpg")
+    image = image.resize((32, 32))
+    red_sum = 0
+    green_sum = 0
+    blue_sum = 0
 
-red_sum = 0
-green_sum = 0
-blue_sum = 0
+    pixels = list(image.getdata())
 
-
-
-for i in range(HEIGHT_CUT): 
-    for j in range(WIDTH_CUT):  
-        left = j * small_width
-        upper = i * small_height
-        right = left + small_width
-        lower = upper + small_height
-        
-        small_image = image.crop((left, upper, right, lower))
-        
-        red_sum = 0
-        green_sum = 0
-        blue_sum = 0
-
-        pixels = list(small_image.getdata())
-
-        for r, g, b in pixels:
+    for r, g, b in pixels:
             red_sum += r
             green_sum += g
             blue_sum += b
 
-        num_pixels = len(pixels)
-        average_red = red_sum 
-        average_green = green_sum 
-        average_blue = blue_sum 
-        sum = average_red+average_blue+average_green
+    num_pixels = len(pixels)
+    average_red = red_sum 
+    average_green = green_sum 
+    average_blue = blue_sum 
+    sum = average_red+average_blue+average_green
         
-        all_data.append(red_sum)
-
-
+    all_data.append(red_sum)
+  
 with open('data.json', 'w') as f:
     json.dump(all_data, f)
 
