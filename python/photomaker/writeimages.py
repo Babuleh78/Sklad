@@ -26,9 +26,9 @@ def make_some_fun(num):
     for i in range(2):
         rand = random.randint(0, 1)
         if rand == 1:
-            our_data[num][i] += 5
+            our_data[num][i] += 3
         else:
-            our_data[num][i] -= 5
+            our_data[num][i] -= 3
 
 
 
