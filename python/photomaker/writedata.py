@@ -18,9 +18,7 @@ image = Image.open("main_photo.jpg")
 
 width, height = image.size
 
-WIDTH_CUT  = 32
-HEIGHT_CUT = 32
-for i in range(128):
+for i in range(170):
     image = Image.open(f"albums/{i+1}.jpg")
     image = image.resize((32, 32))
     red_sum = 0
@@ -33,16 +31,9 @@ for i in range(128):
             red_sum += r
             green_sum += g
             blue_sum += b
+    denum = len(pixels)
 
-    num_pixels = len(pixels)
-    average_red = red_sum 
-    average_green = green_sum 
-    average_blue = blue_sum 
-    sum = average_red+average_blue+average_green
-        
-    all_data.append(red_sum)
+    all_data.append((red_sum//denum, green_sum//denum, blue_sum//denum))
   
-with open('data.json', 'w') as f:
-    json.dump(all_data, f)
 
 print("Конец")
