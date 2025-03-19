@@ -14,45 +14,45 @@ struct Visitor {
 
 
 bool operator<(const Visitor& v1, const Visitor& v2) { // Сравнение для сортировки по времени выхода
-    return v1.exitTime < v2.exitTime;
+    if ( v1.exitTime < v2.exitTime ) {
+        return true;
+    }
+    else if ( v1.exitTime == v2.exitTime ) {
+        if ( v1.entryTime <= v2.entryTime ) {
+            return true;
+        }
+     }
+    return false;
 }
 
-bool operator<=(const Visitor& v1, const Visitor& v2) { // Сравнение для сортировки по времени выхода
-    return v1.exitTime <= v2.exitTime;
-}
-
-
-
-std::ostream& operator<< (std::ostream& os, const Visitor& vis) {
-    os << vis.entryTime << " " << vis.exitTime << " | ";
-    return os;
-}
 
 template<typename T>
 struct compareDefault {
-    bool operator()(const T& l, const T& r) { return l < r; }
+    bool operator()( const T & l, const T & r) { return l < r; }
 };
 
 template<typename T, typename compare>
-void merge(T* arr, int left, int mid, int right, compare cmp) {
+void merge( T* arr, int left, int mid, int right, compare cmp ) {
     // Вычисляем размеры временных массивов
     int n1 = mid - left + 1;
     int n2 = right - mid;
 
-    // Создаем временные массивы
+    // Создаем временные массивы Left L и Right R
     T* L = new T[n1];
     T* R = new T[n2];
 
-    // Копируем данные во временные массивы L[] и R[]
-    for (int i = 0; i < n1; i++)
+    for (int i = 0; i < n1; i++) {
         L[i] = arr[left + i];
-    for (int j = 0; j < n2; j++)
+    }
+    for (int j = 0; j < n2; j++) {
         R[j] = arr[mid + 1 + j];
 
-    // Слияние временных массивов обратно в arr[left..right]
+    }
+
+    //Объединение частей массива
     int i = 0, j = 0, k = left;
     while (i < n1 && j < n2) {
-        if (L[i] <= R[j]) {
+        if (L[i] < R[j]) {
             arr[k] = L[i];
             i++;
         }
@@ -63,15 +63,15 @@ void merge(T* arr, int left, int mid, int right, compare cmp) {
         k++;
     }
 
-    // Копируем оставшиеся элементы L[], если они есть
-    while (i < n1) {
+    // Копируем оставшиеся элементы из Left
+    while ( i < n1 ) {
         arr[k] = L[i];
         i++;
         k++;
     }
 
-    // Копируем оставшиеся элементы R[], если они есть
-    while (j < n2) {
+    // Копируем оставшиеся элементы Right
+    while ( j < n2 ) {
         arr[k] = R[j];
         j++;
         k++;
@@ -84,50 +84,71 @@ void merge(T* arr, int left, int mid, int right, compare cmp) {
 
 // Функция для сортировки массива покупателей
 template<typename T, typename compare = compareDefault<T>>
-void mergeSort(T* arr, int left, int right, compare cmp = compareDefault<T>()) {
-    if (left < right) {
-        int mid = (left + right) / 2;
-        mergeSort(arr, left, mid);
-        mergeSort(arr, mid+1, right);
+void mergeSort( T * arr, int left, int right, compare cmp = compareDefault<T>() ) {
+    if ( left < right ) {
+        int mid = ( left + right ) / 2;
+        mergeSort( arr, left, mid );
+        mergeSort( arr, mid+1, right ) ;
 
-        merge(arr, left, mid, right, cmp);
+        merge( arr, left, mid, right, cmp );
     }
 }
 
-int main() {
-    int count = 0;
-    int n;
-    std::cin >> n;
-    int adTime0 = -1;
-    int adTime1 = -1;
-    Visitor* vis = new Visitor[n];
+void run( std::istream& input, std::ostream& output ) {
+    int count = 0;//Итоговое количество рекламы
 
-    for (int i = 0; i < n; i++) {
+    int n; //Количество посетителей
+    std::cin >> n;
+
+    //Первое и последнее время показа рекламы, соответственно. secondAdTime > firstAdTime
+    int firstAdTime = -1;
+    int secondAdTime = -1;
+    Visitor * vis = new Visitor[n]; //Массив посетителей
+
+    for ( int i = 0; i < n; i++ ) { //Получение данных о посетителях
         int enter, exit;
         std::cin >> enter >> exit;
+
         vis[i].entryTime = enter;
         vis[i].exitTime = exit;
     }
-    mergeSort(vis, 0, n-1, compareDefault<Visitor>());
 
-    for (int i = 0; i < n; i++) {
-        int entry = vis[i].entryTime;
-        int exit = vis[i].exitTime;
+    mergeSort( vis, 0, n - 1, compareDefault<Visitor>() ); //Сортировка массива
 
-        if (adTime0 < entry) {
-            adTime0 = exit;
-            count++;
+    for ( int i = 0; i < n; i++ ) {
+
+        //Для каждого посетителя рассматриваем его время захода и выхода
+        int entryTime = vis[i].entryTime;
+        int exitTime = vis[i].exitTime;
+
+        if (entryTime > secondAdTime) { //Если посетитель вошел позже показа последней рекламы
+            count += 2; //Увеличиваем счетчик на два
+            firstAdTime = exitTime - 1; //И "жадно" показываем рекламу
+            secondAdTime = exitTime;
         }
-
-        if (adTime1 < entry) {
-            adTime1 = exit - 1;
+        else if (entryTime == secondAdTime) { //Если время захода совпало с последней рекламой
+            count++; //Показываем еще одну
+            firstAdTime = secondAdTime; 
+            secondAdTime = exitTime;
+        }
+        else if (entryTime > firstAdTime && exitTime > secondAdTime) { //Если посетитель застал вторую рекламу
             count++;
+            firstAdTime = secondAdTime;
+            secondAdTime = exitTime;
+        }
+        else if (entryTime > firstAdTime && entryTime < secondAdTime) { // Оставшийся случай
+            count++;
+            firstAdTime = exitTime;
         }
     }
-    std::cout << count;
 
-    delete[] vis;
+    std::cout << count; //Выводим ответ
+
+    delete[] vis; //Очищаем память
+}
+
+int main() {
+    run(std::cin, std::cout);
     return 0;
 
-    
 }
