@@ -41,7 +41,7 @@ void merge( T* arr, int left, int mid, int right, compare cmp ) {
     T* L = new T[n1];
     T* R = new T[n2];
 
-    for (int i = 0; i < n1; i++) {
+    for ( int i = 0; i < n1; i++ ) {
         L[i] = arr[left + i];
     }
     for (int j = 0; j < n2; j++) {
@@ -49,9 +49,9 @@ void merge( T* arr, int left, int mid, int right, compare cmp ) {
 
     }
 
-    //Объединение частей массива
+    // Объединение частей массива
     int i = 0, j = 0, k = left;
-    while (i < n1 && j < n2) {
+    while ( i < n1 && j < n2 ) {
         if (L[i] < R[j]) {
             arr[k] = L[i];
             i++;
@@ -100,12 +100,12 @@ void run( std::istream& input, std::ostream& output ) {
     int n; //Количество посетителей
     std::cin >> n;
 
-    //Первое и последнее время показа рекламы, соответственно. secondAdTime > firstAdTime
+    // Первое и последнее время показа рекламы, соответственно. secondAdTime > firstAdTime
     int firstAdTime = -1;
     int secondAdTime = -1;
-    Visitor * vis = new Visitor[n]; //Массив посетителей
+    Visitor * vis = new Visitor[n]; // Массив посетителей
 
-    for ( int i = 0; i < n; i++ ) { //Получение данных о посетителях
+    for ( int i = 0; i < n; i++ ) { // Получение данных о посетителях
         int enter, exit;
         std::cin >> enter >> exit;
 
@@ -113,42 +113,42 @@ void run( std::istream& input, std::ostream& output ) {
         vis[i].exitTime = exit;
     }
 
-    mergeSort( vis, 0, n - 1, compareDefault<Visitor>() ); //Сортировка массива
+    mergeSort( vis, 0, n - 1, compareDefault<Visitor>() ); // Сортировка массива
 
     for ( int i = 0; i < n; i++ ) {
 
-        //Для каждого посетителя рассматриваем его время захода и выхода
+        // Для каждого посетителя рассматриваем его время захода и выхода
         int entryTime = vis[i].entryTime;
         int exitTime = vis[i].exitTime;
 
-        if (entryTime > secondAdTime) { //Если посетитель вошел позже показа последней рекламы
-            count += 2; //Увеличиваем счетчик на два
-            firstAdTime = exitTime - 1; //И "жадно" показываем рекламу
+        if ( entryTime > secondAdTime ) { // Если посетитель вошел позже показа последней рекламы
+            count += 2; //У величиваем счетчик на два
+            firstAdTime = exitTime - 1; // И "жадно" показываем рекламу
             secondAdTime = exitTime;
         }
-        else if (entryTime == secondAdTime) { //Если время захода совпало с последней рекламой
-            count++; //Показываем еще одну
+        else if ( entryTime == secondAdTime)  { // Если время захода совпало с последней рекламой
+            count++; // Показываем еще одну
             firstAdTime = secondAdTime; 
             secondAdTime = exitTime;
         }
-        else if (entryTime > firstAdTime && exitTime > secondAdTime) { //Если посетитель застал вторую рекламу
+        else if ( entryTime > firstAdTime && exitTime > secondAdTime ) { // Если посетитель застал вторую рекламу
             count++;
             firstAdTime = secondAdTime;
             secondAdTime = exitTime;
         }
-        else if (entryTime > firstAdTime && entryTime < secondAdTime) { // Оставшийся случай
+        else if ( entryTime > firstAdTime && entryTime < secondAdTime ) { // Оставшийся случай
             count++;
             firstAdTime = exitTime;
         }
     }
 
-    std::cout << count; //Выводим ответ
+    std::cout << count; // Выводим ответ
 
-    delete[] vis; //Очищаем память
+    delete[] vis; // Очищаем память
 }
 
 int main() {
-    run(std::cin, std::cout);
+    run( std::cin, std::cout );
     return 0;
 
 }
