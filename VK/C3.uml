@@ -1,0 +1,81 @@
+@startuml
+
+skinparam monochrome false
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam package {
+    BackgroundColor #F5F5F5
+    BorderColor #333333
+    FontStyle bold
+}
+
+!define MAIN_COLOR #4B89DC
+!define PAYMENT_COLOR #6C5CE7
+!define SECURITY_COLOR #FF7675
+!define PROMO_COLOR #A29BFE
+!define DATA_COLOR #00B894
+!define INVENTORY_COLOR #FDCB6E
+!define RECOMMENDATION_COLOR #74B9FF
+!define GAME_COLOR #55EFC4
+!define ORDER_COLOR #FF9FF3
+!define ANALYTICS_COLOR #FECA57
+!define SUPPORT_COLOR #FF9FF3
+
+component "Ядро системы покупок" as ShoppingSystem MAIN_COLOR {
+    interface "API системы" as ShoppingAPI
+}
+
+package "Платежи и безопасность" {
+    component "Платежная система" as PaymentSystem PAYMENT_COLOR
+    component "Система безопасности" as SecuritySystem SECURITY_COLOR
+    component "Шифрование данных" as EncryptionSystem DATA_COLOR
+}
+
+package "Маркетинг" {
+    component "Промокоды" as PromoCodeService PROMO_COLOR
+    component "Рекомендации" as RecommendationSystem RECOMMENDATION_COLOR
+}
+
+package "Товары и заказы" {
+    component "Инвентаризация" as InventorySystem INVENTORY_COLOR
+    component "Библиотека игр" as GameLibraryInterface GAME_COLOR
+    component "Обработка заказов" as OrderService ORDER_COLOR
+}
+
+package "Внешние сервисы" {
+    component "Аналитика" as AnalyticsSystem ANALYTICS_COLOR
+    component "Поддержка" as SupportSystem SUPPORT_COLOR
+}
+
+' Связи
+ShoppingSystem --> PaymentSystem : "Обработка\nплатежей"
+ShoppingSystem --> SecuritySystem : "Защита\nданных"
+ShoppingSystem --> PromoCodeService : "Выдача\nпромокодов"
+ShoppingSystem --> EncryptionSystem : "Шифрование\nданных"
+ShoppingSystem --> InventorySystem : "Управление\nтоварами"
+ShoppingSystem --> RecommendationSystem : "Персональные\nрекомендации"
+ShoppingSystem --> GameLibraryInterface : "Каталог\nигр"
+ShoppingSystem --> OrderService : "Обработка\nзаказов"
+
+OrderService --> AnalyticsSystem : "Передача\nстатистики"
+OrderService --> SupportSystem : "Запросы на\nвозвраты"
+
+PromoCodeService --> PaymentSystem : "Применение\nпромокодов"
+RecommendationSystem --> GameLibraryInterface : "Отображение\nрекомендаций"
+
+
+legend right
+    | Цвет                | Назначение          |
+    | <#MAIN_COLOR>      | Основная система    |
+    | <#PAYMENT_COLOR>   | Платежные системы   |
+    | <#SECURITY_COLOR>  | Безопасность        |
+    | <#DATA_COLOR>      | Работа с данными    |
+    | <#PROMO_COLOR>     | Маркетинг           |
+    | <#INVENTORY_COLOR> | Товарные запасы     |
+    | <#GAME_COLOR>      | Контент             |
+    | <#ORDER_COLOR>     | Заказы              |
+    | <#ANALYTICS_COLOR> | Аналитика           |
+    | <#SUPPORT_COLOR>   | Поддержка           |
+endlegend
+
+@enduml
