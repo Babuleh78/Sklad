@@ -1,0 +1,40 @@
+@startuml
+skinparam monochrome false
+skinparam backgroundColor #FFF
+skinparam sequence {
+    ArrowColor #333
+    ActorBorderColor #666
+    LifeLineBorderColor #777
+    ParticipantBackgroundColor #F5F5F5
+}
+
+actor "Пользователь" as User
+participant "Ядро системы" as Core
+participant "Обработка заказов" as OrderService
+participant "Платежная система" as Payment
+participant "Инвентарь" as Inventory
+participant "Библиотека игр" as GameLibrary
+participant "Аналитика " as Analytics
+
+User -> Core: "Выбор товара"
+Core -> GameLibrary: "Запрос данных об игре"
+GameLibrary --> Core: "Информация о товаре"
+Core -> Inventory: "Проверить наличие"
+Inventory --> Core: "Статус остатков"
+
+alt Товар доступен
+    Core -> User: "Подтверждение покупки"
+    User -> Core: "Подтверждение оплаты"
+    Core -> Payment: "Запрос платежа"
+    Payment --> Core: "Результат оплаты"
+    Core -> OrderService: "Создать заказ"
+    OrderService -> Inventory: "Обновить остатки"
+    Inventory --> OrderService: "Подтверждение"
+    OrderService -> Analytics: "Записать статистику"
+    Analytics --> OrderService: "OK"
+    OrderService --> Core: "Заказ оформлен"
+    Core -> User: "Чек + доступ к игре"
+else Товара нет
+    Core -> User: "Уведомление о недоступности"
+end
+@enduml
