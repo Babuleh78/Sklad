@@ -1,0 +1,66 @@
+@startuml
+skinparam monochrome false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam ArrowColor #444444
+skinparam ActorBorderColor #666666
+skinparam ParticipantBorderColor #333333
+skinparam ParticipantBackgroundColor #FFFFFF
+skinparam ParticipantFontStyle bold
+
+actor Покупатель #FFD700
+participant "Веб-приложение\n[JavaScript, React]" as WebApp #87CEEB
+participant "Мобильное приложение\n[Swift/Kotlin]" as MobileApp #98FB98
+participant "Балансировщик NGINX" as NGINX #D3D3D3
+participant "Каталог игр\n[Java, SpringBoot]" as GameCatalog #FFA07A
+participant "Сервис API\n[Java, SpringBoot]" as APIService #FF6347
+participant "Процессинг заказов\n[Java, SpringBoot]" as OrderProcessing #FF4500
+participant "Брокер" as Broker #9370DB
+participant "Шлюз оплаты\n[Java, SpringBoot]" as PaymentGateway #BA55D3
+participant "Система оплаты" as PaymentSystem #FF69B4
+participant "Система безопасноcти" as SecuritySystem #4682B4
+participant "Система DRM" as DRMSystem #20B2AA
+participant "Система уведомлений" as NotificationSystem #32CD32
+participant "Отчетная система" as ReportingSystem #778899
+
+entryspacing 0.8
+== Начало сценария: пользователь просматривает игры ==
+Покупатель -> WebApp : Запросить список игр
+WebApp -> NGINX : GET /games
+NGINX -> GameCatalog : Получить список игр
+GameCatalog -> APIService : Проверить права доступа
+APIService --> GameCatalog : OK
+GameCatalog --> NGINX : Список игр
+NGINX --> WebApp : Список игр
+WebApp --> Покупатель : Отображение игр\n(интерактивный интерфейс)
+
+== Добавление товара в корзину и оформление заказа ==
+group Оформление заказа
+  Покупатель -> WebApp : Добавить в корзину
+  WebApp -> NGINX : POST /order
+  NGINX -> OrderProcessing : Создать заказ
+  OrderProcessing -> DRMSystem : Проверка ограничений DRM
+  OrderProcessing -> SecuritySystem : Верификация пользователя
+  OrderProcessing -> APIService : Проверка авторизации
+  APIService --> OrderProcessing : Доступ подтвержден
+  OrderProcessing -> Брокер : Отправка заказа
+  Брокер -> PaymentGateway : Платежные данные
+end
+
+== Оплата ==
+group Процессинг платежа
+  PaymentGateway -> PaymentSystem : Обработка платежа
+  PaymentSystem -> SecuritySystem : Валидация платежа
+  SecuritySystem --> PaymentSystem : Платеж безопасен
+  PaymentSystem -> DRMSystem : Генерация ключа доступа
+  PaymentSystem --> PaymentGateway : Подтверждение оплаты
+  PaymentGateway -> OrderProcessing : Платеж подтвержден
+  OrderProcessing -> NotificationSystem : Уведомление о покупке
+  NotificationSystem --> Покупатель : Email/SMS подтверждение
+end
+
+== Отчетность ==
+OrderProcessing -> ReportingSystem : Логирование транзакции\n(данные для аналитики)
+
+@enduml
