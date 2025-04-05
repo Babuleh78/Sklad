@@ -1,0 +1,103 @@
+@startuml
+!theme plain
+skinparam monochrome false
+skinparam defaultFontName Arial
+skinparam shadowing false
+
+' === Actors ===
+actor Модератор as Moderator #FFA07A/LightBlue
+actor Клиент as Client #98FB98/LightGreen
+
+' === Main Components ===
+rectangle "Клиентские приложения" #FFFACD {
+  participant "Веб-приложение" as WebApp #FFDAB9
+  participant "Мобильное приложение" as MobileApp #E6E6FA
+}
+
+rectangle "Система входа" #E0FFFF {
+  participant "Балансировщик\nнагрузки" as LoadBalancer #B0E0E6
+  participant "Сервис\nраспределения" as Distributor #AFEEEE
+}
+
+rectangle "Авторизация" #FFE4E1 {
+  participant "Q-Auth\n(модераторы)" as QAuth #ADD8E6
+  participant "Авторизация\nпользователей" as AuthUser #90EE90
+  participant "Авторизация\nмодераторов" as AuthModer #87CEFA
+}
+
+rectangle "Шлюзы" #F5F5DC {
+  participant "Шлюз модераторов" as GatewayModer #6495ED
+  participant "Шлюз пользователей" as GatewayUser #3CB371
+}
+
+rectangle "Безопасность" #FFF8DC {
+  participant "Проверка активности" as SecurityCheck #FFA500
+  participant "2FA" as TwoFactor #FF6347
+  participant "Анализ трафика" as TrafficCheck #FF4500
+}
+
+rectangle "Данные" #F0FFF0 {
+  database "Кэш модераторов" as CacheModer #4682B4
+  database "БД модераторов" as DBModer #4169E1
+  database "Кэш пользователей" as CacheUser #2E8B57
+  database "БД пользователей" as DBUser #228B22
+}
+
+rectangle "Вспомогательные системы" #FAFAD2 {
+  participant "Уведомления" as Notification #DA70D6
+  participant "Брокер" as Broker1 #BA55D3
+  participant "Отчетная система" as ReportSystem #9370DB
+  participant "Внешняя регистрация" as ExternalReg #8A2BE2
+}
+
+' === Процессы ===
+
+' ==== 1. Доступ к контенту ====
+group Доступ к контенту [HTTPS+JSON] #FFFACD
+  Moderator -> WebApp: Запрос контента #FF6347
+  Client -> MobileApp: Запрос контента #3CB371
+  
+  WebApp -> LoadBalancer: Перенаправление #4169E1
+  MobileApp -> LoadBalancer: Перенаправление #4169E1
+  
+  LoadBalancer -> Distributor: Распределение запроса #9370DB
+  Distributor -> Notification: Уведомление о получателе #DA70D6
+end
+
+' ==== 2. Аутентификация модератора ====
+group Аутентификация модератора [Kafka+TLS] #E6E6FA
+  Distributor -> QAuth: Запрос данных #6495ED
+  QAuth -> Broker1: Передача данных #BA55D3
+  Broker1 -> GatewayModer: Данные для входа #4169E1
+  
+  GatewayModer -> AuthModer: Запрос авторизации #87CEFA
+  AuthModer -> Broker1: Ответ #BA55D3
+  Broker1 -> GatewayModer: Подтверждение #4169E1
+  
+  GatewayModer -> ExternalReg: Проверка регистрации #8A2BE2
+  ExternalReg -> DBModer: Получение данных #4169E1
+  
+  GatewayModer -> LoadBalancer: Возврат токена #B0E0E6
+  LoadBalancer -> CacheModer: Кэширование сессии #4682B4
+end
+
+' ==== 3. Аутентификация клиента ====
+group Аутентификация клиента [Kafka+TLS] #E0FFFF
+  Distributor -> AuthUser: Запрос авторизации #90EE90
+  AuthUser -> Broker1: Передача данных #BA55D3
+  Broker1 -> GatewayUser: Данные клиента #3CB371
+  
+  GatewayUser -> TwoFactor: Проверка 2FA #FF6347
+  GatewayUser -> CacheUser: Проверка кэша #2E8B57
+  GatewayUser -> DBUser: Получение данных #228B22
+  
+  GatewayUser -> LoadBalancer: Возврат токена #B0E0E6
+  LoadBalancer -> CacheUser: Кэширование #2E8B57
+end
+
+' ==== 4. Проверки и отчеты ====
+group Проверки безопасности #FFE4E1
+  Distributor -> SecurityCheck: Проверка активности #FFA500
+  SecurityCheck -> CacheUser: Валидация данных #2E8B57
+  SecurityCheck -> ReportSystem: Формирование отчета #9370DB
+  ReportSystem -> TrafficCheck: А
