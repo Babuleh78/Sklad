@@ -1,210 +1,184 @@
+/*Задача 1. Хеш-таблица (8 баллов)
+Реализуйте структуру данных типа “множество строк” на основе динамической хеш-таблицы с открытой адресацией. Хранимые строки непустые и состоят из строчных латинских букв. Начальный размер таблицы должен быть равным 8-ми. Перехеширование выполняйте при добавлении элементов в случае, когда коэффициент заполнения таблицы достигает 3/4.
+Хеш-функцию строки реализуйте с помощью вычисления значения многочлена методом Горнера.
+Структура данных должна поддерживать операции добавления строки в множество, удаления строки из множества и проверки принадлежности данной строки множеству.
+1_1. Для разрешения коллизий используйте квадратичное пробирование. i-ая проба
+g(k, i)=g(k, i-1) + i (mod m). m - степень двойки.
+1_2. Для разрешения коллизий используйте двойное хеширование.
+Формат входных данных
+Каждая строка входных данных задает одну операцию над множеством. Запись операции состоит из типа операции и следующей за ним через пробел строки, над которой проводится операция.
+Тип операции  – один из трех символов:
+    +  означает добавление данной строки в множество; 
+    -  означает удаление  строки из множества;  
+    ?  означает проверку принадлежности данной строки множеству. 
+При добавлении элемента в множество НЕ ГАРАНТИРУЕТСЯ, что он отсутствует в этом множестве. При удалении элемента из множества НЕ ГАРАНТИРУЕТСЯ, что он присутствует в этом множестве.
+Формат выходных данных
+Программа должна вывести для каждой операции одну из двух строк OK или FAIL, в зависимости от того, встречается ли данное слово в нашем множестве.
+*/
+ 
 #include <iostream>
+#include <string>
 #include <vector>
-//Реализуйте структуру данных типа “множество строк” на основе динамической хеш - таблицы
-//с открытой адресацией.Хранимые строки непустые и состоят из строчных латинских букв.
-//Хеш - функция строки должна быть реализована с помощью вычисления значения многочлена методом Горнера.
-//Начальный размер таблицы должен быть равным 8 - ми.Перехеширование выполняйте
-//при добавлении элементов в случае, когда коэффициент заполнения таблицы достигает 3 / 4.
-//Структура данных должна поддерживать операции добавления строки в множество,
-//удаления строки из множества и проверки принадлежности данной строки множеству.
-//Для разрешения коллизий используйте двойное хеширование.
-
-const size_t DEFAULT_CAPACITY = 8;
-
-struct HashCell {
-    std::string value;    // Значение ячейки
-    bool isBusy = false;  // Занята ли ячейка
-    bool isDeleted = false; // Удалена ли ячейка
-};
-
-struct StringHasher {
-    size_t operator()(const std::string& str, size_t prime) const {
-        size_t hash = 0;
-        for (char c : str) {
-            hash = hash * prime + c;
-        }
-        return hash;
+ 
+const int HashTableSize = 8;
+ 
+using namespace std;
+ 
+int Hash1( const string& key, int m ) {
+    int hash = 0;
+    int a = 11;
+    for( int i = 0; i < static_cast<int>( key.size() ); i++ ) {
+        hash = ( hash * a + key[i] ) % m;
     }
-};
-
-template <typename Hasher>
-class Hashtable {
-private:
-    HashCell* table;      // Массив ячеек
-    size_t capacity;      // Вместимость таблицы
-    size_t size;          // Количество элементов
-    size_t prime;         // Простое число для хеширования
-    Hasher hasher;        // Функтор для вычисления хеша
-
-    void initializeCells() {
-        for (size_t i = 0; i < capacity; ++i) {
-            table[i].isBusy = false;
-            table[i].isDeleted = false;
-        }
+    return hash;
+}
+ 
+ 
+int Hash2( const string& key, int m ) {
+    int hash = 0;
+    int a = 17;
+    for( int i = 0; i <static_cast<int>( key.size() ); i++ ) {
+        hash = ( hash * a + key[i] ) % m;
     }
-
-    size_t h1(const std::string& str) const {
-        return hasher(str, prime) % capacity;
-    }
-
-    size_t hash(const std::string& str, size_t i, size_t prevHash) const {
-        (void)str; // Не используется, подавляем предупреждение
-        return (prevHash + i) % capacity;
-    }
-
-    void Rehash() {
-        size_t oldCapacity = capacity;
-        HashCell* oldTable = table;
-
-        capacity *= 2;
-        table = new HashCell[capacity];
-        initializeCells();
-        size = 0;
-
-        for (size_t i = 0; i < oldCapacity; ++i) {
-            if (oldTable[i].isBusy && !oldTable[i].isDeleted) {
-                Add(oldTable[i].value);
-            }
-        }
-
-        delete[] oldTable;
-    }
-
-public:
-    Hashtable() : capacity(DEFAULT_CAPACITY), size(0), prime(71) {
-        table = new HashCell[capacity];
-        initializeCells();
-    }
-
-    ~Hashtable() {
-        delete[] table;
-    }
-
-    // Запрещаем копирование и присваивание
-    Hashtable(const Hashtable&) = delete;
-    Hashtable& operator=(const Hashtable&) = delete;
-
-    bool Add(const std::string& value) {
-        if (size * 4 >= capacity * 3) { // 75% заполненность
-            Rehash();
-        }
-
-        size_t h = h1(value);
-        size_t insertPos = -1;
-
-        for (size_t i = 0; i < capacity; ++i) {
-            h = hash(value, i, h);
-
-            if (table[h].isBusy && !table[h].isDeleted && table[h].value == value) {
-                return false; // Элемент уже существует
-            }
-
-            if (!table[h].isBusy) {
-                if (insertPos == static_cast<size_t>(-1)) {
-                    insertPos = h;
-                }
-                break;
-            }
-
-            if (table[h].isDeleted && insertPos == static_cast<size_t>(-1)) {
-                insertPos = h;
-            }
-        }
-
-        if (insertPos != static_cast<size_t>(-1)) {
-            table[insertPos].value = value;
-            table[insertPos].isBusy = true;
-            table[insertPos].isDeleted = false;
-            size++;
-            return true;
-        }
-
-        return false;
-    }
-
-    bool Has(const std::string& value) const {
-        size_t h = h1(value);
-
-        for (size_t i = 0; i < capacity; ++i) {
-            h = hash(value, i, h);
-
-            if (!table[h].isBusy && !table[h].isDeleted) {
-                return false; // Дошли до пустой ячейки
-            }
-
-            if (table[h].isBusy && !table[h].isDeleted && table[h].value == value) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    bool Delete(const std::string& value) {
-        size_t h = h1(value);
-
-        for (size_t i = 0; i < capacity; ++i) {
-            h = hash(value, i, h);
-
-            if (!table[h].isBusy && !table[h].isDeleted) {
-                return false; // Дошли до пустой ячейки
-            }
-
-            if (table[h].isBusy && !table[h].isDeleted && table[h].value == value) {
-                table[h].isDeleted = true;
-                size--;
-                return true;
-            }
-        }
-
-        return false;
-    }
-};
-
-class StringSet {
-
-    private:
-        Hashtable<StringHasher> table;
-
-    public:
-        bool Add(const std::string& value) {
-            if (table.Has(value)) {
-                return false;
-            }
-
-            return table.Add(value);
-       
-        }
-
-        bool Delete(const std::string& value) {
-            return table.Delete(value);
-        }
-
-        bool Has(const std::string& value) {
-            return table.Has(value);
-        }
-    };
-
-    void run(std::istream& input, std::ostream& output) {
-        StringSet test_set;
-
-        char command;
-        std::string value;
-
-        while (input >> command >> value) {
-            if (command == '+') {
-                test_set.Add(value) ? output << "OK\n" : output << "FAIL\n";
-            }
-            else if (command == '?') {
-                test_set.Has(value) ? output << "OK\n" : output << "FAIL\n";
-            }
-            else if (command == '-'){
-                test_set.Delete(value) ? output << "OK\n" : output << "FAIL\n";
-            }
-        }
-    }
-
-    int main() {
-        run( std::cin, std::cout );
+    hash =( 2 * hash + 1 ) % m;
+    return hash;
+}
+ 
+ 
+int HashFunction( int h1, int h2, int i, int m ) {
+    if( m != 0 ) {
+        return( h1 + i * h2 ) % m;
+    } else {
         return 0;
     }
+}
+ 
+struct HashTableNode {
+    HashTableNode(const string &_key): key(_key), Del(false) {}
+    string key;
+    bool Del;
+};
+ 
+class CHashTable {
+public:
+    CHashTable(): table(HashTableSize, NULL), _size(0) {}
+    bool Insert(const string &key);
+    bool Remove(const string &key);
+    bool Has(const string &key) const;
+    void ReHash();
+ 
+private:
+    vector<HashTableNode*> table;
+    int _size;
+};
+ 
+ 
+bool CHashTable::Insert( const string &key ) {
+    if( static_cast<double>(_size)/static_cast<double>(static_cast<int>( table.size())) >=0.75) {
+        ReHash();
+    }
+ 
+    int h1 = Hash1(key, static_cast<int>( table.size()) );
+    int h2 = Hash2(key, static_cast<int>( table.size()) );
+    int h = HashFunction(h1, h2, 0, static_cast<int>( table.size()));
+    for (int i=0; i<static_cast<int>( table.size()) and table[h] != NULL; i++) {
+        if(table[h]->key == key and table[h]->Del==false) {
+            return false;
+        }
+        if(table[h]->Del==true ) {
+            table[h]->key=key;
+            table[h]->Del=false;
+            _size++;
+            return true;
+        }
+        h=HashFunction(h1, h2, i+1, static_cast<int>( table.size()));
+    }
+ 
+    table[h] = new HashTableNode(key);
+    _size++;
+    return true;
+}
+ 
+bool CHashTable::Remove(const string &key) {
+    int h1 = Hash1(key, static_cast<int>( table.size()) );
+    int h2 = Hash2(key, static_cast<int>( table.size()) );
+    int j = HashFunction( h1, h2, 0, static_cast<int>( table.size()));
+    for( int i = 0; i < static_cast<int>( table.size()); i++ ) {
+        if(table[j] != NULL) {
+            if( table[j]->key == key and table[j]->Del == false) {
+                table[j]->Del = true;
+                _size--;
+                return true;
+            }
+        } else {
+            return false;
+        }
+        j = HashFunction( h1, h2, i+1, static_cast<int>( table.size()));
+    }
+}
+ 
+bool CHashTable::Has( const string &key ) const {
+    int i = 0;
+    int h1 = Hash1(key, static_cast<int>( table.size()) );
+    int h2 = Hash2(key, static_cast<int>( table.size()) );
+    int h=h1;
+    while( table[h] != NULL and i < static_cast<int>( table.size()) ) {
+        if( table[h]->key == key and table[h]->Del==false ){
+            return true;
+        }
+        h = HashFunction( h1, h2, i+1, static_cast<int>( table.size()));
+        i++;
+    }
+    return false;
+}
+ 
+void CHashTable::ReHash() {
+    int newBufferSize = static_cast<int>( table.size()) * 2;
+    vector<HashTableNode*> newBuffer(newBufferSize, NULL);
+    for( int i = 0; i < static_cast<int>( table.size()); i++ ) {
+        if( table[i] != NULL and table[i]->Del==false ) {
+            int j = 0;
+            int h1 = Hash1(table[i]->key, newBufferSize );
+            int h2 = Hash2(table[i]->key, newBufferSize );
+            int h = HashFunction(h1, h2, j, newBufferSize );
+            while( j < newBufferSize ) {
+                if (newBuffer[h] == NULL) {
+                    break;
+                }
+                j++;
+                h = HashFunction(h1, h2, j, newBufferSize );
+            }
+            newBuffer[h] = table[i];
+        }
+    }
+    table = newBuffer;
+}
+ 
+int main()
+{
+    CHashTable table;
+    while( true ) {
+        char command = 0;
+        string value;
+        cin >> command >> value;
+        if( cin.fail() )
+        {
+            break;
+        }
+        switch( command )
+        {
+        case '?':
+            cout << ( table.Has( value ) ? "OK" : "FAIL" ) << std::endl;
+            break;
+        case '+':
+            cout << ( table.Insert( value ) ? "OK" : "FAIL" ) << std::endl;
+            break;
+        case '-':
+            cout << ( table.Remove( value ) ? "OK" : "FAIL" ) << std::endl;
+            break;
+        }
+    }
+ 
+ 
+    return 0;
+}
