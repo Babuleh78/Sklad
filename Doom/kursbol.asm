@@ -6,7 +6,7 @@
 ;
 ; Авторы:
 ;  МГТУ им. Н.Э. Баумана, ИУ5-41Б, 2025 г.
-;   Богуславский А.В.
+;  	Маркин Д.С.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 code segment	'code'
@@ -29,25 +29,24 @@ code segment	'code'
 	signaturePrintingEnabled 		DB	0							; флаг функции вывода информации об авторе
 	cursiveEnabled 				DB	0							; флаг перевода символа в курсив
 
-	cursiveSymbol    DB 00000000b    ; Курсивная буква P (8x16)
+	cursiveSymbol    DB 00000000b    ; Пустая строка (отступ)
 					DB 00000000b
 					DB 00000000b
-					DB 01111100b    ;  ###
-					DB 01111110b    ;  #####
-					DB 01100111b    ;  ##  ###
-					DB 01100011b    ;  ##   ##
-					DB 01100011b    ;  ##   ##
-					DB 01100110b    ;  ##  ##
-					DB 01111100b    ;  ####
-					DB 01100000b    ;  ##
-					DB 01100000b    ;  ##
-					DB 01100000b    ;  ##
-					DB 11110000b    ; ####
+					DB 00011111b    ;    #####  
+					DB 0111011b    ;   ######  
+					DB 01100011b    ;  ##   ##  
+					DB 01100110b    ;  ##    ##
+					DB 11001100b    ; ##    ##    
+					DB 11111000b    ; #####     
+					DB 11000000b    ; ##        
+					DB 11000000b    ; ##
+					DB 11000000b    ; ##
+					DB 11100000b    ; ###       
 					DB 00000000b
 					DB 00000000b
 					DB 00000000b
 	
-	charToCursiveIndex 			DB 'Б'							;@ символ для замены
+	charToCursiveIndex 			DB 'Р'							;@ символ для замены
 	savedSymbol 					DB 16 dup(0FFh)					; переменная для хранения старого символа
 	
 	true 						equ	0FFh							; константа истинности
@@ -67,17 +66,17 @@ code segment	'code'
 	;@ заменить на собственные данные. формирование таблицы идет по строке большей длины (1я строка).
 	signatureLine1				DB	179, 'Маркин Денис Станиславович', 179
 	Line1_length 					equ	$-signatureLine1
-	signatureLine2				DB	179, 'ИУ5-41Б                         ', 179
+	signatureLine2				DB	179, 'ИУ5-41Б                   ', 179
 	Line2_length 					equ	$-signatureLine2
-	signatureLine3				DB	179, 'Вариант #14                      ', 179
+	signatureLine3				DB	179, 'Вариант #14		   ', 179
 	Line3_length 					equ	$-signatureLine3
 	helpMsg DB '>tsr.com [/?] [/u]', 10, 13
 			DB ' [/?] - вывод данной справки', 10, 13
                 DB ' выгрузка резидента из памяти Ctrl+U', 10, 13
-                DB '  F2  - вывод ФИО и группы по таймеру(3 сек) внизу экрана', 10, 13
-                DB '  F3  - включение/отключения курсивного вывода русского символа Р', 10, 13
-                DB '  F4  - включение/отключение частичной русификации клавиатуры: HCNEA -> РСТУФ', 10, 13
-                DB '  F5  - включение/отключение замена русских букв на латинские', 10, 13, 0
+                DB '  F7  - вывод ФИО и группы по таймеру(3 сек) внизу экрана', 10, 13
+                DB '  F8  - включение/отключения курсивного вывода русского символа Р', 10, 13
+                DB '  F9  - включение/отключение частичной русификации клавиатуры: HCNEA -> РСТУФ', 10, 13
+                DB '  F1  - включение/отключение замена русских букв на латинские', 10, 13, 0
 			
 	helpMsg_length				equ  $-helpMsg
 	errorParamMsg					DB	'Ошибка параметров коммандной строки', 10, 13
@@ -100,11 +99,11 @@ code segment	'code'
 	noRemoveMsg					DB  'Не удалось выгрузить резидент'
 	noRemoveMsg_length			equ	$-noRemoveMsg
 	
-	f2_txt      				DB 'F2'
-	f3_txt      				DB 'F3'
-	f4_txt      				DB 'F4'
-	f5_txt      				DB 'F5'
-	fx_length					equ	$-f4_txt
+	F7_txt      				DB 'F7'
+	F8_txt      				DB 'F8'
+	F9_txt      				DB 'F9'
+	F1_txt      				DB 'F1'
+	fx_length					equ	$-F9_txt
 	
 changeFx proc
     push AX
@@ -123,9 +122,9 @@ changeFx proc
     push CS
     pop ES
     
-    ; F2 - Вывод информации об авторе
-    _checkF2:
-        lea BP, f2_txt
+    ; F7 - Вывод информации об авторе
+    _checkF7:
+        lea BP, F7_txt
         mov CX, fx_length
         mov BH, 0
         mov DH, 0               ; Верхняя строка
@@ -133,20 +132,20 @@ changeFx proc
         mov AX, 1301h
         
         cmp signaturePrintingEnabled, true
-        je _greenF2
+        je _greenF7
         
-        _redF2:
+        _redF7:
             mov BL, 01001111b   ; Красный фон
             int 10h
-            jmp _checkF3
+            jmp _checkF8
         
-        _greenF2:
+        _greenF7:
             mov BL, 00101111b   ; Зеленый фон
             int 10h
     
-    ; F3 - Курсивный символ
-    _checkF3:
-        lea BP, f3_txt
+    ; F8 - Курсивный символ
+    _checkF8:
+        lea BP, F8_txt
         mov CX, fx_length
         mov BH, 0
         mov DH, 1               ; Вторая строка
@@ -154,20 +153,20 @@ changeFx proc
         mov AX, 1301h
         
         cmp cursiveEnabled, true
-        je _greenF3
+        je _greenF8
         
-        _redF3:
+        _redF8:
             mov BL, 01001111b   ; Красный фон
             int 10h
-            jmp _checkF4
+            jmp _checkF9
         
-        _greenF3:
+        _greenF8:
             mov BL, 00101111b   ; Зеленый фон
             int 10h
     
-    ; F4 - Русификация
-    _checkF4:
-        lea BP, f4_txt
+    ; F9 - Русификация
+    _checkF9:
+        lea BP, F9_txt
         mov CX, fx_length
         mov BH, 0
         mov DH, 2               ; Третья строка
@@ -175,20 +174,20 @@ changeFx proc
         mov AX, 1301h
         
         cmp translateEnabled, true
-        je _greenF4
+        je _greenF9
         
-        _redF4:
+        _redF9:
             mov BL, 01001111b   ; Красный фон
             int 10h
-            jmp _checkF5
+            jmp _checkF1
         
-        _greenF4:
+        _greenF9:
             mov BL, 00101111b   ; Зеленый фон
             int 10h
     
-    ; F5 - Блокировка ввода
-    _checkF5:
-        lea BP, f5_txt
+    ; F1 - Блокировка ввода
+    _checkF1:
+        lea BP, F1_txt
         mov CX, fx_length
         mov BH, 0
         mov DH, 3               ; Четвертая строка
@@ -196,14 +195,14 @@ changeFx proc
         mov AX, 1301h
         
         cmp ignoreEnabled, true
-        je _greenF5
+        je _greenF1
         
-        _redF5:
+        _redF1:
             mov BL, 01001111b   ; Красный фон
             int 10h
             jmp _outFx
         
-        _greenF5:
+        _greenF1:
             mov BL, 00101111b   ; Зеленый фон
             int 10h
     
@@ -266,30 +265,30 @@ changeFx endp
 		
 		;@ далее - код для всех вариантов
 		
-		;проверка F1-F4
+		;проверка F1-F9
 		_test_Fx:
-sub AL, 59 ; в AL теперь номер функциональной клавиши (F2=59h, F3=60h и т.д.)
-_F2:
-    cmp AL, 1 ; F2
-    jne _F3
+		sub AL, 59 ; в AL теперь номер функциональной клавиши
+_F7:
+    cmp AL, 6 ; F7
+    jne _F8
     not signaturePrintingEnabled
     call changeFx
     jmp _translate_or_ignore
-_F3:
-    cmp AL, 2 ; F3
-    jne _F4
+_F8:
+    cmp AL, 7 ; F8
+    jne _F9
     not cursiveEnabled
     call changeFx
     call setCursive
     jmp _translate_or_ignore
-_F4:
-    cmp AL, 3 ; F4
-    jne _F5
+_F9:
+    cmp AL, 8 ; F9
+    jne _F1
     not translateEnabled
     call changeFx
     jmp _translate_or_ignore
-_F5:
-    cmp AL, 4 ; F5
+_F1:
+    cmp AL, 0 ; F1
     jne _translate_or_ignore
     not ignoreEnabled
     call changeFx
