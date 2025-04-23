@@ -1,303 +1,950 @@
-.model tiny
-.code
-.386
-org 100h
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Сборка:
+;  tasm.exe /l tsr.asm
+;  tlink /t /x tsr.obj
+;
+;
+; Авторы:
+;  МГТУ им. Н.Э. Баумана, ИУ5-41Б, 2025 г.
+;   Богуславский А.В.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-start:
-    jmp init
+code segment	'code'
+	assume	CS:code, DS:code
+	org	100h
+	_start:
+	
+	jmp _initTSR ; на начало программы
+	
+	; данные
+	ignoredChars                DB 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'      
+    replaceWith                 DB 'f,dult`;pbqrkvyjghcnea[wxio]sm''.zF<DULT~:PBQRKVYJGHCNEA{WXIO}SM">Z'
+	ignoredLength 				equ	$-ignoredChars				; длина строки ignoredChars
+	ignoreEnabled 				DB	0							; флаг функции игнорирования ввода
+	translateFrom 				DB	'HCNEA'						;@ символы для замены (АБВГД на англ. раскладке)
+	translateTo 				DB	'РСТУФ'						;@ символы на которые будет идти замена
+	translateLength				equ	$-translateTo					; длина строки trasnlateFrom
+	translateEnabled				DB	0							; флаг функции перевода
+	
+	signaturePrintingEnabled 		DB	0							; флаг функции вывода информации об авторе
+	cursiveEnabled 				DB	0							; флаг перевода символа в курсив
 
-; Данные программы
-old_int09h dd ?         ; Для хранения старого обработчика прерывания клавиатуры
-old_int08h dd ?         ; Для хранения старого обработчика таймера
-old_int16h dd ?         ; Для хранения старого обработчика int 16h
-f1_pressed db 0         ; Флаг нажатия F1
-f7_pressed db 0         ; Флаг нажатия F7
-timer_counter dw 0      ; Счетчик для таймера
-unload_flag db 0        ; Флаг для выгрузки программы
-student_info db 'Иванов Иван Иванович, Группа 1234, Вариант 5', 0
+	cursiveSymbol    DB 00000000b    ; Курсивная буква P (8x16)
+					DB 00000000b
+					DB 00000000b
+					DB 01111100b    ;  ###
+					DB 01111110b    ;  #####
+					DB 01100111b    ;  ##  ###
+					DB 01100011b    ;  ##   ##
+					DB 01100011b    ;  ##   ##
+					DB 01100110b    ;  ##  ##
+					DB 01111100b    ;  ####
+					DB 01100000b    ;  ##
+					DB 01100000b    ;  ##
+					DB 01100000b    ;  ##
+					DB 11110000b    ; ####
+					DB 00000000b
+					DB 00000000b
+					DB 00000000b
+	
+	charToCursiveIndex 			DB 'Б'							;@ символ для замены
+	savedSymbol 					DB 16 dup(0FFh)					; переменная для хранения старого символа
+	
+	true 						equ	0FFh							; константа истинности
+	old_int9hOffset 			DW	?							; адрес старого обработчика int 9h
+	old_int9hSegment 			DW	?							; сегмент старого обработчика int 9h
+	old_int1ChOffset 			DW	?							; адрес старого обработчика int 1Ch
+	old_int1ChSegment 			DW	?							; сегмент старого обработчика int 1Ch
+	old_int2FhOffset 			DW	?							; адрес старого обработчика int 2Fh
+	old_int2FhSegment 			DW	?							; сегмент старого обработчика int 2Fh
+	
+	unloadTSR					DB	0 							; 1 - выгрузить резидент
+	notLoadTSR					DB	0							; 1 - не загружать
+	counter	  					DW	0
+	printDelay					equ	3							;@ задержка перед выводом "подписи" в секундах
+	printPos					DW	2							;@ положение подписи на экране. 0 - верх, 1 - центр, 2 - низ
+	
+	;@ заменить на собственные данные. формирование таблицы идет по строке большей длины (1я строка).
+	signatureLine1				DB	179, 'Маркин Денис Станиславович', 179
+	Line1_length 					equ	$-signatureLine1
+	signatureLine2				DB	179, 'ИУ5-41Б                         ', 179
+	Line2_length 					equ	$-signatureLine2
+	signatureLine3				DB	179, 'Вариант #14                      ', 179
+	Line3_length 					equ	$-signatureLine3
+	helpMsg DB '>tsr.com [/?] [/u]', 10, 13
+			DB ' [/?] - вывод данной справки', 10, 13
+                DB ' выгрузка резидента из памяти Ctrl+U', 10, 13
+                DB '  F2  - вывод ФИО и группы по таймеру(3 сек) внизу экрана', 10, 13
+                DB '  F3  - включение/отключения курсивного вывода русского символа Р', 10, 13
+                DB '  F4  - включение/отключение частичной русификации клавиатуры: HCNEA -> РСТУФ', 10, 13
+                DB '  F5  - включение/отключение замена русских букв на латинские', 10, 13, 0
+			
+	helpMsg_length				equ  $-helpMsg
+	errorParamMsg					DB	'Ошибка параметров коммандной строки', 10, 13
+	errorParamMsg_length			equ	$-errorParamMsg
+	
+	tableTop						DB	218, Line1_length-2 dup (196), 191
+	tableTop_length 				equ	$-tableTop
+	tableBottom					DB	192, Line1_length-2 dup (196), 217
+	tableBottom_length 			equ  $-tableBottom
+	
+	; сообщения		
+	installedMsg					DB  'Резидент загружен!$'
+	alreadyInstalledMsg			DB  'Резидент уже загружен$'
+	noMemMsg						DB  'Недостаточно памяти$'
+	notInstalledMsg				DB  'Резидент не был загружен$'
+	
+	removedMsg					DB  'Резидент выгружен из памяти'
+	removedMsg_length				equ	$-removedMsg
+	
+	noRemoveMsg					DB  'Не удалось выгрузить резидент'
+	noRemoveMsg_length			equ	$-noRemoveMsg
+	
+	f2_txt      				DB 'F2'
+	f3_txt      				DB 'F3'
+	f4_txt      				DB 'F4'
+	f5_txt      				DB 'F5'
+	fx_length					equ	$-f4_txt
+	
+changeFx proc
+    push AX
+    push BX
+    push CX
+    push DX
+    push BP
+    push ES
+    xor BX, BX
+	xor DX, DX
+    
+    mov AH, 03h                 ; Получить текущую позицию курсора
+    int 10h
+    push DX                     ; Сохранить позицию курсора
+    
+    push CS
+    pop ES
+    
+    ; F2 - Вывод информации об авторе
+    _checkF2:
+        lea BP, f2_txt
+        mov CX, fx_length
+        mov BH, 0
+        mov DH, 0               ; Верхняя строка
+        mov DL, 78              ; Правая часть экрана
+        mov AX, 1301h
+        
+        cmp signaturePrintingEnabled, true
+        je _greenF2
+        
+        _redF2:
+            mov BL, 01001111b   ; Красный фон
+            int 10h
+            jmp _checkF3
+        
+        _greenF2:
+            mov BL, 00101111b   ; Зеленый фон
+            int 10h
+    
+    ; F3 - Курсивный символ
+    _checkF3:
+        lea BP, f3_txt
+        mov CX, fx_length
+        mov BH, 0
+        mov DH, 1               ; Вторая строка
+        mov DL, 78              ; Правая часть экрана
+        mov AX, 1301h
+        
+        cmp cursiveEnabled, true
+        je _greenF3
+        
+        _redF3:
+            mov BL, 01001111b   ; Красный фон
+            int 10h
+            jmp _checkF4
+        
+        _greenF3:
+            mov BL, 00101111b   ; Зеленый фон
+            int 10h
+    
+    ; F4 - Русификация
+    _checkF4:
+        lea BP, f4_txt
+        mov CX, fx_length
+        mov BH, 0
+        mov DH, 2               ; Третья строка
+        mov DL, 78              ; Правая часть экрана
+        mov AX, 1301h
+        
+        cmp translateEnabled, true
+        je _greenF4
+        
+        _redF4:
+            mov BL, 01001111b   ; Красный фон
+            int 10h
+            jmp _checkF5
+        
+        _greenF4:
+            mov BL, 00101111b   ; Зеленый фон
+            int 10h
+    
+    ; F5 - Блокировка ввода
+    _checkF5:
+        lea BP, f5_txt
+        mov CX, fx_length
+        mov BH, 0
+        mov DH, 3               ; Четвертая строка
+        mov DL, 78              ; Правая часть экрана
+        mov AX, 1301h
+        
+        cmp ignoreEnabled, true
+        je _greenF5
+        
+        _redF5:
+            mov BL, 01001111b   ; Красный фон
+            int 10h
+            jmp _outFx
+        
+        _greenF5:
+            mov BL, 00101111b   ; Зеленый фон
+            int 10h
+    
+    _outFx:
+        pop DX                  ; Восстановить позицию курсора
+        mov AH, 02h
+        int 10h
+        
+        pop ES
+        pop BP
+        pop DX
+        pop CX
+        pop BX
+        pop AX
+        ret
+changeFx endp
+	
+    ;новый обработчик
+    new_int9h proc far
+		; сохраняем значения всех, изменяемых регистров в стэке
+		push SI
+		push AX
+		push BX
+		push CX
+		push DX
+		push ES
+		push DS
+		push BP
+		; синхронизируем CS и DS
+		push CS
+		pop	DS
 
-; Таблица замены русских букв на латинские
-rus_to_lat db 32 dup(?) ; Пропускаем служебные символы
-           db 'a', 'b', 'w', 'g', 'd', 'e', 'v', 'z', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'
-           db 'r', 's', 't', 'u', 'f', 'h', 'c', '~', 'x', 'y', '~'
-           db 5 dup(?)  ; Остальные символы
-           db 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 'a', 's'
-           db 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', 39, '`', 'z', 'x', 'c', 'v'
-           db 'b', 'n', 'm', ',', '.', '/'
+		mov	AX, 40h ; 40h-сегмент,где хранятся флаги сост-я клавиатуры, кольц. буфер ввода 
+		mov	ES, AX
+		in	AL, 60h	; записываем в AL скан-код нажатой клавиши
+		
+		;@ проверка на Ctrl+U, только для ИУ5-41
+		cmp	AL, 22	; была нажата клавиша U?
+		jne	_test_Fx
+		mov	AH, ES:[17h]     ; флаги клавиатуры
+		and	AH, 00001111b
+		cmp	AH, 00000100b	; был ли нажат ctrl?
+		jne	_test_Fx
+		; выгрузка по CTRL+U
+			mov AH, 0FFh
+			mov AL, 01h
+			int 2Fh
+			; завершаем обработку нажатия
+			
+			in	AL, 61h	;контроллер состояния клавиатуры
+			or	AL, 10000000b	;пометим, что клавишу нажали
+			out	61h, AL
+			and	AL, 01111111b	;пометим, что клавишу отпустили
+			out	61h, AL
+			mov	AL, 20h
+			out	20h, AL	;отправим в контроллер прерываний признак конца прерывания
+			
+			; выходим
+			jmp _quit
+		
+		;@ далее - код для всех вариантов
+		
+		;проверка F1-F4
+		_test_Fx:
+sub AL, 59 ; в AL теперь номер функциональной клавиши (F2=59h, F3=60h и т.д.)
+_F2:
+    cmp AL, 1 ; F2
+    jne _F3
+    not signaturePrintingEnabled
+    call changeFx
+    jmp _translate_or_ignore
+_F3:
+    cmp AL, 2 ; F3
+    jne _F4
+    not cursiveEnabled
+    call changeFx
+    call setCursive
+    jmp _translate_or_ignore
+_F4:
+    cmp AL, 3 ; F4
+    jne _F5
+    not translateEnabled
+    call changeFx
+    jmp _translate_or_ignore
+_F5:
+    cmp AL, 4 ; F5
+    jne _translate_or_ignore
+    not ignoreEnabled
+    call changeFx
+    jmp _translate_or_ignore
+				
+		;игнорирование и перевод
+		_translate_or_ignore:
+		
+		pushf
+		call dword ptr CS:[old_int9hOffset] ; вызываем стандартный обработчик прерывания
+		mov	AX, 40h 	; 40h-сегмент,где хранятся флаги сост-я клавы,кольц. буфер ввода 
+		mov	ES, AX
+		mov	BX, ES:[1Ch]	; адрес хвоста
+		dec	BX	; сместимся назад к последнему
+		dec	BX	; введённому символу
+		cmp	BX, 1Eh	; не вышли ли мы за пределы буфера?
+		jae	_go
+		mov	BX, 3Ch	; хвост вышел за пределы буфера, значит последний введённый символ
+				    ; находится	в конце буфера
 
-; Новый обработчик прерывания клавиатуры (int 09h)
-new_int09h proc far
-    pushf
-    push ax
-    push bx
-    push ds
-    
-    mov ax, cs
-    mov ds, ax
-    
-    in al, 60h          ; Получить скан-код нажатой клавиши
-    
-    ; Проверка на F1
-    cmp al, 3Bh         ; Скан-код F1
-    jne check_f7
-    cmp f1_pressed, 0
-    je set_f1
-    mov f1_pressed, 0
-    jmp check_unload
-set_f1:
-    mov f1_pressed, 1
-    jmp check_unload
+	_go:		
+		mov DX, ES:[BX] ; в DX 0 введённый символ
+		;включен ли режим блокировки ввода?
+		cmp ignoreEnabled, true
+		jne _check_translate
+		
+		; да, включен
+		mov SI, 0
+		mov CX, ignoredLength ;кол-во игнорируемых символов
+		
+		; проверяем, присутствует ли текущий символ в списке игнорируемых
+	_check_ignored:
+		cmp DL,ignoredChars[SI]
+		je _block
+		inc SI
+	loop _check_ignored
+		jmp _check_translate
+		
+	; блокируем
+	_block:
+		;mov ES:[1Ch], BX ;блокировка ввода символа
+		;@ если по варианту нужно не блокировать ввод символа,
+		;@ а заменять одни символы другими,
+		;@ замените строку выше строкой
+		;@  mov ES:[BX], AX
+		;@ на месте AX может быть '*' для замены всех символов множества ignoredChars на звёздочки
+		;@ или, для перевода одних символов в другие - завести массив
+		;@ replaceWith DB '...', где перечислить символы, на которые пойдёт замена
+		;@ и раскомментировать строки ниже:
+		  xor AX, AX
+		  mov AL, replaceWith[SI]
+		  mov ES:[BX], AX	; замена символа
+		jmp _quit
+	
+	_check_translate:
+		; включен ли режим перевода?
+		cmp translateEnabled, true
+		jne _quit
+		
+		; да, включен
+		mov SI, 0
+		mov CX, translateLength ; кол-во символов для перевода
+		; проверяем, присутствует ли текущий символ в списке для перевода
+		_check_translate_loop:
+			cmp DL, translateFrom[SI]
+			je _translate
+			inc SI
+		loop _check_translate_loop
+		jmp _quit
+		
+		; переводим
+		_translate:		
+			xor AX, AX
+			mov AL, translateTo[SI]
+			mov ES:[BX], AX	; замена символа
+			
+	_quit:
+		; восстанавливаем все регистры
+		pop BP
+		pop	DS
+		pop	ES
+		pop DX
+		pop CX
+		pop	BX
+		pop	AX
+		pop SI
+		iret
+new_int9h endp  
 
-check_f7:
-    ; Проверка на F7
-    cmp al, 41h         ; Скан-код F7
-    jne check_unload
-    cmp f7_pressed, 0
-    je set_f7
-    mov f7_pressed, 0
-    jmp check_unload
-set_f7:
-    mov f7_pressed, 1
-    mov timer_counter, 0
+;=== Обработчик прерывания int 1Ch ===;
+;=== Вызывается каждые 55 мс ===;
+new_int1Ch proc far
+	push AX
+	push CS
+	pop DS
+	
+	pushf
+	call dword ptr CS:[old_int1ChOffset]
+	
+	cmp signaturePrintingEnabled, true ; если нажата управляющая клавиша (в данном случае F1)
+	jne _notToPrint		
+	
+		cmp counter, printDelay*1000/55 + 1 ; если кол-во "тактов" эквивалентно %printDelay% секундам
+		je _letsPrint
+		
+		jmp _dontPrint
+		
+		_letsPrint:
+			not signaturePrintingEnabled
+			mov counter, 0
+			call printSignature
+		
+		_dontPrint:
+			add counter, 1
+		
+	_notToPrint:
+	
+	pop AX
+	
+	iret
+new_int1Ch endp
 
-check_unload:
-    ; Проверка на Ctrl+U (выгрузка)
-    in al, 61h          ; Получить состояние клавиатуры
-    mov ah, al
-    or al, 80h          ; Установить бит подтверждения
-    out 61h, al
-    xchg ah, al
-    out 61h, al         ; Восстановить исходное состояние
-    
-    mov al, 0Eh         ; Скан-код Backspace (для проверки Ctrl)
-    call get_key_state
-    test al, 4          ; Проверить состояние Ctrl
-    jz skip_unload_check
-    
-    mov al, 16h         ; Скан-код U
-    call get_key_state
-    test al, 128        ; Проверить, отпущена ли клавиша
-    jnz skip_unload_check
-    
-    mov unload_flag, 1  ; Установить флаг выгрузки
-    
-skip_unload_check:
-    pop ds
-    pop bx
-    pop ax
-    popf
-    jmp dword ptr cs:old_int09h ; Передать управление старому обработчику
-new_int09h endp
+;=== Обработчик прерывания int 2Fh ===;
+;=== Служит для:
+;===  1) проверки факта присутствия TSR в памяти (при AH=0FFh, AL=0)
+;===     будет возвращён AH='i' в случае, если TSR уже загружен
+;===  2) выгрузки TSR из памяти (при AH=0FFh, AL=1)
+;===     
+new_int2Fh proc
+	cmp	AH, 0FFh	;наша функция?
+	jne	_2Fh_std	;нет - на старый обработчик
+	cmp	AL, 0	;подфункция проверки, загружен ли резидент в память?
+	je	_already_installed
+	cmp	AL, 1	;подфункция выгрузки из памяти?
+	je	_uninstall	
+	jmp	_2Fh_std	;нет - на старый обработчик
+	
+_2Fh_std:
+	jmp	dword ptr CS:[old_int2FhOffset]	;вызов старого обработчика
+	
+_already_installed:
+		mov	AH, 'i'	;вернём 'i', если резидент загружен	в память
+		iret
+	
+_uninstall:
+	push	DS
+	push	ES
+	push	DX
+	push	BX
+	
+	xor BX, BX
+	
+	; CS = ES, для доступа к переменным
+	push CS
+	pop ES
+	
+	mov	AX, 2509h
+	mov DX, ES:old_int9hOffset         ; возвращаем вектор прерывания
+    mov DS, ES:old_int9hSegment        ; на место
+	int	21h
+	
+	mov	AX, 251Ch
+	mov DX, ES:old_int1ChOffset         ; возвращаем вектор прерывания
+    mov DS, ES:old_int1ChSegment        ; на место
+	int	21h
 
-; Функция для получения состояния клавиши
-; Вход: AL - скан-код
-; Выход: AL - состояние клавиши
-get_key_state proc
-    push es
-    mov bx, 40h
-    mov es, bx
-    mov bx, 17h         ; Адрес состояния клавиш
-    mov ah, al
-    shr al, 3           ; Получить смещение байта
-    and ah, 7           ; Получить номер бита
-    add bl, al
-    mov al, es:[bx]     ; Получить байт состояния
-    mov cl, ah
-    shr al, cl          ; Сдвинуть нужный бит в младший разряд
-    and al, 1           ; Изолировать бит
-    pop es
-    ret
-get_key_state endp
+	mov	AX, 252Fh
+	mov DX, ES:old_int2FhOffset         ; возвращаем вектор прерывания
+    mov DS, ES:old_int2FhSegment        ; на место
+	int	21h
 
-; Новый обработчик прерывания таймера (int 08h)
-new_int08h proc far
-    pushf
-    push ax
-    push ds
-    
-    mov ax, cs
-    mov ds, ax
-    
-    ; Проверка флага выгрузки
-    cmp unload_flag, 1
-    je unload_program
-    
-    ; Обработка F7 (3-секундная задержка)
-    cmp f7_pressed, 1
-    jne skip_f7_processing
-    inc timer_counter
-    cmp timer_counter, 3*18 ; 3 секунды (18.2 тика/сек)
-    jl skip_f7_processing
-    
-    ; Вывод информации о студенте
-    call show_student_info
-    mov f7_pressed, 0
-    mov timer_counter, 0
+	mov	ES, CS:2Ch	; загрузим в ES адрес окружения			
+	mov	AH, 49h		; выгрузим из памяти окружение
+	int	21h
+	jc _notRemove
+	
+	push	CS
+	pop	ES	;в ES - адрес резидентной программы
+	mov	AH, 49h  ;выгрузим из памяти резидент
+	int	21h
+	jc _notRemove
+	jmp _unloaded
+	
+_notRemove: ; не удалось выполнить выгрузку
+    ; вывод сообщения о неудачной выгрузке
+	mov AH, 03h					; получаем позицию курсора
+	int 10h
+	lea BP, noRemoveMsg
+	mov CX, noRemoveMsg_length
+	mov BL, 0111b
+	mov AX, 1301h
+	int 10h
+	jmp _2Fh_exit
+	
+_unloaded: ; выгрузка прошла успешно
+    ; вывод сообщения об удачной выгрузке
+	mov AH, 03h					; получаем позицию курсора
+	int 10h
+	lea BP, removedMsg
+	mov CX, removedMsg_length
+	mov BL, 0111b
+	mov AX, 1301h
+	int 10h
+	
+_2Fh_exit:
+	pop BX
+	pop	DX
+	pop	ES
+	pop	DS
+	iret
+new_int2Fh endp
 
-skip_f7_processing:
-    pop ds
-    pop ax
-    popf
-    jmp dword ptr cs:old_int08h ; Передать управление старому обработчику
+;=== Процедура вывода подписи (ФИО, группа)
+;=== Настраивается значениями переменных в начале исходника
+;===
+printSignature proc
+	push AX
+	push DX
+	push CX
+	push BX
+	push ES
+	push SP
+	push BP
+	push SI
+	push DI
 
-unload_program:
-    ; Восстановление старых обработчиков прерываний
-    cli
-    mov dx, word ptr old_int09h
-    mov ds, word ptr old_int09h+2
-    mov ax, 2509h
+	xor AX, AX
+	xor BX, BX
+	xor DX, DX
+	
+	mov AH, 03h						;чтение текущей позиции курсора
+	int 10h
+	push DX							;помещаем информацию о положении курсора в стек
+	
+	cmp printPos, 0
+	je _printTop
+	
+	cmp printPos, 1
+	je _printCenter
+	
+	cmp printPos, 2
+	je _printBottom
+	
+	;все числа подобраны на глаз...
+	_printTop:
+		mov DH, 0
+		mov DL, 15
+		jmp _actualPrint
+	
+	_printCenter:
+		mov DH, 9
+		mov DL, 15
+		jmp _actualPrint
+		
+	_printBottom:
+		mov DH, 19
+		mov DL, 15
+		jmp _actualPrint
+		
+	_actualPrint:	
+		mov AH, 0Fh					;чтение текущего видеорежима. в BH - текущая страница
+		int 10h
+
+		push CS						
+		pop ES						;указываем ES на CS
+		
+		;вывод 'верхушки' таблицы
+		push DX
+		lea BP, tableTop				;помещаем в BP указатель на выводимую строку
+		mov CX, tableTop_length		;в CX - длина строки
+		mov BL, 0111b 				;цвет выводимого текста ref: http://en.wikipedia.org/wiki/BIOS_color_attributes
+		mov AX, 1301h					;AH=13h - номер ф-ии, AL=01h - курсор перемещается при выводе каждого из символов строки
+		int 10h
+		pop DX
+		inc DH
+		
+		
+		;вывод первой линии
+		push DX
+		lea BP, signatureLine1
+		mov CX, Line1_length
+		mov BL, 0111b
+		mov AX, 1301h
+		int 10h
+		pop DX
+		inc DH
+		
+		;вывод второй линии
+		push DX
+		lea BP, signatureLine2
+		mov CX, Line2_length
+		mov BL, 0111b
+		mov AX, 1301h
+		int 10h
+		pop DX
+		inc DH
+		
+		;вывод третьей линии
+		push DX
+		lea BP, signatureLine3
+		mov CX, Line3_length
+		mov BL, 0111b
+		mov AX, 1301h
+		int 10h
+		pop DX
+		inc DH
+		
+		;вывод 'низа' таблицы
+		push DX
+		lea BP, tableBottom
+		mov CX, tableBottom_length
+		mov BL, 0111b
+		mov AX, 1301h
+		int 10h
+		pop DX
+		inc DH
+		
+		xor BX, BX
+		pop DX						;восстанавливаем из стека прежнее положение курсора
+		mov AH, 02h					;меняем положение курсора на первоначальное
+		int 10h
+		call changeFx
+		
+	pop DI
+	pop SI
+	pop BP
+	pop SP
+	pop ES
+	pop BX
+	pop CX
+	pop DX
+	pop AX
+	
+	ret
+printSignature endp
+
+;=== Функция, которая в зависимости от флага cursiveEnabled меняет начертание символа с курсива на обычное и наоброт
+;=== Сама смена происходит в процедуре changeFont, а здесь подготавливаются данные
+setCursive proc
+	push ES ; сохраняем регистры
+	push AX
+	push CS
+	pop ES
+
+	cmp cursiveEnabled, true
+	jne _restoreSymbol
+	; если флаг равен true, выполняем замену символа на курсивный вариант,
+	; предварительно сохраняя старый символ в savedSymbol
+	
+	call saveFont
+	mov CL, charToCursiveIndex
+_shifTtable:
+	; мы получаем в BP таблицу всех символов. адрес указывает на символ 0
+	; поэтому нуэно совершить сдвиг 16*X - где X - код символа
+	add BP, 16
+	loop _shiftTable
+	
+	; пpи savefont смещается pегистp ES
+	; поэтомy пpиходится делать такие махинации, чтобы 
+	; записать полyченный элемент в savedSymbol
+	; swap(ES, DS) и сохранение старого значения DS
+	push DS
+	pop AX
+	push ES
+	pop DS
+	push AX
+	pop ES
+	push AX
+
+	mov SI, BP
+	lea DI, savedSymbol
+	; сохpаняем в пеpеменнyю savedSymbol
+	; таблицy нyжного символа
+	mov CX, 16
+	; movsb из DS:SI в ES:DI
+	rep movsb
+	; исходные позиции сегментов возвpащены	
+	pop DS ; восстановление DS
+
+	; заменим написание символа на кypсив
+	mov CX, 1
+	mov DH, 0
+	mov DL, charToCursiveIndex
+	lea BP, cursiveSymbol
+	call changeFont
+	jmp _exitSetCursive
+	
+_restoreSymbol:	
+	; если флаг равен 0, выполняем замену курсивного символа на старый вариант
+
+	mov CX, 1
+	mov DH, 0
+	mov DL, charToCursiveIndex
+	lea bp, savedSymbol
+	call changeFont
+	
+_exitSetCursive:
+	pop AX
+	pop ES
+	ret
+setCursive endp	
+	
+;=== Функция смены начертания символа (курсив/нормальное)
+;===
+; *** входные данные
+; DL = номер символа для замены
+; CX = Кол-во символов заменяемых изображений символов
+; (начиная с символа указанного в DX)
+; ES:bp = адрес таблицы
+;
+; *** описание работы процедуры
+; Происходит вызов int 10h (видеосервис)
+; с функцией AH = 11h (функции знакогенератора)
+; Параметр AL = 0 сообщает, что будет заменено изображение
+; символа для текущего шрифта
+; В случаях, когда AL = 1 или 2, будет заменено изображение
+; только для опредленного шрифта (8x14 и 8x8 соответственно)
+; Параметр BH = 0Eh сообщает, что на опредление каждого изображения символа
+; расходуется по 14 байт (режим 8x14 бит как раз 14 байт)
+; Параметр BL = 0 - блок шрифта для загрузки (от 0 до 4)
+;
+; *** результат
+; изображение указанного(ых) символа(ов) будет заменено
+; на предложенное пользователем.
+; Изменению подвергнутся все символы, находящиеся на экране,
+; то есть если изображение заменено, старый вариант нигде уже не проявится
+
+changeFont proc
+	push AX
+	push BX
+	mov AX, 1100h
+	mov BX, 1000h
+	int 10h
+	pop AX
+	pop BX
+	ret
+changeFont endp
+
+;=== Функция сохранения нормального начертания символа
+;===
+; *** входные данные
+; BH - тип возвращаемой символьной таблицы
+;   0 - таблица из int 1fh
+;   1 - таблица из int 44h
+;   2-5 - таблица из 8x14, 8x8, 8x8 (top), 9x14
+;   6 - 8x16
+;
+; *** описание работы процедуры
+; Происходит вызов int 10h (видеосервис)
+; с функцией AH = 11h (функции знакогенератора)
+; Параметр AL = 30 - подфункция получения информации о EGA
+;
+; *** результат
+; в ES:BP находится таблица символов (полная)
+; в CX находится байт на символ
+; в DL количество экранных строк
+; ВАЖНО! Происходит сдвиг регистра ES
+; ( ES становится равным C000h )
+
+saveFont proc
+	push AX
+	push BX
+	mov AX, 1130h
+	mov BX, 0600h
+	int 10h
+	pop AX
+	pop BX
+	ret
+saveFont endp
+
+
+;=== Отсюда начинается выполнение основной части программы ===;
+;===
+_initTSR:                         	; старт резидента
+	mov AH, 03h
+	int 10h
+	push DX
+	mov AH,00h					; установка видеорежима (83h  текст  80x25  16/8  CGA,EGA  b800  Comp,RGB,Enhanced), без очистки экрана
+	mov AL,83h
+	int 10h
+	pop DX
+	mov AH, 02h
+	int 10h
+	
+	
+    call commandParamsParser    
+	mov AX,3509h                    ; получить в ES:BX вектор 09
+    int 21h                         ; прерывания
+	
+	;@ === Удаление резидента из памяти ===
+	;@ Если по варианту необходимо выгружать резидент по повторному запуску приложений, 
+	;@ нужно закомментировать следующие 3 строки, а также
+	;@ содержимое метки _finishTSR ф-ии commandParamsParser, но не саму метку!
+	cmp unloadTSR, true
+	je _removingOnParameter
+	jmp _notRemovingNow
+
+	_removingOnParameter:
+		mov AH, 0FFh
+		mov AL, 0
+		int 2Fh
+		cmp AH, 'i'  ; проверка того, загружена ли уже программа
+		je _remove 
+		mov AH, 09h				;@ для выгрузки резидента по повторному запуску закомментировать эту строку
+		lea DX, notInstalledMsg	;@ для выгрузки резидента по повторному запуску закомментировать эту строку
+		int 21h					;@ для выгрузки резидента по повторному запуску закомментировать эту строку
+		int 20h					;@ для выгрузки резидента по повторному запуску закомментировать эту строку
+	 
+	_notRemovingNow:
+	
+	cmp notLoadTSR, true			; если была выведена справка
+	je _exit_tmp						; просто выходим
+
+	;@ Если по варианту необходимо выгружать резидент по повторному запуску, то комментируем 5 строк ниже
+	;@ если необходимо выгружать по параметру коммандной строки, то оставляем их
+	mov AH, 0FFh
+	mov AL, 0
+	int 2Fh
+	cmp AH, 'i'  ; проверка того, загружена ли уже программа
+	je _alreadyInstalled
+    
+	jmp _tmp
+	
+	_exit_tmp:
+		jmp _exit
+	
+	_tmp:
+	push ES
+    mov AX, DS:[2Ch]                ; psp
+    mov ES, AX
+    mov AH, 49h                     ; хватит памяти чтоб остаться
+    int 21h                         ; резидентом?
+    pop ES
+    jc _notMem                      ; не хватило - выходим
+	
+	;== int 09h ==;
+
+	mov	word ptr CS:old_int9hOffset, BX
+	mov	word ptr CS:old_int9hSegment, ES
+    mov AX, 2509h                   ; установим вектор на 09
+    mov DX, offset new_int9h            ; прерывание
     int 21h
-    
-    mov dx, word ptr old_int08h
-    mov ds, word ptr old_int08h+2
-    mov ax, 2508h
-    int 21h
-    
-    mov dx, word ptr old_int16h
-    mov ds, word ptr old_int16h+2
-    mov ax, 2516h
-    int 21h
-    sti
-    
-    ; Освобождение памяти
-    mov ax, 3100h
-    mov dx, (init - start + 15) / 16 ; Размер резидентной части в параграфах
-    int 21h
-new_int08h endp
+	
+	;== int 1Ch ==;
+	mov AX,351Ch                    ; получить в ES:BX вектор 1C
+    int 21h                         ; прерывания
+	mov	word ptr CS:old_int1ChOffset, BX
+	mov	word ptr CS:old_int1ChSegment, ES
+	mov AX, 251Ch                   ; установим вектор на 1C
+	mov DX, offset new_int1Ch            ; прерывание
+	int 21h
+	
+	;== int 2Fh ==;
+	mov AX,352Fh                    ; получить в ES:BX вектор 1C
+    int 21h                         ; прерывания
+	mov	word ptr CS:old_int2FhOffset, BX
+	mov	word ptr CS:old_int2FhSegment, ES
+	mov AX, 252Fh                   ; установим вектор на 2F
+	mov DX, offset new_int2Fh            ; прерывание
+	int 21h
 
-; Процедура для вывода информации о студенте
-show_student_info proc
-    push ax
-    push bx
-    push cx
-    push dx
-    push es
-    push si
-    push di
-    
-    mov ax, 0B800h      ; Сегмент видеопамяти
-    mov es, ax
-    
-    ; Вычисляем позицию для вывода (низ экрана)
-    mov di, (24*80)*2   ; 24 строка (0-based), 0 колонка
-    
-    lea si, student_info
-    mov ah, 07h         ; Атрибут символа (серый на черном)
-    
-print_loop:
-    lodsb               ; Загрузить символ из строки
-    test al, al         ; Проверка на конец строки
-    jz print_done
-    
-    stosw               ; Записать символ и атрибут в видеопамять
-    jmp print_loop
-    
-print_done:
-    pop di
-    pop si
-    pop es
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    ret
-show_student_info endp
+	call changeFx
+    mov DX, offset installedMsg         ; выводим что все ок
+    mov AH, 9
+    int 21h
+    mov DX, offset _initTSR       ; остаемся в памяти резидентом
+    int 27h                         ; и выходим
+    ; конец основной программы  
+_remove: ; выгрузка программы из памяти
+	mov AH, 0FFh
+	mov AL, 1
+	int 2Fh
+	jmp _exit
+_alreadyInstalled:
+	mov AH, 09h
+	lea DX, alreadyInstalledMsg
+	int 21h
+	jmp _exit
+_notMem:                            ; не хватает памяти, чтобы остаться резидентом
+    mov DX, offset noMemMsg
+    mov AH, 9
+    int 21h
+_exit:                               ; выход
+    int 20h
 
-; Новый обработчик прерывания клавиатуры (int 16h)
-new_int16h proc far
-    cmp ah, 00h         ; Функция чтения символа
-    je handle_read
-    cmp ah, 01h         ; Функция проверки буфера
-    je handle_check
-    
-    ; Для других функций передаем управление старому обработчику
-    jmp dword ptr cs:old_int16h
-    
-handle_check:
-    pushf
-    call dword ptr cs:old_int16h
-    jz no_key_available
-    ; Если есть символ в буфере, проверить нужно ли его заменять
-    test cs:f1_pressed, 1
-    jz no_translation_needed
-    ; Заменить русский символ на латинский
-    push bx
-    push ds
-    push cs
-    pop ds
-    mov bx, offset rus_to_lat
-    sub al, 80h         ; Русские символы начинаются с 80h
-    xlatb
-    pop ds
-    pop bx
-no_translation_needed:
-    retf 2              ; Выход с сохранением флагов
-no_key_available:
-    retf 2              ; Выход с сохранением флагов
-    
-handle_read:
-    pushf
-    call dword ptr cs:old_int16h
-    test cs:f1_pressed, 1
-    jz read_done
-    ; Заменить русский символ на латинский
-    push bx
-    push ds
-    push cs
-    pop ds
-    mov bx, offset rus_to_lat
-    sub al, 80h         ; Русские символы начинаются с 80h
-    xlatb
-    pop ds
-    pop bx
-read_done:
-    iret
-new_int16h endp
+;=== Процедура проверки параметров ком. строки ===;
+;===
+commandParamsParser proc
+	push CS
+	pop ES
+	mov unloadTSR, 0
+	mov notLoadTSR, 0
+	
+	mov SI, 80h   				;SI=смещение командной строки.
+	lodsb        					;Получим кол-во символов.
+	or AL, AL     				;Если 0 символов введено, 
+	jz _exitHelp   				;то все в порядке. 
 
-; Инициализация программы
-init:
-    ; Получить и сохранить старые обработчики прерываний
-    mov ax, 3509h       ; Получить вектор прерывания 09h
-    int 21h
-    mov word ptr old_int09h, bx
-    mov word ptr old_int09h+2, es
-    
-    mov ax, 3508h       ; Получить вектор прерывания 08h
-    int 21h
-    mov word ptr old_int08h, bx
-    mov word ptr old_int08h+2, es
-    
-    mov ax, 3516h       ; Получить вектор прерывания 16h
-    int 21h
-    mov word ptr old_int16h, bx
-    mov word ptr old_int16h+2, es
-    
-    ; Установить новые обработчики прерываний
-    mov dx, offset new_int09h
-    mov ax, 2509h
-    int 21h
-    
-    mov dx, offset new_int08h
-    mov ax, 2508h
-    int 21h
-    
-    mov dx, offset new_int16h
-    mov ax, 2516h
-    int 21h
-    
-    ; Вывести сообщение о резидентной загрузке
-    mov dx, offset init_msg
-    mov ah, 09h
-    int 21h
-    
-    ; Оставить резидентную часть и выйти
-    mov dx, (init - start + 15) / 16 ; Размер резидентной части в параграфах
-    mov ax, 3100h
-    int 21h
+	_nextChar:
+	
+	inc SI       					;Теперь SI указывает на первый символ строки.
+	
+	cmp [SI], BYTE ptr 13
+	je _exitHelp
+	
+	
+		lodsw       				;Получаем два символа
+		cmp AX, '?/' 				;Это '/?' (данные расположены в обратном порядк, т.е. AL:AH вместо AH:AL)
+		je _question
+		cmp AX, 'u/'
+		je _finishTSR
+		;;; для большой "U"
+		cmp AX, 'U/'
+		je _finishTSR
+		;cmp AH, '/'
+		;je _errorParam
+		
+		jmp _exitHelp
+   
+	_question:
+		; вывод строки помощи
+			mov AH,03
+			int 10h	
+			lea BP, helpMsg
+			mov CX, helpMsg_length
+			mov BL, 0111b
+			mov AX, 1301h
+			int 10h
+		; конец вывода строки помощи
+		not notLoadTSR	        ;флаг того, что необходимо не загружать резидент
+		jmp _nextChar
+	
+	;@ === Удаление резидента из памяти ===
+	;@ Если по варианту необходимо выгружать резидент по параметру '/u' коммандной строки, 
+	;@ нужно использовать следующий код, в остальных случаях необходимо закомменитровать 
+	;@ этот код, кроме названия метки! (по желанию можно избавиться и от метки, но аккуратно просмотреть использование)
+	_finishTSR:
+		not unloadTSR		      ;флаг того, что необходимо выгузить резидент
+		jmp _nextChar
 
-init_msg db 'Резидентная программа загружена. Горячие клавиши:', 0Dh, 0Ah
-         db 'F7 - вывести информацию через 3 секунды', 0Dh, 0Ah
-         db 'F1 - переключить режим ввода рус/лат', 0Dh, 0Ah
-         db 'Ctrl+U - выгрузить программу', 0Dh, 0Ah, '$'
+	jmp _exitHelp
 
-end start
+	_errorParam:
+		;вывод строки
+			mov AH,03
+			int 10h	
+			lea BP, CS:errorParamMsg
+			mov CX, errorParamMsg_length
+			mov BL, 0111b
+			mov AX, 1301h
+			int 10h
+		;конец вывода строки
+	_exitHelp:
+	ret
+commandParamsParser endp
+
+code ends
+end _start
