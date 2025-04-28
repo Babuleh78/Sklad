@@ -122,7 +122,7 @@ private:
         }
     }
 
-    int minDepth(Node* root) {
+    int minDepth(Node* root) const {
         if (root == nullptr) { // Если дерево пустое
             return 0;
         }
