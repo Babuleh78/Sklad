@@ -1,0 +1,1653 @@
+openapi: 3.0.0
+info:
+  title: Games Library API
+  version: 1.0.0
+  description: API для управления библиотекой игр
+
+servers:
+  - url: https://api.example.com/library/v1
+    description: Production server
+    
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  
+
+paths:
+  /mods:
+    get:
+      summary: Получить список всех модификаций
+      description: Возвращает список модификаций
+      tags:
+        - Модификации
+      parameters:
+        - name: limit
+          in: query
+          description: Количество возвращаемых результатов (на одной странице)
+          required: false
+          schema:
+            type: integer
+            default: 30
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+        '200':
+          description: Успешный запрос
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Общее количество модификаций
+                    example: 30
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        version:
+                          type: string
+                        author:
+                          type: string
+                        game_id:
+                          type: integer
+              example:
+                - id: 1
+                  name: HD Текстуры
+                  description: Лучшие текстуры
+                  version: 1.0.0
+                  author: user1
+                  game_id: 1
+                - id: 2
+                  name: Doom на сковородке
+                  description: Всегда мечтал
+                  version: 2.0.1
+                  author: user2
+                  game_id: 2
+        '400':
+          description: Неверные параметры запроса
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Invalid parameters"
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req_123456"
+  
+    post:
+      summary: Создать новую модификацию
+      description: Создает новую модификацию для указанной игры
+      tags:
+        - Модификации
+      security:
+        - bearerAuth: []
+      parameters:
+      
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+       
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, game_id]
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                description:
+                  type: string
+                  maxLength: 500
+                version:
+                  type: string
+                game_id:
+                  type: integer
+            example:
+              name: "New Mod"
+              description: "Great mod"
+              version: "1.0.0"
+              game_id: 3
+      responses:
+        '201':
+          description: Модификация успешно создана
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+            Location:
+              description: URL созданной модификации
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  status:
+                    type: string
+              example:
+                id: 3
+                name: "New Mod"
+                status: "created"
+        '400':
+          description: Неверные данные запроса
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Failed"
+                details:
+                  - field: "name"
+                    error: "Неверные данные"
+                  - field: "version"
+                    error: "Должен быть по шаблону X.Y.Z"
+        '401':
+          description: Требуется авторизация
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+        '403':
+          description: Доступ запрещен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "У вас нет прав, чтобы создавать моды"
+        '409':
+          description: модификация уже существует
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Mod already exists"
+                existing_id: 5
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req_787878"
+                
+  /mods/{mod_id}:
+    get:
+      summary: Получить информацию о модификации
+      description: Возвращает информацию о конкретной модификации
+      tags:
+        - Модификации
+      parameters:
+        - name: mod_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: ID модификации
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+        '200':
+          description: Успешный запрос
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  version:
+                    type: string
+                  downloads:
+                    type: integer
+                  rate:
+                    type: number
+                    format: float
+                  author:
+                    type: string
+                  game_id:
+                    type: integer
+                example:
+                  id: 1
+                  name: "HD Textures"
+                  description: "High definition textures pack"
+                  version: "1.2.0"
+                  downloads: 1500
+                  rate: 4.5
+                  author: "user123"
+                  game_id: 5
+        '400':
+          description: Неверный ID модификации
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Invalid mod ID"
+                message: "Уточните ID мода и проверьте его корректность!"
+        '404':
+          description: Модификация не найдена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Mod not found"
+                mod_id: 999
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal server error"
+                request_id: "req_123456"
+  
+    put:
+      summary: Обновить модификацию
+      description: Обновляет информацию о модификации
+      tags:
+        - Модификации
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mod_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+            
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                description:
+                  type: string
+                  maxLength: 1000
+                version:
+                  type: string
+            example:
+              name: "HD Textures Pro"
+              description: "Updated HD textures pack with new materials"
+              version: "1.3.0"
+      responses:
+        '200':
+          description: Модификация успешно обновлена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                id: 1
+                status: "updated"
+                changes:
+                  - field: "name"
+                    old_value: "HD Textures"
+                    new_value: "HD Textures Pro"
+                  - field: "version"
+                    old_value: "1.2.0"
+                    new_value: "1.3.0"
+        '400':
+          description: Неверные данные запроса
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Validation error"
+                details:
+                  - field: "version"
+                    error: "Должна соответствовать паттерну X.Y.Z"
+        '401':
+          description: Требуется авторизация
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+        '403':
+          description: Нет прав на обновление
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "У вас нет прав на обновление данного мода!"
+        '404':
+          description: Модификация не найдена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Mod not found"
+                message: "Проверьте данные мода"
+        '429':
+          description: Слишком много запросов
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+            Retry-After:
+              description: Время ожидания перед повторным запросом (секунды)
+              schema:
+                type: integer
+          content:
+            application/json:
+              example:
+                error: "Too many requests"
+                message: "Повторите попытку позже"
+                retry_after_seconds: 60
+  
+    delete:
+      summary: Удалить модификацию
+      description: Удаляет модификацию из системы
+      security:
+        - bearerAuth: []
+      tags:
+        - Модификации
+      parameters:
+        - name: mod_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+    
+      responses:
+        '204':
+          description: Модификация успешно удалена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+        '401':
+          description: Требуется авторизация
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+        '403':
+          description: Нет прав на удаление
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "У вас нет прав на удаление данного мода!"
+        '404':
+          description: Модификация не найдена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Mod not found"
+                
+  /games:
+    get:
+      summary: Получить список всех игр
+      description: Возвращает список игр
+      tags:
+        - Игры
+      parameters:
+        - name: limit
+          in: query
+          description: Количество результатов на странице
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+        '200':
+          description: Успешный запрос
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - id: 101
+                  title: "The Witcher 3"
+                  publisher: "CD Projekt"
+                - id: 102
+                  title: "Cyberpunk 2077"
+                  publisher: "CD Projekt"
+        '400':
+          description: Неверные параметры запроса
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Invalid parameters"
+        '500':
+          description: Ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req_123456"
+  
+    post:
+      summary: Добавить новую игру
+      description: Создает новую запись об игре 
+      tags:
+        - Игры
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: "New Game"
+              publisher: "Ilya Frolov corporated"
+      responses:
+        '201':
+          description: Игра успешно добавлена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+            Location:
+              description: URL созданной игры
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  status:
+                    type: string
+              example:
+                id: 103
+                title: "New Game"
+                status: "created"
+        '400':
+          description: Неверные данные игры
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Validation failed"
+                details:
+                  - field: "title"
+                    error: "Title is required"
+                    message: "Проверьте название!"
+        '401':
+          description: Требуется авторизация
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+        '409':
+          description: Конфликт данных
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Game already exists"
+                existing_id: 101
+  
+  /games/{game_id}:
+    get:
+      summary: Получить информацию об игре
+      description: Возвращает полную информацию об указанной игре
+      tags:
+        - Игры
+      parameters:
+        - name: game_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+        '200':
+          description: Успешный запрос
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                id: 101
+                title: "The Witcher 3"
+                publisher: "CD Projekt"
+                release_date: "2015-05-19"
+                mods_count: 15
+                average_rating: 9.7
+        '404':
+          description: Игра не найдена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Game not found"
+                game_id: 999
+        '500':
+          description: Ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+
+    put:
+      summary: Обновить информацию об игре
+      description: Обновляет данные об указанной игре
+      tags:
+        - Игры
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: game_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: "The Witcher 3: Game of the Year Edition"
+              publisher: "CD Projekt RED"
+      responses:
+        '200':
+          description: Данные обновлены
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  changes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                        old_value:
+                          type: string
+                        new_value:
+                          type: string
+              example:
+                id: 101
+                changes:
+                  - field: "title"
+                    old_value: "The Witcher 3"
+                    new_value: "The Witcher 3: Game of the Year Edition"
+                  - field: "publisher"
+                    old_value: "CD Projekt"
+                    new_value: "CD Projekt RED"
+        '403':
+          description: Нет прав на обновление
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "У вас нет прав обновлять данную игру"
+        '404':
+          description: Игра не найдена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Game not found"
+
+    delete:
+      summary: Удалить игру
+      description: Удаляет игру из системы
+      tags:
+        - Игры
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: game_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Игра успешно удалена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+        '403':
+          description: Нет прав на удаление
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "Вы не можете удалить данную игру"
+        '404':
+          description: Игра не найдена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Game not found"
+  
+  /games/{game_id}/install:
+    post:
+      summary: Установить игру
+      description: Запускает процесс установки игры
+      tags:
+        - Установка
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: game_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+        '202':
+          description: Запрос на установку принят
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+            Retry-After:
+              description: Время ожидания до следующего запроса статуса (секунды)
+              schema:
+                type: integer
+          content:
+            application/json:
+              example:
+                game_id: 101
+                status: "installation_queued"
+                position_in_queue: 3
+        '409':
+          description: Игра уже установлена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Already installed"
+                installation_path: "/games/witcher3"
+
+  /games/{game_id}/launch:
+    post:
+      summary: Запустить игру
+      description: Запускает установленную игру
+      tags:
+        - Запуск
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: game_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+        '200':
+          description: Игра успешно запущена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                game_id: 101
+                status: "running"
+                process_id: 12345
+        '404':
+          description: Игра не установлена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Game not installed"
+                meaage: "Сканачала скачайте игру!"
+                
+  /shop/items:
+    get:
+      summary: Получить список всех предметов
+      tags:
+        - Предметы
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+        '200':
+          description: Все имеющиеся предметы
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                - id: 1
+                  name: "Mega Item"
+                  cost: 2000
+                - id: 2
+                  name: "Simple Item"
+                  cost: 100
+        '404':
+          description: Предметы не найдены
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Items not found"
+                code: 404
+    
+    post:
+      summary: Добавить новый предмет
+      tags:
+        - Предметы
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, cost]
+              properties:
+                name:
+                  type: string
+                cost:
+                  type: integer
+                description:
+                  type: string
+            example:
+              name: "Artbook"
+              cost: 150
+              description: "Da mne nadoelo chto-to pridumivat"
+      responses:
+        '201':
+          description: Предмет добавлен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+            Location:
+              description: URL созданного предмета
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                id: 3
+                name: "Artbook"
+                status: "created"
+        '400':
+          description: Неверные данные
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Invalid input data"
+
+  /shop/items/{item_id}:
+    get:
+      summary: Получить информацию о предмете
+      tags:
+        - Предметы
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+        '200':
+          description: Информация о предмете
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                id: 1
+                name: "Predmet"
+        '404':
+          description: Предмет не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Item not found"
+                item_id: 1
+    
+    put:
+      summary: Обновить предмет
+      tags:
+        - Предметы
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                cost:
+                  type: integer
+            example:
+              name: "Rare Item"
+              cost: 250
+      responses:
+        '200':
+          description: Предмет обновлен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                id: 1
+                status: "updated"
+        '404':
+          description: Предмет не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Item not found"
+    
+    delete:
+      summary: Удалить предмет
+      tags:
+        - Предметы
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Предмет удален
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+        '404':
+          description: Предмет не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Item not found"
+
+  /shop/buy:
+    post:
+      summary: Купить предмет
+      tags:
+        - Предметы
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [item_id]
+              properties:
+                item_id:
+                  type: integer
+            example:
+              item_id: 1
+      responses:
+        '200':
+          description: Предмет куплен
+          content:
+            application/json:
+              example:
+                new_balance: 1300
+                purchased_item:
+                  id: 1
+                  name: "Item"
+                  
+        '400':
+          description: Недостаточно средств
+          content:
+            application/json:
+              example:
+                error: "Insufficient funds"
+                current_balance: 100
+                required: 200
+        '404':
+          description: Предмет не найден
+          content:
+            application/json:
+              example:
+                error: "Item not found"
+                item_id: 1
+  
+  /user/{user_id}/points:
+    get:
+      summary: Получить баланс очков пользователя
+      description: Возвращает количество очков указанного пользователя
+      tags:
+        - Очки пользователя
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: Уникальный идентификатор пользователя
+          schema:
+            type: integer
+            example: 1
+            
+      responses:
+        '200':
+          description: Успешный запрос. Возвращает баланс очков
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    description: ID пользователя
+                    example: 1
+                  points:
+                    type: integer
+                    description: Количество очков пользователя
+                    example: 1500
+                  
+        '400':
+          description: Неверный запрос
+          content:
+            application/json:
+              example:
+                
+                error: "Invalid Value"
+                    
+        '401':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              example:
+                 error: "Unautorized"
+                 
+        '403':
+          description: Доступ запрещен
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                  
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              example:
+                error: "User not found"
+                
+      
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              example:
+                error: "Server don't reply"
+
+
+  /games/sharing:
+    get:
+      summary: Получить список доступов
+      description: Возвращает список игр с информацией о пользователях, которым предоставлен доступ
+      tags:
+        - Совместное пользование
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+        '200':
+          description: Доступные игры для совместного пользования
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                - game_id: 101
+                  shared_with: [42, 56]
+                - game_id: 102
+                  shared_with: [42]
+        '401':
+          description: Не авторизован
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+                message: "Авторизируйтесь в системе!"
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal server error"
+                request_id: "req_787878"
+  
+    post:
+      summary: Предоставить доступ к игре
+      description: Предоставляет указанному пользователю доступ к игре
+      tags:
+        - Совместное пользование
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [game_id, user_id]
+              properties:
+                game_id:
+                  type: integer
+                  description: ID игры
+                user_id:
+                  type: integer
+                  description: ID пользователя
+            example:
+              game_id: 101
+              user_id: 102
+      responses:
+        '200':
+          description: Доступ предоставлен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                status: "success"
+                game_id: 101
+                shared_with: 102
+        '400':
+          description: Неверный запрос
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Bad request"
+        '403':
+          description: Доступ запрещен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "У вас нет прав на эту операцию"
+        '404':
+          description: Игра или пользователь не найдены
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Not found"
+                message: "Игра или пользователь не найдены"
+  
+    delete:
+      summary: Отозвать доступ к игре
+      description: Отзывает у пользователя доступ к игре
+      tags:
+        - Совместное пользование
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: game_id
+          required: true
+          schema:
+            type: integer
+          description: ID игры
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: ID пользователя
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Доступ отозван
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                status: "success"
+                game_id: 101
+                revoked_from: 102
+        '400':
+          description: Неверный запрос
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Bad request"
+        '403':
+          description: Доступ запрещен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "У вас нет прав, чтобы забрать доступ"
+        '404':
+          description: Запись о доступе не найдена
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Not found"
+                details: "Проверьте данные о пользователе и игре"
