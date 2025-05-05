@@ -1,0 +1,1902 @@
+openapi: 3.0.0
+info:
+  title: Games Library API
+  version: 1.0.0
+  description: API для интерфейса пользователя
+  
+servers:
+  - url: https://api.example.com/library/v1
+    description: Production server
+    
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  
+
+paths:
+  /profile/{profile_id}:
+    get:
+      summary: Получить информацию о профиле
+      description: Возвращает полную информацию о профиле пользователя 
+      tags:
+        - Профиль
+      parameters:
+        - name: profile_id
+          in: path
+          description: Идентификатор профиля
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '200':
+          description: Успешный запрос информации о профиле
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  bio:
+                    type: string
+                  avatar_url:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+              example:
+                id: 123
+                username: "example_user"
+                email: "user@example.com"
+                bio: "Pro gamer Vasya 2012"
+                avatar_url: "https://example.com/avatars/123.jpg"
+                created_at: "2023-01-15T10:30:00Z"
+                updated_at: "2023-05-20T14:45:00Z"
+        '404':
+          description: Профиль не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Profile not found"
+                message: "Профиль с ID 123 не существует"
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+  
+    patch:
+      summary: Обновить информацию профиля
+      description: Обновляет информацию профиля пользовател
+      tags:
+        - Профиль
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: profile_id
+          in: path
+          description: Идентификатор профиля для обновления
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 50
+                email:
+                  type: string
+                  format: email
+                  maxLength: 255
+                bio:
+                  type: string
+                  maxLength: 500
+                avatar_url:
+                  type: string
+                  format: uri
+                  maxLength: 2048
+            example:
+              username: "updated_username"
+              bio: "Обновленная информация обо мне"
+              avatar_url: "https://example.com/new_avatar.jpg"
+      responses:
+      
+        '200':
+          description: Профиль успешно обновлен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  status:
+                    type: string
+              example:
+                id: 123
+                username: "updated_username"
+                email: "user@example.com"
+                status: "updated"
+                
+        '400':
+          description: Неверные данные запроса
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Validation failed"
+                details:
+                  - field: "username"
+                    error: "Должен содержать только буквы, цифры и подчеркивания"
+                  - field: "avatar_url"
+                    error: "Некорректный URL"
+                    
+        '401':
+          description: Требуется авторизация
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+                
+        '403':
+          description: Доступ запрещен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "Вы можете обновлять только свой профиль"
+                
+        '404':
+          description: Профиль не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Profile not found"
+                message: "Такого профиля не существует"
+                
+        '409':
+          description: Конфликт данных
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Conflict"
+                message: "Имя пользователя уже занято"
+                
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+                
+    delete:
+      summary: Удалить профиль пользователя
+      description: Удаляет профиль пользователя 
+      tags:
+        - Профиль
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: profile_id
+          in: path
+          description: Идентификатор профиля для удаления
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '204':
+          description: Профиль успешно удален
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+                
+        '401':
+          description: Требуется авторизация
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+                
+        '403':
+          description: Доступ запрещен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "Вы можете удалять только свой профиль"
+                
+        '404':
+          description: Профиль не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Profile not found"
+                message: "Такого профиля не существует"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+                
+  /profile/:
+    post:
+      summary: Создать новый профиль пользователя
+      description: Создает новый профиль пользователя с указанными данными
+      tags:
+        - Профиль
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, email]
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 50
+                email:
+                  type: string
+                  format: email
+                  maxLength: 255
+                bio:
+                  type: string
+                  maxLength: 500
+                avatar_url:
+                  type: string
+                  format: uri
+                  maxLength: 2048
+              example:
+                username: "new_user"
+                email: "user@example.com"
+                bio: "Новый пользователь"
+                avatar_url: "https://example.com/avatar.jpg"
+      responses:
+      
+        '201':
+          description: Профиль успешно создан
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+            Location:
+              description: URL созданного профиля
+              schema:
+                type: string
+                example: "/profile/123"
+                
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  status:
+                    type: string
+                example:
+                  id: 123
+                  username: "new_user"
+                  status: "created"
+                  
+        '400':
+          description: Неверные данные запроса
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Validation failed"
+                details:
+                  - field: "username"
+                    error: "Должен содержать только буквы, цифры и подчеркивания"
+                  - field: "email"
+                    error: "Некорректный email"
+                    
+        '401':
+          description: Требуется авторизация
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+                
+        '409':
+          description: Профиль уже существует
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Profile already exists"
+                existing_id: 123
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+                
+  /friends/{user_id}:
+    get:
+      summary: Получить список друзей пользователя
+      description: Возвращает список друзей указанного пользователя
+      tags:
+        - Друзья
+      parameters:
+        - name: user_id
+          in: path
+          description: ID пользователя, чей список друзей запрашивается
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Количество возвращаемых результатов
+          required: false
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+        - name: offset
+          in: query
+          description: Смещение для пагинации
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '200':
+          description: Успешный запрос списка друзей
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_friends:
+                    type: integer
+                    example: 40
+                  friends:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user_id:
+                          type: integer
+                        username:
+                          type: string
+                        avatar_url:
+                          type: string
+                        friendship_since:
+                          type: string
+                          format: date-time
+              example:
+                total_friends: 3
+                friends:
+                  - user_id: 1
+                    username: "friend1"
+                    avatar_url: "https://example.com/avatars/456.jpg"
+                    friendship_since: "2021-11-28T21:14:00Z"
+                  - user_id: 2
+                    username: "friend2"
+                    avatar_url: "https://example.com/avatars/789.jpg"
+                    friendship_since: "2023-07-20T14:15:00Z"
+                    
+        '404':
+          description: Пользователь не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "User not found"
+                message: "Пользователь не существует"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+  
+    delete:
+      summary: Удалить пользователя из друзей
+      description: Удаляет указанного пользователя из списка друзей текущего пользователя
+      tags:
+        - Друзья
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          description: ID пользователя, которого нужно удалить из друзей
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '204':
+          description: Пользователь успешно удален из друзей
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+                
+     
+        '404':
+          description: Пользователь не найден или не является другом
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Not Found"
+                message: "Пользователь с ID 78 не найден среди ваших друзей"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+                
+  
+  /friends/request:
+    post:
+      summary: Отправить запрос на дружбу
+      description: Отправляет запрос на дружбу указанному пользователю
+      tags:
+        - Друзья
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id]
+              properties:
+                user_id:
+                  type: integer
+                  description: ID пользователя, которому отправляется запрос
+                message:
+                  type: string
+                  maxLength: 200
+                  description: Персональное сообщение к запросу
+              example:
+                user_id: 78
+                message: "Добавь в друзья пж"
+      responses:
+      
+        '201':
+          description: Запрос на дружбу успешно отправлен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: integer
+                  status:
+                    type: string
+                example:
+                  request_id: 5
+                  status: "sent"
+              
+        '404':
+          description: Пользователь не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "User not found"
+                message: "Пользователь с таким id не существует"
+                
+        '409':
+          description: Конфликт
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Conflict"
+                message: "Запрос на дружбу уже существует или пользователь уже в друзьях"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+  
+  /friends/{user_id}/accept:
+    post:
+      summary: Принять запрос на дружбу
+      description: Принимает входящий запрос на дружбу от указанного пользователя
+      tags:
+        - Друзья
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          description: ID пользователя, чей запрос на дружбу принимается
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '200':
+          description: Запрос на дружбу успешно принят
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  friendship_id:
+                    type: integer
+                  status:
+                    type: string
+                example:
+                  friendship_id: 12
+                  status: "accepted"
+      
+                
+        '404':
+          description: Запрос на дружбу не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Friend request not found"
+                message: "Нет активного запроса на дружбу от пользователя с указанным ID"
+                
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+                
+              
+  /communities/:
+    get:
+      summary: Получить список сообществ
+      description: Возвращает список всех сообществ с возможностью фильтрации 
+      tags:
+        - Сообщества
+      parameters:
+        - name: limit
+          in: query
+          description: Количество возвращаемых результатов
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          description: Смещение для пагинации
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: category
+          in: query
+          description: Фильтр по категории
+          required: false
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: Поиск по названию сообщества
+          required: false
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '200':
+          description: Успешный запрос списка сообществ
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 150
+                  communities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        members_count:
+                          type: integer
+                        category:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                        is_member:
+                          type: boolean
+                          description: Присутствует только для аутентифицированных пользователей
+                          
+              example:
+                total: 2
+                communities:
+                  - id: 1
+                    name: "Геймеры"
+                    description: "Сообщество любителей игр"
+                    members_count: 1250
+                    category: "Игры"
+                    created_at: "2022-01-10T12:00:00Z"
+                  - id: 2
+                    name: "Dota2 Community"
+                    description: "Дальше Бога нет"
+                    members_count: 666
+                    category: "MOBA игры"
+                    created_at: "2022-03-15T14:30:00Z"
+                    
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+  
+  /communities/{community_id}/join:
+    post:
+      summary: Присоединиться к сообществу
+      description: Добавляет текущего пользователя в указанное сообщество
+      tags:
+        - Сообщества
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: community_id
+          in: path
+          description: ID сообщества
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '200':
+          description: Успешное присоединение к сообществу
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  community_id:
+                    type: integer
+                  status:
+                    type: string
+                example:
+                  community_id: 1
+                  status: "joined"
+                  
+        '400':
+          description: Пользователь уже состоит в сообществе
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Bad Request"
+                message: "Вы уже состоите в этом сообществе"
+                
+        '404':
+          description: Сообщество не найдено
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Community not found"
+                message: "Сообщество с таким id не существует"
+                
+        '403':
+          description: Доступ запрещен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "Это закрытое сообщество, вам нужно приглашение"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+  
+  /communities/{community_id}/leave:
+    post:
+      summary: Покинуть сообщество
+      description: Удаляет текущего пользователя из указанного сообщества
+      tags:
+        - Сообщества
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: community_id
+          in: path
+          description: ID сообщества
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '200':
+          description: Успешный выход из сообщества
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  community_id:
+                    type: integer
+                  status:
+                    type: string
+                example:
+                  community_id: 1
+                  status: "left"
+                  
+        '400':
+          description: Пользователь не состоит в сообществе
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Bad Request"
+                message: "Вы не состоите в этом сообществе"
+                
+        '404':
+          description: Сообщество не найдено
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Community not found"
+                message: "Сообщество с таким id не существует"
+                
+     
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+  
+  /communities/create:
+    post:
+      summary: Создать новое сообщество
+      description: Создает новое сообщество с текущим пользователем в качестве владельца
+      tags:
+        - Сообщества
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, category]
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                  description: Название сообщества
+                description:
+                  type: string
+                  maxLength: 500
+                  description: Описание сообщества
+                category:
+                  type: string
+                  description: Категория сообщества
+                is_private:
+                  type: boolean
+                  description: Приватное ли сообщество
+                  default: false
+                rules:
+                  type: string
+                  maxLength: 1000
+                  description: Правила сообщества
+              example:
+                name: "WoW RU"
+                description: "Сообщество игроков в Варкрафт"
+                category: "RPG"
+                is_private: false
+                rules: "1. Уважать друг друга\n2. Играть за альянс"
+      responses:
+      
+        '201':
+          description: Сообщество успешно создано
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+            Location:
+              description: URL созданного сообщества
+              schema:
+                type: string
+                example: "/communities/3"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  status:
+                    type: string
+                example:
+                  id: 3
+                  name: "Wow RU"
+                  status: "created"
+                  
+        '400':
+          description: Неверные данные запроса
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Validation failed"
+                details:
+                  - field: "name"
+                    error: "Название должно быть от 3 до 100 символов"
+                  - field: "category"
+                    error: "Категория обязательна"
+                    
+        '409':
+          description: Сообщество с таким названием уже существует
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Community exists"
+                message: "Сообщество с таким названием уже существует"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+                
+                
+  /games/library/{user_id}:
+    get:
+      summary: Получить игровую библиотеку пользователя
+      description: Возвращает список игр, принадлежащих указанному пользователю
+      tags:
+        - Игры
+      parameters:
+        - name: user_id
+          in: path
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Количество возвращаемых результатов
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          description: Смещение для пагинации
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: sort
+          in: query
+          description: Поле для сортировки (playtime, added_date, title)
+          required: false
+          schema:
+            type: string
+            enum: [playtime, added_date, title]
+            default: added_date
+        - name: order
+          in: query
+          description: Порядок сортировки (asc, desc)
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '200':
+          description: Успешный запрос игровой библиотеки
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_games:
+                    type: integer
+                    example: 45
+                  games:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        game_id:
+                          type: integer
+                        title:
+                          type: string
+                        playtime:
+                          type: integer
+                          description: Время игры в минутах
+                        added_date:
+                          type: string
+                          format: date-time
+                        last_played:
+                          type: string
+                          format: date-time
+                        cover_url:
+                          type: string
+              example:
+                total_games: 2
+                games:
+                  - game_id: 101
+                    title: "Cyberpunk 2077"
+                    playtime: 1250
+                    added_date: "2022-01-15T14:20:00Z"
+                    last_played: "2023-04-10T18:45:00Z"
+                    cover_url: "https://example.com/covers/cyberpunk.jpg"
+                  - game_id: 205
+                    title: "The Witcher 3"
+                    playtime: 3420
+                    added_date: "2021-11-05T10:15:00Z"
+                    last_played: "2023-03-22T21:30:00Z"
+                    cover_url: "https://example.com/covers/witcher.jpg"
+                    
+        '404':
+          description: Пользователь не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "User not found"
+                message: "Пользователь с таким id не существует"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+                
+  
+  /games/{game_id}/{user_id}/review:
+    post:
+      summary: Добавить или обновить отзыв на игру
+      description: Создает новый отзыв или обновляет существующий отзыв пользователя на игру
+      tags:
+        - Игры
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: game_id
+          in: path
+          description: ID игры
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rating, comment]
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  description: Оценка игры (1-5 звёзд)
+                comment:
+                  type: string
+                  maxLength: 2000
+                  description: Текст отзыва
+                is_public:
+                  type: boolean
+                  description: Виден ли отзыв другим пользователям
+                  default: true
+              example:
+                rating: 5
+                comment: "Когда начинал играть было ощущение, что заперли в комнате с 9 даунами. Позже оказалось, что даунов в комнате 10..."
+                is_public: true
+      responses:
+      
+        '200':
+          description: Отзыв успешно обновлен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  review_id:
+                    type: integer
+                  status:
+                    type: string
+                example:
+                  review_id: 12
+                  status: "updated"
+                  
+        '201':
+          description: Отзыв успешно создан
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  review_id:
+                    type: integer
+                  status:
+                    type: string
+                example:
+                  review_id: 1
+                  status: "created"
+                  
+        '400':
+          description: Неверные данные отзыва
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Validation failed"
+                details:
+                  - field: "rating"
+                    error: "Оценка должна быть от 1 до 5"
+                  - field: "comment"
+                    error: "Комментарий не может быть пустым"
+     
+                
+        '404':
+          description: Игра или пользователь не найдены
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Not Found"
+                message: "Игра с ID 777 или пользователь с ID 888 не найдены"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+  
+    delete:
+      summary: Удалить отзыв на игру
+      description: Удаляет отзыв пользователя на указанную игру
+      tags:
+        - Игры
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: game_id
+          in: path
+          description: ID игры
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '204':
+          description: Отзыв успешно удален
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+                
+    
+                
+        '404':
+          description: Отзыв не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Review not found"
+                message: "Отзыв пользователя 777 на игру 888 не найден"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+                
+                
+  /accessibility/{user_id}:
+    get:
+      summary: Получить настройки пользователя
+      description: Возвращает текущие настройки для указанного пользователя
+      tags:
+        - Доступность
+      parameters:
+        - name: user_id
+          in: path
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      responses:
+      
+        '200':
+          description: Успешный запрос настроек доступности
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                  text_size:
+                    type: string
+                    enum: [small, medium, large]
+                    description: Размер текста
+                  color_scheme:
+                    type: string
+                    enum: [light, dark, high_contrast]
+                    description: Цветовая схема
+                  screen_reader:
+                    type: boolean
+                    description: Поддержка скринридера
+                  animations:
+                    type: boolean
+                    description: Включены ли анимации
+                  keyboard_navigation:
+                    type: boolean
+                    description: Поддержка клавиатурной навигации
+                  last_updated:
+                    type: string
+                    format: date-time
+                example:
+                  user_id: 123
+                  text_size: "large"
+                  color_scheme: "dark"
+                  screen_reader: true
+                  animations: false
+                  keyboard_navigation: true
+                  last_updated: "2023-05-15T14:30:00Z"
+                  
+        '401':
+          description: Неавторизованный доступ
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+                message: "Требуется авторизация"
+                
+        '403':
+          description: Доступ запрещен
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+                message: "Вы можете просматривать только свои настройки"
+                
+        '404':
+          description: Пользователь не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "User not found"
+                message: "Пользователь с таким id не существует"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
+  
+    put:
+      summary: Обновить настройки пользователя
+      description: Обновляет настройки для указанного пользователя
+      tags:
+        - Доступность
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          description: Идентификатор запроса для трассировки
+          required: false
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Язык ответа
+          required: false
+          schema:
+            type: string
+            default: ru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text_size:
+                  type: string
+                  enum: [small, medium, large]
+                  description: Размер текста
+                color_scheme:
+                  type: string
+                  enum: [light, dark, high_contrast]
+                  description: Цветовая схема
+                screen_reader:
+                  type: boolean
+                  description: Поддержка скринридера
+                animations:
+                  type: boolean
+                  description: Включены ли анимации
+                keyboard_navigation:
+                  type: boolean
+                  description: Поддержка клавиатурной навигации
+              example:
+                text_size: "large"
+                color_scheme: "high_contrast"
+                screen_reader: true
+                animations: false
+                keyboard_navigation: true
+      responses:
+      
+        '200':
+          description: Настройки успешно обновлены
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                  updated_fields:
+                    type: array
+                    items:
+                      type: string
+                  status:
+                    type: string
+                example:
+                  user_id: 123
+                  updated_fields: ["text_size", "color_scheme"]
+                  status: "updated"
+                  
+        '400':
+          description: Неверные данные запроса
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Validation failed"
+                details:
+                  - field: "text_size"
+                    error: "Допустимые значения: small, medium, large"
+                  - field: "color_scheme"
+                    error: "Допустимые значения: light, dark, high_contrast"
+                    
+        '401':
+          description: Неавторизованный доступ
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+                message: "Требуется авторизация"
+                
+        '404':
+          description: Пользователь не найден
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "User not found"
+                message: "Пользователь с таким id не существует"
+                
+        '500':
+          description: Внутренняя ошибка сервера
+          headers:
+            X-Request-ID:
+              description: Идентификатор запроса
+              schema:
+                type: string
+          content:
+            application/json:
+              example:
+                error: "Internal Server Error"
+                request_id: "req787878"
