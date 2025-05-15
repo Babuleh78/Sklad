@@ -10,7 +10,7 @@
 class ListGraph :IGraph {
 
 private:
-	std::vector <std::vector<int>> adjacencyLists;
+	std::vector <std::vector<int>> adjacencyLists; // Массив списков смежности
 
 	bool isValidIndex(int index) const { // Проверка индекса вершины на корректность 
 		return index >= 0 && index < VerticesCount();
@@ -69,15 +69,15 @@ public:
 	}
 };
 
-void run(std::istream& input, std::ostream& output) { // Тесты
+void runListTests(std::istream& input, std::ostream& output) { // Тесты
     // Тест 1: Создание графа и проверка количества вершин
     {
         ListGraph graph(5);
         if (graph.VerticesCount() != 5) {
-            output << "Test 1 failed: Wrong vertices count\n";
+            output << "Test 1 FAILED: Wrong vertices count\n";
         }
         else {
-            output << "Test 1 passed: Vertices count correct\n";
+            output << "Test 1 PASSED: Vertices count correct\n";
         }
     }
 
@@ -91,10 +91,10 @@ void run(std::istream& input, std::ostream& output) { // Тесты
         auto next0 = graph.GetNextVertices(0);
         std::sort(next0.begin(), next0.end());
         if (next0 != std::vector<int>{1, 2}) {
-            output << "Test 2 failed: Wrong next vertices for vertex 0\n";
+            output << "Test 2 FAILED: Wrong next vertices for vertex 0\n";
         }
         else {
-            output << "Test 2 passed: Next vertices correct\n";
+            output << "Test 2 PASSED: Next vertices correct\n";
         }
     }
 
@@ -108,10 +108,10 @@ void run(std::istream& input, std::ostream& output) { // Тесты
         auto prev1 = graph.GetPrevVertices(1);
         std::sort(prev1.begin(), prev1.end());
         if (prev1 != std::vector<int>{0, 2, 3}) {
-            output << "Test 3 failed: Wrong previous vertices for vertex 1\n";
+            output << "Test 3 FAILED: Wrong previous vertices for vertex 1\n";
         }
         else {
-            output << "Test 3 passed: Previous vertices correct\n";
+            output << "Test 3 PASSED: Previous vertices correct\n";
         }
     }
 
@@ -127,10 +127,10 @@ void run(std::istream& input, std::ostream& output) { // Тесты
         }
 
         if (!exceptionThrown) {
-            output << "Test 4 failed: No exception for invalid index\n";
+            output << "Test 4 FAILED: No exception for invalid index\n";
         }
         else {
-            output << "Test 4 passed: Exception thrown for invalid index\n";
+            output << "Test 4 PASSED: Exception thrown for invalid index\n";
         }
     }
 
@@ -144,15 +144,15 @@ void run(std::istream& input, std::ostream& output) { // Тесты
         ListGraph graph2(graph1);
 
         if (graph2.VerticesCount() != 3) {
-            output << "Test 5 failed: Wrong vertices count after copy\n";
+            output << "Test 5 FAILED: Wrong vertices count after copy\n";
         }
         else {
             auto next1 = graph2.GetNextVertices(1);
             if (next1 != std::vector<int>{2}) {
-                output << "Test 5 failed: Wrong edges after copy\n";
+                output << "Test 5 FAILED: Wrong edges after copy\n";
             }
             else {
-                output << "Test 5 passed: Graph copied correctly\n";
+                output << "Test 5 PASSED: Graph copied correctly\n";
             }
         }
     } 
@@ -161,10 +161,10 @@ void run(std::istream& input, std::ostream& output) { // Тесты
     {
         ListGraph graph(0);
         if (graph.VerticesCount() != 0) {
-            output << "Test 6 failed: Empty graph has non-zero size\n";
+            output << "Test 6 FAILED: Empty graph has non-zero size\n";
         }
         else {
-            output << "Test 6 passed: Empty graph handled correctly\n";
+            output << "Test 6 PASSED: Empty graph handled correctly\n";
         }
     }
 
@@ -174,10 +174,10 @@ void run(std::istream& input, std::ostream& output) { // Тесты
         graph.AddEdge(1, 1); // Петля
         auto next = graph.GetNextVertices(1);
         if (next != std::vector<int>{1}) {
-            output << "Test 7 failed: Loop edge not handled correctly\n";
+            output << "Test 7 FAILED: Loop edge not handled correctly\n";
         }
         else {
-            output << "Test 7 passed: Loop edge handled correctly\n";
+            output << "Test 7 PASSED: Loop edge handled correctly\n";
         }
     }
 
@@ -188,10 +188,10 @@ void run(std::istream& input, std::ostream& output) { // Тесты
         graph.AddEdge(0, 1); // Дублирование ребра
         auto next = graph.GetNextVertices(0);
         if (next.size() != 2 || next[0] != 1 || next[1] != 1) {
-            output << "Test 8 failed: Multiple edges not handled correctly\n";
+            output << "Test 8 FAILED: Multiple edges not handled correctly\n";
         }
         else {
-            output << "Test 8 passed: Multiple edges handled correctly\n";
+            output << "Test 8 PASSED: Multiple edges handled correctly\n";
         }
     }
 
@@ -217,10 +217,10 @@ void run(std::istream& input, std::ostream& output) { // Тесты
         }
 
         if (!correct) {
-            output << "Test 9 failed: Large graph handling problem\n";
+            output << "Test 9 FAILED: Large graph handling problem\n";
         }
         else {
-            output << "Test 9 passed: Large graph handled correctly\n";
+            output << "Test 9 PASSED: Large graph handled correctly\n";
         }
     }
 
@@ -234,15 +234,15 @@ void run(std::istream& input, std::ostream& output) { // Тесты
         graph2 = graph1;
 
         if (graph2.VerticesCount() != 3) {
-            output << "Test 10 failed: Assignment operator vertices count\n";
+            output << "Test 10 FAILED: Assignment operator vertices count\n";
         }
         else {
             auto next = graph2.GetNextVertices(0);
             if (next != std::vector<int>{1}) {
-                output << "Test 10 failed: Assignment operator edges\n";
+                output << "Test 10 FAILED: Assignment operator edges\n";
             }
             else {
-                output << "Test 10 passed: Assignment operator works correctly\n";
+                output << "Test 10 PASSED: Assignment operator works correctly\n";
             }
         }
     }
@@ -250,7 +250,7 @@ void run(std::istream& input, std::ostream& output) { // Тесты
 
 }
 
-int main() {
-	run(std::cin, std::cout);
+int TestListGraph() {
+	runListTests(std::cin, std::cout);
 	return 0;
 }
