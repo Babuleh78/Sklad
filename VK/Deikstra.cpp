@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <climits>
 
 //Требуется отыскать самый выгодный маршрут между городами.
 //Требования: время работы O((N + M)logN), где N - количество городов, M - известных дорог между ними.
@@ -63,66 +64,69 @@ public:
 		adjacencyLists[from].emplace_back(to, weight);
 	}
 
-	std::vector<Edge> GetNextEdges(int vertex) const override {
+	std::vector<Edge> GetNextEdges(int vertex) const override { // Получение городов, до которых можно добраться
 		if (!isValidIndex(vertex)) {
 			throw std::out_of_range("Invalid index");
 		}
 		return adjacencyLists[vertex];
 	}
+
+
+
 };
 
-int solver(const ListGraph& graph, int start, int end) {
+int MinimalDistant(const ListGraph& graph, int start, int end) { // Функция для поиска минимального расстояния между городами
+	
+	int vertices = graph.VerticesCount(); // Количество городов
+	std::vector<int> distances(vertices, INT_MAX); // Инициализируем начальные расстояния, как бесконечности
+	distances[start] = 0; // Расстояние от исходного города до самого семя нулевое
 
-	int vertices = graph.VerticesCount();
-	std::vector<int> distances(vertices, INT_MAX);
-	distances[start] = 0;
-
-	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq;
+	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq; // Очередь для обработки городов (пара расстояние - город)
 	pq.push({ 0, start });
 
-	while (!pq.empty()) {
-		int current_distance = pq.top().first;
-		int current_vertex = pq.top().second;
-		pq.pop();
+	while (!pq.empty()) { // Пока не прошли по всем городам
+		int current_distance = pq.top().first; // Текущее расстояние
+		int current_vertex = pq.top().second; // Текущий город
+		pq.pop(); // Удаляем данный город из очереди
 
-		if (current_distance > distances[current_vertex]) {
-			continue;
+		if (current_distance > distances[current_vertex]) { // Если есть более короткий маршрут
+			continue; 
 		}
 
-		for (const Edge& edge : graph.GetNextEdges(current_vertex)) {
-			int neighbor = edge.to;
-			int weight = edge.weight;
+		for (const Edge& edge : graph.GetNextEdges(current_vertex)) { // Начинаем обработку всех городов, в которые можно добраться из текущего
+			int neighbor = edge.to; // Получаем соседний город
+			int weight = edge.weight; // И "Вес" (длина) дороги
 			int distance = current_distance + weight;
 
-			if (distance < distances[neighbor]) {
-				distances[neighbor] = distance;
-				pq.push({ distance, neighbor });
+			if (distance < distances[neighbor]) { // Если нашли более короткий маршрут
+				distances[neighbor] = distance; // Обновляем дистанцию
+				pq.push({ distance, neighbor }); // И добавляем в очередь город, до которого ведет короткая дорога
 			}
 		}
 	}
 
-	return distances[end];
+	return distances[end]; // Возвращаем расстояние до конечного пункта
 
 }
 
 
 void run(std::istream& input, std::ostream& output) {
 	int N, M;
-	input >> N >> M;
+	input >> N >> M; // Получаем количество городов и дорог
 
 	ListGraph graph(N);
 
-	for (int i = 0; i < M; ++i) {
+	for (int i = 0; i < M; i++) {
 		int from, to, weight;
 		input >> from >> to >> weight;
 		graph.AddEdge(from, to, weight);
-		graph.AddEdge(to, from, weight); // если граф неориентированный
+		graph.AddEdge(to, from, weight); // Граф неориентированный
 	}
 
 	int start, end;
 	input >> start >> end;
 
-	int shortest_path = solver(graph, start, end);
+	int shortest_path = MinimalDistant(graph, start, end); 
 	output << shortest_path;
 }
 
