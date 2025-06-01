@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <queue>
+#include <set>
 #include <climits>
 
 //Требуется отыскать самый выгодный маршрут между городами.
@@ -76,31 +76,31 @@ public:
 };
 
 int MinimalDistant(const ListGraph& graph, int start, int end) { // Функция для поиска минимального расстояния между городами
-	
+
 	int vertices = graph.VerticesCount(); // Количество городов
 	std::vector<int> distances(vertices, INT_MAX); // Инициализируем начальные расстояния, как бесконечности
 	distances[start] = 0; // Расстояние от исходного города до самого семя нулевое
 
-	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq; // Очередь для обработки городов (пара расстояние - город)
-	pq.push({ 0, start });
+	std::set<std::pair<int, int>> pq; // Множество для обработки городов (пара расстояние - город)
+	pq.insert({ 0, start });
 
 	while (!pq.empty()) { // Пока не прошли по всем городам
-		int current_distance = pq.top().first; // Текущее расстояние
-		int current_vertex = pq.top().second; // Текущий город
-		pq.pop(); // Удаляем данный город из очереди
-
-		if (current_distance > distances[current_vertex]) { // Если есть более короткий маршрут
-			continue; 
-		}
+		int current_vertex = pq.begin()->second; // Получаем текущий город
+		pq.erase(pq.begin());
 
 		for (const Edge& edge : graph.GetNextEdges(current_vertex)) { // Начинаем обработку всех городов, в которые можно добраться из текущего
 			int neighbor = edge.to; // Получаем соседний город
 			int weight = edge.weight; // И "Вес" (длина) дороги
-			int distance = current_distance + weight;
+			int distance = distances[current_vertex] + weight;
 
 			if (distance < distances[neighbor]) { // Если нашли более короткий маршрут
-				distances[neighbor] = distance; // Обновляем дистанцию
-				pq.push({ distance, neighbor }); // И добавляем в очередь город, до которого ведет короткая дорога
+				auto it = pq.find({ distances[neighbor], neighbor });
+				if (it != pq.end()) { // Удаляем старое значение расстояния, если оно существует
+					pq.erase(it);
+				}
+
+				distances[neighbor] = distance; // Обновляем расстояние 
+				pq.insert({ distance, neighbor }); // Добавляем новое значение в set
 			}
 		}
 	}
@@ -126,12 +126,12 @@ void run(std::istream& input, std::ostream& output) {
 	int start, end;
 	input >> start >> end;
 
-	int shortest_path = MinimalDistant(graph, start, end); 
+	int shortest_path = MinimalDistant(graph, start, end);
 	output << shortest_path;
 }
 
 
 int main() {
-    run(std::cin, std::cout);
-    return 0;
+	run(std::cin, std::cout);
+	return 0;
 }
