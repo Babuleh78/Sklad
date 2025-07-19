@@ -81,8 +81,18 @@ async def recognize_plate_from_photo(photo_data: bytes, metadata: dict):
         nparr = np.frombuffer(photo_data, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-        detection_results = await cv_model.predict(img)
-        plate_text = await rec_model.recognize(detection_results)[0]
+        detection_results = cv_model.predict(img)[0]
+
+        license_plates = []
+        for result in detection_results:
+            boxes = result.boxes.xyxy.cpu().numpy()
+            for box in boxes:
+                x1, y1, x2, y2 = map(int, box[:4])
+                license_plate = img[y1:y2, x1:x2]
+                license_plates.append(license_plate)
+        print(len(license_plates))
+
+        plate_text = recognize_plate_text(license_plates[0], rec_model)
         
         print(f"Распознанный номер: {plate_text}")
         print(f"Метаданные: {metadata}")
