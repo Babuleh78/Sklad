@@ -6,6 +6,7 @@ from aiokafka import AIOKafkaConsumer
 import json
 import sys
 from pathlib import Path
+import time
 
 sys.path.append(str(Path(__file__).parent.parent))
 from models.computer_vision_model.demo import cv_model
@@ -16,13 +17,31 @@ from models.demonstration import rotate_to_horizontal
 # Конфигурация
 BOOTSTRAP_SERVERS = "localhost:9092"
 TOPIC = "testtopic"
-
 async def recognize_plate_from_photo(photo_data: bytes, metadata: dict):
-    try:
+
+    global plate_confirmation, last_detection_time
+    
+    if 'plate_confirmation' not in globals():
+        plate_confirmation = {}  # Словарь для хранения состояний номеров
+        last_detection_time = time.time()  # Время последней детекции
+    
+    CONFIRMATION_COUNT = 3  # Необходимое количество подтверждений
+    CONFIRMATION_TIMEOUT = 3.0  # Максимальное время между подтверждениями (сек)
+    
+    try: # Везде, где возвращается NONE в последствии убрать print, чтобы не засорять логи
+        current_time = time.time()
         nparr = np.frombuffer(photo_data, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        if img is None:
+            print("Не удалось декодировать изображение")
+            return None
         
-        detection_results = cv_model.predict(img)[0]
+       
+        detection_results = cv_model.predict(img, verbose=False)
+        if not detection_results or len(detection_results[0].boxes) == 0:
+            print("Номера не обнаружены")
+            return None
 
         license_plates = []
         for result in detection_results:
@@ -30,24 +49,62 @@ async def recognize_plate_from_photo(photo_data: bytes, metadata: dict):
             for box in boxes:
                 x1, y1, x2, y2 = map(int, box[:4])
                 license_plate = img[y1:y2, x1:x2]
-                license_plates.append(license_plate)
+                if license_plate.size > 0:
+                    license_plates.append(license_plate)
+        
+        if not license_plates:
+            print("Не удалось извлечь области с номерами")
+            return None
         
         corrected_plate = rotate_to_horizontal(license_plates[0])
-        results = cv_model.predict(corrected_plate)
+        results = cv_model.predict(corrected_plate, verbose=False)
+        if not results or len(results[0].boxes) == 0:
+            print("Не удалось уточнить позицию номера после поворота")
+            return None
     
         x1, y1, x2, y2 = results[0].boxes.xyxy[0].cpu().numpy().astype(int)
         final_plate = corrected_plate[y1:y2, x1:x2]
-                    
-        final_text = recognize_plate_text(final_plate, rec_model)
-        
-              
-        print(f"Распознанный номер: {final_text}")
-        print(f"Метаданные: {metadata}")
 
-        return final_text
+        if final_plate.size == 0:
+            print("Пустая область после уточнения")
+            return None
+                    
+        plate_text = recognize_plate_text(final_plate, rec_model)
+        if not plate_text.strip():
+            print("Не удалось распознать текст номера")
+            return None
+        
+        clean_plate_text = ''.join(c for c in plate_text if c.isalnum()).upper()
+        
+        current_state = plate_confirmation.get(clean_plate_text, {
+            'count': 0,
+            'last_seen': 0,
+            'confirmed': False
+        })
+        
+        if current_time - current_state['last_seen'] < CONFIRMATION_TIMEOUT:
+            current_state['count'] += 1
+        else:
+            current_state['count'] = 1  
+            
+        current_state['last_seen'] = current_time
+        
+        if current_state['count'] >= CONFIRMATION_COUNT and not current_state['confirmed']:
+            current_state['confirmed'] = True
+            print(f"Подтвержденный номер: {clean_plate_text} (подтверждений: {current_state['count']})")
+            print(f"Метаданные: {metadata}")
+           
+            
+            plate_confirmation[clean_plate_text] = current_state
+            return clean_plate_text
+        else:
+            print(f"Предварительное распознавание: {clean_plate_text} (подтверждений: {current_state['count']}/{CONFIRMATION_COUNT})")
+            plate_confirmation[clean_plate_text] = current_state
+            return None
+            
     except Exception as e:
         print(f"Ошибка распознавания: {e}")
-        raise
+        return None
 
 async def consume_and_process_photos():
     consumer = AIOKafkaConsumer(
