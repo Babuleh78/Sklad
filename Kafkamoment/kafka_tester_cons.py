@@ -19,7 +19,6 @@ from models.demonstration import rotate_to_horizontal
 from database.database import Database
 from database.redis import RedisCache
 
-
 # Конфигурация
 BOOTSTRAP_SERVERS = "localhost:9092"
 TOPIC = "testtopic"
